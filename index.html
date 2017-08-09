@@ -331,27 +331,15 @@
       
         
           
-            <h1 id="1-示例"><a href="#1-示例" class="headerlink" title="1.示例"></a>1.示例</h1><h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">A First Level Header</div><div class="line">====================</div><div class="line">A Second Level Header</div><div class="line">---------------------</div><div class="line"></div><div class="line">Now is the time for all good men to come to</div><div class="line">the aid of their country. This is just a</div><div class="line">regular paragraph.</div><div class="line"></div><div class="line">The quick brown fox jumped over the lazy</div><div class="line">dog&apos;s back.</div><div class="line">### Header 3</div><div class="line"></div><div class="line">&gt; This is a blockquote.</div><div class="line">&gt; </div><div class="line">&gt; This is the second paragraph in the blockquote.</div><div class="line">&gt;</div><div class="line">&gt; ## This is an H2 in a blockquote</div></pre></td></tr></table></figure>
-<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2><h1 id="A-First-Level-Header"><a href="#A-First-Level-Header" class="headerlink" title="A First Level Header"></a>A First Level Header</h1><h2 id="A-Second-Level-Header"><a href="#A-Second-Level-Header" class="headerlink" title="A Second Level Header"></a>A Second Level Header</h2><p>Now is the time for all good men to come to<br>the aid of their country. This is just a<br>regular paragraph.</p>
-<p>The quick brown fox jumped over the lazy<br>dog’s back.</p>
-<h3 id="Header-3"><a href="#Header-3" class="headerlink" title="Header 3"></a>Header 3</h3><blockquote>
-<p>This is a blockquote.</p>
-<p>This is the second paragraph in the blockquote.</p>
-<h2 id="This-is-an-H2-in-a-blockquote"><a href="#This-is-an-H2-in-a-blockquote" class="headerlink" title="This is an H2 in a blockquote"></a>This is an H2 in a blockquote</h2></blockquote>
-<h1 id="2-换行"><a href="#2-换行" class="headerlink" title="2.换行"></a>2.换行</h1><blockquote>
-<p>按入两个以上的空格然后回车</p>
-</blockquote>
-<h1 id="3-链接"><a href="#3-链接" class="headerlink" title="3.链接"></a>3.链接</h1><blockquote>
-<p>1.网页链接<br>安装<a href="https://github.com/qiniu/qshell">qshell</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">安装[qshell](https://github.com/qiniu/qshell)</div></pre></td></tr></table></figure></p>
-<p>2.图片<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">![下载安装qshell](http://omjdi9fe0.bkt.clouddn.com/qshellDownload.png)</div></pre></td></tr></table></figure></p>
-<p>3.限制图片大小并居中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;img src=&quot;http://ww2.sinaimg.cn/bmiddle/88070423gw1ep30aw8an7g204d04gkgd.gif&quot; width=&quot;400&quot; height=&quot;400&quot; alt=&quot;亦菲表演机器猫&quot;/&gt;</div></pre></td></tr></table></figure></p>
-</blockquote>
-<h1 id="4-插入代码"><a href="#4-插入代码" class="headerlink" title="4.插入代码"></a>4.插入代码</h1><blockquote>
-<p>1.在文字行中插入一段代码<code>HelloWorld</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">如下</div><div class="line">在文字行中插入一段代码`HelloWorld`</div></pre></td></tr></table></figure></p>
-<p>2.在文章中插入代码块<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">代码块放这里</div></pre></td></tr></table></figure></p>
-</blockquote>
-
-          
+          1.示例代码123456789101112131415161718A First Level Header====================A Second Level Header---------------------Now is the time for all good men to
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/HomePage/2017/08/09/Markdown语法/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -469,32 +457,16 @@
       
         
           
-            <p>之前没接触过蓝牙开发，最近一直在跟蓝牙打交道。iOS开发蓝牙APP主要使用的是苹果原生的框架CoreBluetooth，这篇文章是对CoreBluetooth框架做一个简单的介绍，也是对前面一阶段的工作做一个梳理，加强自己对蓝牙开发这一块的理解。</p>
-<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p><code>CBPeripheral</code>蓝牙外设，与APP通信的蓝牙设备，比如蓝牙手环。<br><code>CBCentralManager</code>蓝牙管理中心，管理APP与外设之间的交互。<br><code>CBService</code>蓝牙外设的服务，每一个外设都有0个或者多个服务。而每一个服务又可能包含0个或者多个蓝牙服务，也可能包含0个或者多个蓝牙特征。<br><code>CBCharacteristic</code>特征，每一个蓝牙特征中都包含有一些数据或者信息。  </p>
-<h3 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h3><blockquote>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li>创建CBCentralManager。</li>
-<li>在蓝牙开启的状态下扫描可连接的蓝牙外设。</li>
-<li>根据连接目标蓝牙外设。</li>
-<li>查询目标蓝牙外设下的服务。</li>
-<li>遍历服务中的特征，获取特征中的数据或者保存某些可写的特征，或者设置某些特征值改变时，通知主动获取。</li>
-<li>在通知更新特征中值的方法中读取特征中的数据（再设置特征的通知为YES的情况下）</li>
-<li>读取特征中的值。</li>
-<li>根据可写特征的UUID，向蓝牙外设写入数据。</li>
-</ol>
-</blockquote>
-<p>创建<code>CBCentralManager</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//在蓝牙管理单例中创建管理中心</div><div class="line">CBCentralManager *manager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];</div></pre></td></tr></table></figure></p>
-<p>创建完之后，就会调用一次CBCentralManagerDelegate代理方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">//在蓝牙模板的状态发生改变的时候，就会回调。</div><div class="line">- (void)centralManagerDidUpdateState:(CBCentralManager *)central &#123;</div><div class="line">NSError *error = nil;</div><div class="line">switch (self.manager.state) &#123;</div><div class="line">case CBCentralManagerStatePoweredOn: //蓝牙打开</div><div class="line">[self.manager scanForPeripheralsWithServices:nil options:nil];//扫描可用的蓝牙外设</div><div class="line">break;</div><div class="line">case CBCentralManagerStatePoweredOff: //蓝牙关闭</div><div class="line">error = [NSError errorWithDomain:@&quot;CBCentralManagerStatePoweredOff&quot; code:-1 userInfo:nil];</div><div class="line">break;</div><div class="line">case CBCentralManagerStateResetting: //蓝牙重置</div><div class="line">break;</div><div class="line">case CBCentralManagerStateUnknown: //未知状态</div><div class="line">error = [NSError errorWithDomain:@&quot;CBCentralManagerStateUnknown&quot; code:-1 userInfo:nil];</div><div class="line">break;</div><div class="line">case CBCentralManagerStateUnsupported: //设备不支持</div><div class="line">error = [NSError errorWithDomain:@&quot;CBCentralManagerStateUnsupported&quot; code:-1 userInfo:nil];</div><div class="line">break;</div><div class="line">default:</div><div class="line">break;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>扫描到可用的外设之后，会调用<code>CBCentralManagerDelegate</code>的此代理方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">*  搜索到设备回调</div><div class="line">*</div><div class="line">*  @param central           CBCentralManager</div><div class="line">*  @param peripheral        CBPeripheral（扫描到的外设）</div><div class="line">*  @param advertisementData NSDictionary（蓝牙设备的广播数据）</div><div class="line">*  @param RSSI              NSNumber（设备的信息强度）</div><div class="line"></div><div class="line">*/</div><div class="line">//在此方法中接收到外设的广播信息</div><div class="line">- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary&lt;NSString *,id&gt; *)advertisementData RSSI:(NSNumber *)RSSI &#123;</div><div class="line"></div><div class="line">if ( [peripheral.name hasPrefix:@&quot;xxx-&quot;])</div><div class="line">// 连接某个蓝牙外设</div><div class="line">[self.manager connectPeripheral:peripheral options:@&#123;CBConnectPeripheralOptionNotifyOnDisconnectionKey:@(YES)&#125;];</div><div class="line">// 设置外设的代理是为了后面查询外设的服务和外设的特性，以及特性中的数据。</div><div class="line">[peripheral setDelegate:self];</div><div class="line">// 既然已经连接到某个蓝牙了，那就不需要在继续扫描外设了</div><div class="line">[self.manager stopScan];</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>连接外设成功后，查找其具有的服务：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div></pre></td><td class="code"><pre><div class="line">- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral</div><div class="line">&#123;</div><div class="line">NSLog(@&quot;didConnectPeripheral&quot;);</div><div class="line">// 连接成功后，查找服务</div><div class="line">[peripheral discoverServices:nil];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(nullable NSError *)error</div><div class="line">&#123;</div><div class="line">NSLog(@&quot;didFailToConnectPeripheral&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">#pragma mark - CBPeripheralDelegate</div><div class="line">- (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(nullable NSError *)error</div><div class="line">&#123;</div><div class="line">NSString *UUID = [peripheral.identifier UUIDString];</div><div class="line">NSLog(@&quot;didDiscoverServices:%@&quot;,UUID);</div><div class="line">if (error) &#123;</div><div class="line">NSLog(@&quot;出错&quot;);</div><div class="line">return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">CBUUID *cbUUID = [CBUUID UUIDWithString:UUID];</div><div class="line">NSLog(@&quot;cbUUID:%@&quot;,cbUUID);</div><div class="line"></div><div class="line">for (CBService *service in peripheral.services) &#123;</div><div class="line">NSLog(@&quot;service:%@&quot;,service.UUID);</div><div class="line">//如果我们知道要查询的特性的CBUUID，可以在参数一中传入CBUUID数组。</div><div class="line">[peripheral discoverCharacteristics:nil forService:service];</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//遍历服务中的特性</div><div class="line">- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(nullable NSError *)error</div><div class="line">&#123;</div><div class="line">if (error) &#123;</div><div class="line">NSLog(@&quot;出错&quot;);</div><div class="line">return;</div><div class="line">&#125;</div><div class="line">CBUUID * uuid = [CBUUID UUIDWithString:NewServiceUUIDCharacteristicUUIDRead];</div><div class="line">CBUUID * uuid_Write = [CBUUID UUIDWithString:NewServiceUUIDCharacteristicUUIDWrite];</div><div class="line"></div><div class="line">for (CBCharacteristic *c in service.characteristics) &#123;</div><div class="line"></div><div class="line">if ([c.UUID isEqual:uuid]) &#123;</div><div class="line"></div><div class="line">if (peripheral.state == CBPeripheralStateConnected)&#123;</div><div class="line">CBCharacteristic * chara = [self findCharacteristic:peripheral CharacteristicUUID:NewServiceUUIDCharacteristicUUIDRead ServiceUUID:NewServiceUUID];</div><div class="line">chara != nil?[peripheral setNotifyValue:YES forCharacteristic:chara]:nil;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">if ([c.UUID isEqual:uuid_Write]) &#123;</div><div class="line"></div><div class="line">if (peripheral.state == CBPeripheralStateConnected)&#123;</div><div class="line">//查询数据</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">//获取外设发来的数据，read和notify，都在这个方法</div><div class="line">- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error &#123;</div><div class="line">CBUUID * ReadUUID = [CBUUID UUIDWithString:NewServiceUUIDCharacteristicUUIDRead];</div><div class="line">if ([characteristic.UUID isEqual:ReadUUID]) &#123;</div><div class="line">NSLog(@&quot;返回的数据:%@&quot;,characteristic.value);</div><div class="line">&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>向外设写入数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[peripheral writeValue:infoData forCharacteristic:_chatacter type:CBCharacteristicWriteWithoutResponse];</div></pre></td></tr></table></figure></p>
-<p>与蓝牙外设断开连接：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[self.manager cancelPeripheralConnection:peripheral];</div></pre></td></tr></table></figure></p>
-<p>中心设备连接中断回调<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error</div><div class="line">&#123;</div><div class="line">NSLog(@&quot;连接断开 %@&quot;, [error localizedDescription]);</div><div class="line">[_operationDelegate disconnected];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h4 id="注意问题"><a href="#注意问题" class="headerlink" title="注意问题"></a>注意问题</h4><p>1.在ios中蓝牙广播信息中通常会包含以下4种类型的信息。ios的蓝牙通信协议中不接受其他类型的广播信息。因为iOS端的限制，所以需要将设备的Mac地址放到kCBAdvDataManufacturerData这个字段中。</p>
-<p>2.iOS10以上需要在info.plist里声明向用户申请蓝牙权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Privacy - Bluetooth Peripheral Usage Description</div><div class="line">需要使用蓝牙来连接您的设备</div></pre></td></tr></table></figure></p>
-<p>3.扫描设备过程中，会弹出是否配对的弹窗(蓝牙固件传回来系统才会弹出的，手机端控制不了)。用户点击取消的时候，设备会进入假连接状态（杀掉APP之后，设备即断开连接）.点击配对之后，系统就会把设备信息存在我的设备里，后续调retrive函数直接可以连接，相当于自动重连(杀掉APP之后，设备仍然连接中)，如果需要断开连接的话，需要提醒用户去设置-蓝牙-忽略设备。暂未发现可以解决此问题的方法。</p>
-
-          
+          之前没接触过蓝牙开发，最近一直在跟蓝牙打交道。iOS开发蓝牙APP主要使用的是苹果原生的框架CoreBluetooth，这篇文章是对CoreBluetooth框架做一个简单的介绍，也是对前面一阶段的工作做一个梳理，加强自己对蓝牙开发这一块的理解。
+概念CBPeripheral蓝牙外设，与APP通信的
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/HomePage/2017/08/09/CoreBluetooth框架使用详解/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -612,16 +584,16 @@
       
         
           
-            <h3 id="安装qshell"><a href="#安装qshell" class="headerlink" title="安装qshell"></a>安装<a href="https://github.com/qiniu/qshell">qshell</a></h3><p><img src="http://omjdi9fe0.bkt.clouddn.com/qshellDownload.png" alt="下载安装qshell"><br>将qshell_darwin_amd64文件重命名为qshell,讲qshell文件放到/usr/local/bin目录下。</p>
-<h3 id="设置-AccessKey-和SecretKey"><a href="#设置-AccessKey-和SecretKey" class="headerlink" title="设置 AccessKey 和SecretKey"></a>设置 AccessKey 和SecretKey</h3><h4 id="安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。"><a href="#安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。" class="headerlink" title="安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。"></a>安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell account n3MELju6OwMSGK4YxJp1w6Cg-YJmHt8Y3JX321bw i2atyP-SPyPcS-NhOp-Zvsq9Y_j0FPhceNw2AcHJ</div></pre></td></tr></table></figure>
-<h3 id="查看bucket上的所有文件列表，生成txt文件到当前目录下"><a href="#查看bucket上的所有文件列表，生成txt文件到当前目录下" class="headerlink" title="查看bucket上的所有文件列表，生成txt文件到当前目录下"></a>查看bucket上的所有文件列表，生成txt文件到当前目录下</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell listbucket halo filelist.txt</div></pre></td></tr></table></figure>
-<h3 id="上传文件命令"><a href="#上传文件命令" class="headerlink" title="上传文件命令"></a>上传文件命令</h3><h5 id="参数1：bucket名"><a href="#参数1：bucket名" class="headerlink" title="参数1：bucket名"></a>参数1：bucket名</h5><h5 id="参数2：文件名"><a href="#参数2：文件名" class="headerlink" title="参数2：文件名"></a>参数2：文件名</h5><h5 id="参数3：要上传的文件的本地路径"><a href="#参数3：要上传的文件的本地路径" class="headerlink" title="参数3：要上传的文件的本地路径"></a>参数3：要上传的文件的本地路径</h5><h5 id="参数4：bucket所在的服务器-http-upload-z2-qiniu-com-华南地区"><a href="#参数4：bucket所在的服务器-http-upload-z2-qiniu-com-华南地区" class="headerlink" title="参数4：bucket所在的服务器(http://upload-z2.qiniu.com)[华南地区]"></a>参数4：bucket所在的服务器(<a href="http://upload-z2.qiniu.com)[华南地区" target="_blank" rel="external">http://upload-z2.qiniu.com)[华南地区</a>]</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell fput halo test.jpg /Users/hekangjie/Desktop/mypic/Data/11111.png http://upload-z2.qiniu.com</div></pre></td></tr></table></figure>
-<h3 id="使用qshell同步目录"><a href="#使用qshell同步目录" class="headerlink" title="使用qshell同步目录"></a>使用qshell同步目录</h3><p><a href="https://developer.qiniu.com/kodo/kb/using-qshell-synchronize-directories" target="_blank" rel="external">使用qupload命令同步目录</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell qupload [&lt;ThreadCount&gt;] &lt;LocalUploadConfig&gt;</div></pre></td></tr></table></figure></p>
-<p>同步目录的配置文件放在txt文件内。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell qupload 10 config.txt</div></pre></td></tr></table></figure></p>
-<p>config.txt内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">&quot;src_dir&quot; : &quot;C:\\test&quot;,</div><div class="line">&quot;access_key&quot; : &quot;cuK5sZRq1XD-APpuhiHQG8H6Zo5XyKKYcpLwFgnQ&quot;,</div><div class="line">&quot;secret_key&quot; : &quot;2IAlc-ZnS-Sm6R0RZj6K1dIILsle2KEy1DrB8OC8&quot;,</div><div class="line">&quot;bucket&quot; : &quot;test&quot; </div><div class="line">&quot;ignore_dir&quot; : true</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="进阶版，创建脚本自动上传文件"><a href="#进阶版，创建脚本自动上传文件" class="headerlink" title="进阶版，创建脚本自动上传文件"></a>进阶版，创建脚本自动上传文件</h3><p><a href="http://jverson.com/2016/08/30/autohotkey-markdown-uploadImage/" target="_blank" rel="external">AutoHotkey 实现自动上传</a></p>
-
-          
+          安装qshell将qshell_darwin_amd64文件重命名为qshell,讲qshell文件放到/usr/local/bin目录下。
+设置 AccessKey 和SecretKey安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。1qshell account n3MELju
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/HomePage/2017/08/08/七牛云qshell的安装及使用/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -739,15 +711,16 @@
       
         
           
-            <h3 id="在控制台开启服务"><a href="#在控制台开启服务" class="headerlink" title="在控制台开启服务"></a>在控制台开启服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">开启:  sudo apachectl start</div><div class="line"></div><div class="line">重启:  sudo apachectl restart</div><div class="line"></div><div class="line">关闭:  sudo apachectl stop</div></pre></td></tr></table></figure>
-<h4 id="启动后，在浏览器中输入-http-127-0-0-1-或者-http-localhost-如果看到-It-Works-页面："><a href="#启动后，在浏览器中输入-http-127-0-0-1-或者-http-localhost-如果看到-It-Works-页面：" class="headerlink" title="启动后，在浏览器中输入 http://127.0.0.1/ 或者 http://localhost  如果看到 It Works! 页面："></a>启动后，在浏览器中输入 <a href="http://127.0.0.1/" target="_blank" rel="external">http://127.0.0.1/</a> 或者 <a href="http://localhost" target="_blank" rel="external">http://localhost</a>  如果看到 It Works! 页面：</h4><p><img src="http://omjdi9fe0.bkt.clouddn.com/Apache_1.png" alt=""></p>
-<h5 id="那么Apache-就启动成功了，站点的根目录为系统级根目录"><a href="#那么Apache-就启动成功了，站点的根目录为系统级根目录" class="headerlink" title="那么Apache 就启动成功了，站点的根目录为系统级根目录"></a>那么Apache 就启动成功了，站点的根目录为系统级根目录</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/Library/WebServer/Documents</div></pre></td></tr></table></figure>
-<p>启动后，你可以通过编辑 /etc/apache2/httpd.conf 文件来修改 Apache 配置。</p>
-<h4 id="访问服务器文件"><a href="#访问服务器文件" class="headerlink" title="访问服务器文件"></a>访问服务器文件</h4><p>1.将一个json文件（test.json）放到服务器路径下</p>
-<p>2.用浏览器访问 <a href="http://127.0.0.1/test" target="_blank" rel="external">http://127.0.0.1/test</a> 或者<br><a href="http://localhost/test" target="_blank" rel="external">http://localhost/test</a> </p>
-<p>在浏览器中访问时，中文可能会出现乱码，但在项目中请求回来，打印在控制台的是正常的。</p>
-
-          
+          在控制台开启服务12345开启:  sudo apachectl start重启:  sudo apachectl restart关闭:  sudo apachectl stop
+启动后，在浏览器中输入 http://127.0.0.1/ 或者 http://localhost  如果看到 It W
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/HomePage/2017/08/08/Mac本地服务器Apache使用/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
