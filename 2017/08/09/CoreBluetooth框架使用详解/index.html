@@ -78,7 +78,7 @@
 <link href="/HomePage/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="iOS开发," />
 
 
 
@@ -94,13 +94,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Otto&#39;s blog">
-<meta property="og:url" content="https://github.com/WuOtto/HomePage/index.html">
+<meta name="description" content="之前没接触过蓝牙开发，最近一直在跟蓝牙打交道。iOS开发蓝牙APP主要使用的是苹果原生的框架CoreBluetooth，这篇文章是对CoreBluetooth框架做一个简单的介绍，也是对前面一阶段的工作做一个梳理，加强自己对蓝牙开发这一块的理解。 概念CBPeripheral蓝牙外设，与APP通信的蓝牙设备，比如蓝牙手环。CBCentralManager蓝牙管理中心，管理APP与外设之间的交互。C">
+<meta name="keywords" content="iOS开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CoreBluetooth框架使用详解">
+<meta property="og:url" content="https://github.com/WuOtto/HomePage/2017/08/09/CoreBluetooth框架使用详解/index.html">
 <meta property="og:site_name" content="Otto&#39;s blog">
+<meta property="og:description" content="之前没接触过蓝牙开发，最近一直在跟蓝牙打交道。iOS开发蓝牙APP主要使用的是苹果原生的框架CoreBluetooth，这篇文章是对CoreBluetooth框架做一个简单的介绍，也是对前面一阶段的工作做一个梳理，加强自己对蓝牙开发这一块的理解。 概念CBPeripheral蓝牙外设，与APP通信的蓝牙设备，比如蓝牙手环。CBCentralManager蓝牙管理中心，管理APP与外设之间的交互。C">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-08-09T07:59:32.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Otto&#39;s blog">
+<meta name="twitter:title" content="CoreBluetooth框架使用详解">
+<meta name="twitter:description" content="之前没接触过蓝牙开发，最近一直在跟蓝牙打交道。iOS开发蓝牙APP主要使用的是苹果原生的框架CoreBluetooth，这篇文章是对CoreBluetooth框架做一个简单的介绍，也是对前面一阶段的工作做一个梳理，加强自己对蓝牙开发这一块的理解。 概念CBPeripheral蓝牙外设，与APP通信的蓝牙设备，比如蓝牙手环。CBCentralManager蓝牙管理中心，管理APP与外设之间的交互。C">
 
 
 
@@ -129,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/WuOtto/HomePage/"/>
+  <link rel="canonical" href="https://github.com/WuOtto/HomePage/2017/08/09/CoreBluetooth框架使用详解/"/>
 
 
 
 
 
-  <title>Otto's blog</title>
+  <title>CoreBluetooth框架使用详解 | Otto's blog</title>
   
 
 
@@ -160,9 +165,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -245,9 +248,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -277,9 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/08/09/CoreBluetooth框架使用详解/" itemprop="url">CoreBluetooth框架使用详解</a></h1>
+          <h1 class="post-title" itemprop="name headline">CoreBluetooth框架使用详解</h1>
         
 
         <div class="post-meta">
@@ -329,9 +330,7 @@
       
 
       
-        
-          
-            <p>之前没接触过蓝牙开发，最近一直在跟蓝牙打交道。iOS开发蓝牙APP主要使用的是苹果原生的框架CoreBluetooth，这篇文章是对CoreBluetooth框架做一个简单的介绍，也是对前面一阶段的工作做一个梳理，加强自己对蓝牙开发这一块的理解。</p>
+        <p>之前没接触过蓝牙开发，最近一直在跟蓝牙打交道。iOS开发蓝牙APP主要使用的是苹果原生的框架CoreBluetooth，这篇文章是对CoreBluetooth框架做一个简单的介绍，也是对前面一阶段的工作做一个梳理，加强自己对蓝牙开发这一块的理解。</p>
 <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p><code>CBPeripheral</code>蓝牙外设，与APP通信的蓝牙设备，比如蓝牙手环。<br><code>CBCentralManager</code>蓝牙管理中心，管理APP与外设之间的交互。<br><code>CBService</code>蓝牙外设的服务，每一个外设都有0个或者多个服务。而每一个服务又可能包含0个或者多个蓝牙服务，也可能包含0个或者多个蓝牙特征。<br><code>CBCharacteristic</code>特征，每一个蓝牙特征中都包含有一些数据或者信息。  </p>
 <h3 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h3><blockquote>
 <h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
@@ -356,8 +355,6 @@
 <p>2.iOS10以上需要在info.plist里声明向用户申请蓝牙权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Privacy - Bluetooth Peripheral Usage Description</div><div class="line">需要使用蓝牙来连接您的设备</div></pre></td></tr></table></figure></p>
 <p>3.扫描设备过程中，会弹出是否配对的弹窗(蓝牙固件传回来系统才会弹出的，手机端控制不了)。用户点击取消的时候，设备会进入假连接状态（杀掉APP之后，设备即断开连接）.点击配对之后，系统就会把设备信息存在我的设备里，后续调retrive函数直接可以连接，相当于自动重连(杀掉APP之后，设备仍然连接中)，如果需要断开连接的话，需要提醒用户去设置-蓝牙-忽略设备。暂未发现可以解决此问题的方法。</p>
 
-          
-        
       
     </div>
     
@@ -372,267 +369,36 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/08/08/七牛云qshell的安装及使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="otto">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Otto's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/08/08/七牛云qshell的安装及使用/" itemprop="url">七牛云qshell的安装及使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T16:58:51+08:00">
-                2017-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/HomePage/tags/iOS开发/" rel="tag"># iOS开发</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="安装qshell"><a href="#安装qshell" class="headerlink" title="安装qshell"></a>安装<a href="https://github.com/qiniu/qshell">qshell</a></h3><p><img src="http://omjdi9fe0.bkt.clouddn.com/qshellDownload.png" alt="下载安装qshell"><br>将qshell_darwin_amd64文件重命名为qshell,讲qshell文件放到/usr/local/bin目录下。</p>
-<h3 id="设置-AccessKey-和SecretKey"><a href="#设置-AccessKey-和SecretKey" class="headerlink" title="设置 AccessKey 和SecretKey"></a>设置 AccessKey 和SecretKey</h3><h4 id="安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。"><a href="#安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。" class="headerlink" title="安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。"></a>安装好qshell之后，将你在七牛云后台看到的两个ey设置到本地。</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell account n3MELju6OwMSGK4YxJp1w6Cg-YJmHt8Y3JX321bw i2atyP-SPyPcS-NhOp-Zvsq9Y_j0FPhceNw2AcHJ</div></pre></td></tr></table></figure>
-<h3 id="查看bucket上的所有文件列表，生成txt文件到当前目录下"><a href="#查看bucket上的所有文件列表，生成txt文件到当前目录下" class="headerlink" title="查看bucket上的所有文件列表，生成txt文件到当前目录下"></a>查看bucket上的所有文件列表，生成txt文件到当前目录下</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell listbucket halo filelist.txt</div></pre></td></tr></table></figure>
-<h3 id="上传文件命令"><a href="#上传文件命令" class="headerlink" title="上传文件命令"></a>上传文件命令</h3><h5 id="参数1：bucket名"><a href="#参数1：bucket名" class="headerlink" title="参数1：bucket名"></a>参数1：bucket名</h5><h5 id="参数2：文件名"><a href="#参数2：文件名" class="headerlink" title="参数2：文件名"></a>参数2：文件名</h5><h5 id="参数3：要上传的文件的本地路径"><a href="#参数3：要上传的文件的本地路径" class="headerlink" title="参数3：要上传的文件的本地路径"></a>参数3：要上传的文件的本地路径</h5><h5 id="参数4：bucket所在的服务器-http-upload-z2-qiniu-com-华南地区"><a href="#参数4：bucket所在的服务器-http-upload-z2-qiniu-com-华南地区" class="headerlink" title="参数4：bucket所在的服务器(http://upload-z2.qiniu.com)[华南地区]"></a>参数4：bucket所在的服务器(<a href="http://upload-z2.qiniu.com)[华南地区" target="_blank" rel="external">http://upload-z2.qiniu.com)[华南地区</a>]</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell fput halo test.jpg /Users/hekangjie/Desktop/mypic/Data/11111.png http://upload-z2.qiniu.com</div></pre></td></tr></table></figure>
-<h3 id="使用qshell同步目录"><a href="#使用qshell同步目录" class="headerlink" title="使用qshell同步目录"></a>使用qshell同步目录</h3><p><a href="https://developer.qiniu.com/kodo/kb/using-qshell-synchronize-directories" target="_blank" rel="external">使用qupload命令同步目录</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell qupload [&lt;ThreadCount&gt;] &lt;LocalUploadConfig&gt;</div></pre></td></tr></table></figure></p>
-<p>同步目录的配置文件放在txt文件内。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">qshell qupload 10 config.txt</div></pre></td></tr></table></figure></p>
-<p>config.txt内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">&quot;src_dir&quot; : &quot;C:\\test&quot;,</div><div class="line">&quot;access_key&quot; : &quot;cuK5sZRq1XD-APpuhiHQG8H6Zo5XyKKYcpLwFgnQ&quot;,</div><div class="line">&quot;secret_key&quot; : &quot;2IAlc-ZnS-Sm6R0RZj6K1dIILsle2KEy1DrB8OC8&quot;,</div><div class="line">&quot;bucket&quot; : &quot;test&quot; </div><div class="line">&quot;ignore_dir&quot; : true</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="进阶版，创建脚本自动上传文件"><a href="#进阶版，创建脚本自动上传文件" class="headerlink" title="进阶版，创建脚本自动上传文件"></a>进阶版，创建脚本自动上传文件</h3><p><a href="http://jverson.com/2016/08/30/autohotkey-markdown-uploadImage/" target="_blank" rel="external">AutoHotkey 实现自动上传</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
       
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/08/08/Mac本地服务器Apache使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="otto">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Otto's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/08/08/Mac本地服务器Apache使用/" itemprop="url">Mac本地服务器Apache使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T16:47:40+08:00">
-                2017-08-08
-              </time>
+              <a href="/HomePage/2017/08/08/七牛云qshell的安装及使用/" rel="next" title="七牛云qshell的安装及使用">
+                <i class="fa fa-chevron-left"></i> 七牛云qshell的安装及使用
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <h3 id="在控制台开启服务"><a href="#在控制台开启服务" class="headerlink" title="在控制台开启服务"></a>在控制台开启服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">开启:  sudo apachectl start</div><div class="line"></div><div class="line">重启:  sudo apachectl restart</div><div class="line"></div><div class="line">关闭:  sudo apachectl stop</div></pre></td></tr></table></figure>
-<h4 id="启动后，在浏览器中输入-http-127-0-0-1-或者-http-localhost-如果看到-It-Works-页面："><a href="#启动后，在浏览器中输入-http-127-0-0-1-或者-http-localhost-如果看到-It-Works-页面：" class="headerlink" title="启动后，在浏览器中输入 http://127.0.0.1/ 或者 http://localhost  如果看到 It Works! 页面："></a>启动后，在浏览器中输入 <a href="http://127.0.0.1/" target="_blank" rel="external">http://127.0.0.1/</a> 或者 <a href="http://localhost" target="_blank" rel="external">http://localhost</a>  如果看到 It Works! 页面：</h4><p><img src="http://omjdi9fe0.bkt.clouddn.com/Apache_1.png" alt=""></p>
-<h5 id="那么Apache-就启动成功了，站点的根目录为系统级根目录"><a href="#那么Apache-就启动成功了，站点的根目录为系统级根目录" class="headerlink" title="那么Apache 就启动成功了，站点的根目录为系统级根目录"></a>那么Apache 就启动成功了，站点的根目录为系统级根目录</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/Library/WebServer/Documents</div></pre></td></tr></table></figure>
-<p>启动后，你可以通过编辑 /etc/apache2/httpd.conf 文件来修改 Apache 配置。</p>
-<h4 id="访问服务器文件"><a href="#访问服务器文件" class="headerlink" title="访问服务器文件"></a>访问服务器文件</h4><p>1.将一个json文件（test.json）放到服务器路径下</p>
-<p>2.用浏览器访问 <a href="http://127.0.0.1/test" target="_blank" rel="external">http://127.0.0.1/test</a> 或者<br><a href="http://localhost/test" target="_blank" rel="external">http://localhost/test</a> </p>
-<p>在浏览器中访问时，中文可能会出现乱码，但在项目中请求回来，打印在控制台的是正常的。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -642,10 +408,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -653,6 +420,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -673,8 +444,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG"
@@ -740,6 +520,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码分析"><span class="nav-number">2.</span> <span class="nav-text">代码分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#步骤"><span class="nav-number"></span> <span class="nav-text">步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注意问题"><span class="nav-number">1.</span> <span class="nav-text">注意问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -847,10 +643,10 @@
 
 
   
-    <script type="text/javascript" src="/HomePage/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/HomePage/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/HomePage/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
