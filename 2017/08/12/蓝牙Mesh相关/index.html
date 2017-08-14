@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Otto&#39;s blog">
 <meta property="og:description" content="什么是蓝牙Mesh？蓝牙Mesh网络是用于建立多对多（many：many）设备通信的低能耗蓝牙（Bluetooth Low Energy，也称为Bluetooth LE）新的网络拓扑。它允许您创建基于多个设备的大型网络，网络可以包含数十台，数百甚至数千台蓝牙Mesh设备，这些设备之间可以相互进行信息的传递，无疑这样一种应用形态为楼宇自动化，无线传感器网络，资产跟踪和其他解决方案提供了理想的选择。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-12T09:35:01.000Z">
+<meta property="og:updated_time" content="2017-08-14T08:28:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="蓝牙Mesh相关">
 <meta name="twitter:description" content="什么是蓝牙Mesh？蓝牙Mesh网络是用于建立多对多（many：many）设备通信的低能耗蓝牙（Bluetooth Low Energy，也称为Bluetooth LE）新的网络拓扑。它允许您创建基于多个设备的大型网络，网络可以包含数十台，数百甚至数千台蓝牙Mesh设备，这些设备之间可以相互进行信息的传递，无疑这样一种应用形态为楼宇自动化，无线传感器网络，资产跟踪和其他解决方案提供了理想的选择。">
@@ -343,7 +343,7 @@
 <h2 id="低功耗，Friendship"><a href="#低功耗，Friendship" class="headerlink" title="低功耗，Friendship"></a>低功耗，Friendship</h2><p>低功耗是蓝牙技术的一大优点，这一优点在蓝牙Mesh技术当中也得以继承。在蓝牙Mesh网络中有一类节点支持低功耗特性（Low Power Feature），也可以称为低功耗节点。这一类节点可以通过减少射频收发机（RF transceiver）开启的占空比来达到低功耗的目的，也就是说这一类节点只有在需要进行消息收发的时候才会打开射频收发器，其他时间都处于休眠状态。</p>
 <p>在蓝牙Mesh网络中还有一类节点是专门为低功耗节点服务的，其具有Friend特性，也可以称为Friend节点。Friend节点与低功耗节点可以建立Friendship关系。建立此种关系之后，Friend节点可以暂存发往低功耗节点的信息，待低功耗节点退出休眠模式之后，再从Friend节点取回相关信息。</p>
 <p>在实际应用中，Friend节点可以是灯泡、机顶盒、路由器，这些设备都是通过市电供电的，对于功耗不是很敏感；低功耗节点可以是由电池供电的设备，如传感器、门锁等。</p>
-<h2 id="APP接入蓝牙Mesh网络"><a href="#APP接入蓝牙Mesh网络" class="headerlink" title="APP接入蓝牙Mesh网络"></a>APP接入蓝牙Mesh网络</h2><p>必须使用蓝牙Mesh的代理（Proxy）协议，才能通过代理节点与网状网络进行通信。关于代理协议，在蓝牙Mesh规范的第6章节有非常消息的介绍。在这里，对于代理协议进行简单的描述就是：代理协议可以在标准低功耗蓝牙GAP和GATT API之上得以实现，应用程序实现预先定义的GATT服务（service）和特性（Characteristic），就可以与蓝牙Mesh当中的代理节点进行通信，进而通过代理结点，与蓝牙Mesh网络进行互动。</p>
+<h2 id="APP接入蓝牙Mesh网络"><a href="#APP接入蓝牙Mesh网络" class="headerlink" title="APP接入蓝牙Mesh网络"></a>APP接入蓝牙Mesh网络</h2><p>必须使用蓝牙Mesh的代理（Proxy）协议，才能通过代理节点与网状网络进行通信。关于代理协议，在蓝牙Mesh规范的第6章节有非常详细的介绍。在这里，对于代理协议进行简单的描述就是：代理协议可以在标准低功耗蓝牙GAP和GATT API之上得以实现，应用程序实现预先定义的GATT服务（service）和特性（Characteristic），就可以与蓝牙Mesh当中的代理节点进行通信，进而通过代理结点，与蓝牙Mesh网络进行互动。</p>
 <h2 id="Mesh相关资源"><a href="#Mesh相关资源" class="headerlink" title="Mesh相关资源"></a>Mesh相关资源</h2><p>1.蓝牙Mesh规范（Bluetooth Specification Mesh Profile）<br>与蓝牙核心规范一样，蓝牙Mesh也有自己的规范文档，其作用和蓝牙核心规范类似，详细定义了蓝牙Mesh相关的技术细节。蓝牙Mesh规范<a href="https://www.bluetooth.com/specifications/mesh-specifications" target="_blank" rel="external">下载</a> </p>
 <p>2.Mesh术语表<br>由于Mesh的概念对于蓝牙技术来说是一个非常新的领域，因此在蓝牙Mesh规范中有很多新的技术术语，关于这些新的术语，蓝牙技术联盟早有所准备，我们开辟了专门的网页为大家进行解释，请移步访问<a href="https://www.bluetooth.com/what-is-bluetooth-technology/how-it-works/le-mesh/mesh-glossary" target="_blank" rel="external">这里</a>  </p>
 <p>3.<a href="https://www.bluetooth.com/~/media/files/marketing/mesh%20technology%20overview.ashx" target="_blank" rel="external">《蓝牙Mesh概览》</a><br>蓝牙Mesh白皮书，概要的介绍一些技术的细节。</p>
