@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Otto&#39;s blog">
 <meta property="og:description" content="概述项目开发中经常会用到方法的延时调用，下面列举常用的几种实现方式： 1.performSelector 2.NSTimer 3.NSThread线程的sleep 4.GCD">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-11T06:20:28.000Z">
+<meta property="og:updated_time" content="2017-09-11T06:27:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS开发中方法延迟执行的几种方式">
 <meta name="twitter:description" content="概述项目开发中经常会用到方法的延时调用，下面列举常用的几种实现方式： 1.performSelector 2.NSTimer 3.NSThread线程的sleep 4.GCD">
@@ -350,7 +350,8 @@
 <ul>
 <li>(void)cancelPreviousPerformRequestsWithTarget:(id)aTarget;</li>
 </ul>
-<p>上面2种都是类方法，不能用实例对象去调用，只能用NSObject。<br>eg：<br>[NSObject cancelPreviousPerformRequestsWithTarget:self];<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">### 2.NSTimer定时器</div></pre></td></tr></table></figure></p>
+<p>上面2种都是类方法，不能用实例对象去调用，只能用NSObject。<br>eg：<br>[NSObject cancelPreviousPerformRequestsWithTarget:self];</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div><div class="line">### 2.NSTimer定时器</div></pre></td></tr></table></figure>
 <p>NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(delayMethod) userInfo:nil repeats:NO];<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; 此方法是一种非阻塞的执行方式  </div><div class="line">&gt; 取消执行方法：`[time invalidate];`</div><div class="line"></div><div class="line">### 3.NSThread线程的sleep</div></pre></td></tr></table></figure></p>
 <p>[NSThread sleepForTimeInterval:2.0];<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; 此方法是一种阻塞执行方式，建议放在子线程中执行，否则会卡住界面。但有时还是需要阻塞执行，如进入欢迎界面需要沉睡3秒才进入主界面时。  </div><div class="line">&gt; 没有找到取消执行方式。</div><div class="line"></div><div class="line">### 4.GCD</div></pre></td></tr></table></figure></p>
 <p>__block ViewController <em>weakSelf = self;<br>dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 </em> NSEC_PER_SEC));</p>
