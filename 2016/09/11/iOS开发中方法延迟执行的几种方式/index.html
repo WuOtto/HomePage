@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="Otto&#39;s blog">
 <meta property="og:description" content="概述项目开发中经常会用到方法的延时调用，下面列举常用的几种实现方式： 1.performSelector 2.NSTimer 3.NSThread线程的sleep 4.GCD">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-09-11T06:39:52.000Z">
+<meta property="og:updated_time" content="2017-09-11T06:50:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS开发中方法延迟执行的几种方式">
 <meta name="twitter:description" content="概述项目开发中经常会用到方法的延时调用，下面列举常用的几种实现方式： 1.performSelector 2.NSTimer 3.NSThread线程的sleep 4.GCD">
@@ -335,22 +335,18 @@
 <p>2.NSTimer</p>
 <p>3.NSThread线程的sleep</p>
 <p>4.GCD<br><a id="more"></a></p>
-<h3 id="1-performSelector"><a href="#1-performSelector" class="headerlink" title="1.performSelector"></a>1.performSelector</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[self performSelector:@selector(delayMethod) withObject:nil/*可传任意类型参数*/ afterDelay:2.0];</div><div class="line">``</div><div class="line"></div><div class="line">此方法是一种非阻塞的执行方式,取消方法如下：</div></pre></td></tr></table></figure>
-<p>第一种：</p>
-<ul>
-<li>(void)cancelPreviousPerformRequestsWithTarget:(id)aTarget selector:(SEL)aSelector object:(nullable id)anArgument;</li>
-</ul>
-<p>第二种：<br>//撤回全部申请延迟执行的方法</p>
-<ul>
-<li>(void)cancelPreviousPerformRequestsWithTarget:(id)aTarget;</li>
-</ul>
-<p>上面2种都是类方法，不能用实例对象去调用，只能用NSObject。<br>eg：<br>[NSObject cancelPreviousPerformRequestsWithTarget:self];<br>``</p>
+<h3 id="1-performSelector"><a href="#1-performSelector" class="headerlink" title="1.performSelector"></a>1.performSelector</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[self performSelector:@selector(delayMethod) withObject:nil afterDelay:2.0];</div></pre></td></tr></table></figure>
+<p>此方法是一种非阻塞的执行方式,取消方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">第一种：</div><div class="line"></div><div class="line">+ (void)cancelPreviousPerformRequestsWithTarget:(id)aTarget selector:(SEL)aSelector object:(nullable id)anArgument;</div><div class="line"></div><div class="line">第二种：</div><div class="line">//撤回全部申请延迟执行的方法</div><div class="line">+ (void)cancelPreviousPerformRequestsWithTarget:(id)aTarget;</div><div class="line"></div><div class="line">上面2种都是类方法，不能用实例对象去调用，只能用NSObject。</div><div class="line">eg：</div><div class="line">[NSObject cancelPreviousPerformRequestsWithTarget:self];</div></pre></td></tr></table></figure>
 <h3 id="2-NSTimer定时器"><a href="#2-NSTimer定时器" class="headerlink" title="2.NSTimer定时器"></a>2.NSTimer定时器</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(delayMethod) userInfo:nil repeats:NO];</div></pre></td></tr></table></figure>
 <blockquote>
 <p>此方法是一种非阻塞的执行方式<br>取消执行方法：<code>[time invalidate];</code></p>
 </blockquote>
-<h3 id="3-NSThread线程的sleep"><a href="#3-NSThread线程的sleep" class="headerlink" title="3.NSThread线程的sleep"></a>3.NSThread线程的sleep</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[NSThread sleepForTimeInterval:2.0];</div><div class="line">``</div><div class="line">&gt; 此方法是一种阻塞执行方式，建议放在子线程中执行，否则会卡住界面。但有时还是需要阻塞执行，如进入欢迎界面需要沉睡3秒才进入主界面时。  </div><div class="line">&gt; 没有找到取消执行方式。</div><div class="line"></div><div class="line">### 4.GCD</div></pre></td></tr></table></figure>
-<p>__block ViewController <em>weakSelf = self;<br>dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 </em> NSEC_PER_SEC));</p>
+<h3 id="3-NSThread线程的sleep"><a href="#3-NSThread线程的sleep" class="headerlink" title="3.NSThread线程的sleep"></a>3.NSThread线程的sleep</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[NSThread sleepForTimeInterval:2.0];</div></pre></td></tr></table></figure>
+<blockquote>
+<p>此方法是一种阻塞执行方式，建议放在子线程中执行，否则会卡住界面。但有时还是需要阻塞执行，如进入欢迎界面需要沉睡3秒才进入主界面时。<br>没有找到取消执行方式。</p>
+</blockquote>
+<h3 id="4-GCD"><a href="#4-GCD" class="headerlink" title="4.GCD"></a>4.GCD</h3><p>```<br>__block ViewController <em>weakSelf = self;<br>dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 </em> NSEC_PER_SEC));</p>
 <p>dispatch_after(delayTime, dispatch_get_main_queue(), ^{<br>[weakSelf delayMethod];<br>});<br>``</p>
 <blockquote>
 <p>此方法可以在参数中选择执行的线程，是一种非阻塞执行方式。因为该方法交给了GCD自动处理，因此不容易取消操作。</p>
@@ -531,7 +527,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-performSelector"><span class="nav-number">2.</span> <span class="nav-text">1.performSelector</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NSTimer定时器"><span class="nav-number">3.</span> <span class="nav-text">2.NSTimer定时器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-NSThread线程的sleep"><span class="nav-number">4.</span> <span class="nav-text">3.NSThread线程的sleep</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-performSelector"><span class="nav-number">2.</span> <span class="nav-text">1.performSelector</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NSTimer定时器"><span class="nav-number">3.</span> <span class="nav-text">2.NSTimer定时器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-NSThread线程的sleep"><span class="nav-number">4.</span> <span class="nav-text">3.NSThread线程的sleep</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-GCD"><span class="nav-number">5.</span> <span class="nav-text">4.GCD</span></a></li></ol></div>
             
 
           </div>
