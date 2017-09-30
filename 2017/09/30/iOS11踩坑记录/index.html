@@ -94,20 +94,20 @@
 
 
 
-<meta name="description" content="记录在iOS 11上遇到的一些问题~ 坑112345-(void)layoutSubviews&amp;#123;/*此方法在iOS11上引入了新的机制，在执行动画时，会调用此方法刷新UI；所以如果在此方法中定义了View的frame的话，会引起问题*/&amp;#125; iOS10.3.3下，一个View从创建—&amp;gt;执行show动画—&amp;gt;隐藏  iOS 11下，一个View从创建—&amp;gt;执行show">
+<meta name="description" content="记录在iOS 11上遇到的一些问题~">
 <meta name="keywords" content="iOS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS11踩坑记录">
 <meta property="og:url" content="https://github.com/WuOtto/HomePage/2017/09/30/iOS11踩坑记录/index.html">
 <meta property="og:site_name" content="Otto&#39;s blog">
-<meta property="og:description" content="记录在iOS 11上遇到的一些问题~ 坑112345-(void)layoutSubviews&amp;#123;/*此方法在iOS11上引入了新的机制，在执行动画时，会调用此方法刷新UI；所以如果在此方法中定义了View的frame的话，会引起问题*/&amp;#125; iOS10.3.3下，一个View从创建—&amp;gt;执行show动画—&amp;gt;隐藏  iOS 11下，一个View从创建—&amp;gt;执行show">
+<meta property="og:description" content="记录在iOS 11上遇到的一些问题~">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1518534-f5c6cedf809cbb30.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1518534-c32f20fc207b76cd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-09-30T10:35:22.000Z">
+<meta property="og:updated_time" content="2017-09-30T10:37:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS11踩坑记录">
-<meta name="twitter:description" content="记录在iOS 11上遇到的一些问题~ 坑112345-(void)layoutSubviews&amp;#123;/*此方法在iOS11上引入了新的机制，在执行动画时，会调用此方法刷新UI；所以如果在此方法中定义了View的frame的话，会引起问题*/&amp;#125; iOS10.3.3下，一个View从创建—&amp;gt;执行show动画—&amp;gt;隐藏  iOS 11下，一个View从创建—&amp;gt;执行show">
+<meta name="twitter:description" content="记录在iOS 11上遇到的一些问题~">
 <meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1518534-f5c6cedf809cbb30.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
@@ -333,7 +333,7 @@
       
 
       
-        <p>记录在iOS 11上遇到的一些问题~</p>
+        <p>记录在iOS 11上遇到的一些问题~<br><a id="more"></a></p>
 <h3 id="坑1"><a href="#坑1" class="headerlink" title="坑1"></a>坑1</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">-(void)layoutSubviews&#123;</div><div class="line">/*此方法在iOS11上引入了新的机制，在执行动画时，会调用此方法刷新UI；</div><div class="line">所以如果在此方法中定义了View的frame的话，会引起问题</div><div class="line">*/</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>iOS10.3.3下，一个View从创建—&gt;执行show动画—&gt;隐藏</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/1518534-f5c6cedf809cbb30.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="屏幕快照 2017-09-30 下午5.42.25.png"></p>
