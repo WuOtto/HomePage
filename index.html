@@ -330,24 +330,14 @@
 
       
         
-          
-            <h3 id="1-如果之前没有注册过trunk的话-需要注册"><a href="#1-如果之前没有注册过trunk的话-需要注册" class="headerlink" title="1.如果之前没有注册过trunk的话,需要注册"></a>1.如果之前没有注册过<code>trunk</code>的话,需要注册</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">pod trunk register 邮箱 &apos;用户名&apos; --verbose</div><div class="line">// 之后点击邮箱链接进行验证</div></pre></td></tr></table></figure>
-<h3 id="2-查看注册信息"><a href="#2-查看注册信息" class="headerlink" title="2.查看注册信息"></a>2.查看注册信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pod trunk me</div></pre></td></tr></table></figure>
-<h3 id="3-在需要发布的库的根目录创建-podspec文件"><a href="#3-在需要发布的库的根目录创建-podspec文件" class="headerlink" title="3.在需要发布的库的根目录创建.podspec文件"></a>3.在需要发布的库的根目录创建<code>.podspec</code>文件</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">// OttoKeyboardView : 库名字</div><div class="line">pod spec create OttoKeyboardView</div></pre></td></tr></table></figure>
-<h3 id="3-编辑库相关信息"><a href="#3-编辑库相关信息" class="headerlink" title="3.编辑库相关信息"></a>3.编辑库相关信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Vi OttoKeyboardView.podspec</div></pre></td></tr></table></figure>
-<h3 id="4-podspec文件信息"><a href="#4-podspec文件信息" class="headerlink" title="4.podspec文件信息"></a>4.podspec文件信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">s.name = &apos;OttoKeyboardView&apos;</div><div class="line">s.version = &apos;0.0.1&apos;</div><div class="line">s.license = &apos;MIT&apos;</div><div class="line">s.summary = &apos;A view like OttoKeyboardView on iOS.&apos;</div><div class="line">s.homepage = &apos;https://github.com/summerxx27/XTAlertViewController&apos;</div><div class="line">s.source = &#123; :git =&gt; &apos;https://github.com/summerxx27/XTAlertViewController.git&apos;, :tag =&gt; s.version.to_s &#125;</div><div class="line">s.requires_arc = true</div><div class="line">s.ios.deployment_target = &apos;8.0&apos;</div><div class="line">s.source_files = &apos;OttoKeyboardView/*.&#123;h,m&#125;&apos;</div><div class="line">s.framework  = &quot;UIKit&quot;</div></pre></td></tr></table></figure>
-<h3 id="5-验证本地文件编写是否正确"><a href="#5-验证本地文件编写是否正确" class="headerlink" title="5.验证本地文件编写是否正确"></a>5.验证本地文件编写是否正确</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pod lib lint OttoKeyboardView.podspec</div></pre></td></tr></table></figure>
-<h3 id="6-将编辑好的文件同步到github"><a href="#6-将编辑好的文件同步到github" class="headerlink" title="6.将编辑好的文件同步到github"></a>6.将编辑好的文件同步到github</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git tag &apos;0.0.1&apos;</div><div class="line">git push --tags</div></pre></td></tr></table></figure>
-<h3 id="7-把编写好的文件同步到Cocoapods"><a href="#7-把编写好的文件同步到Cocoapods" class="headerlink" title="7.把编写好的文件同步到Cocoapods"></a>7.把编写好的文件同步到Cocoapods</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pod trunk push OttoKeyboardView.podspec</div></pre></td></tr></table></figure>
-<h3 id="p-s"><a href="#p-s" class="headerlink" title="p.s."></a>p.s.</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">pod search OttoKeyboardView</div><div class="line"></div><div class="line">[!] Unable to find a pod with name, author, summary, or description matching `OttoKeyboardView`</div></pre></td></tr></table></figure>
-<p>我遇到的情况是执行<code>pod search OttoKeyboardView</code>搜索不到，但是我在工程的<code>podfile</code>里面添加库，然后<code>pod install</code>发现可以安装成功。只好再等待一段时间。  </p>
-<p>解决方法：<br>1.一般情况安装<code>CocoaPods</code>执行<code>pod install</code>时，系统会默认操作<code>pod setup</code>,但可能<code>pod setup</code>会不成功，所以我们先<code>pod setup</code>一下。</p>
-<p>2.如果还是不能正常执行<code>pod search</code>，删除<code>~/Library/Caches/CocoaPods</code>目录下的<code>search_index.json</code>文件。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">rm ~/Library/Caches/CocoaPods/search_index.json</div><div class="line"></div><div class="line">pod search OttoKeyboardView</div><div class="line"></div><div class="line">Creating search index for spec repo &apos;master&apos;..Done！</div></pre></td></tr></table></figure>
-<p>这样会重新触发<code>CocoaPods</code>去创建索引文件，然后就可以正常执行了。</p>
-<p>3.如果还是不执行的，那就是直接重新安装<code>CocoaPods</code>吧！</p>
-
-          
+          从零开始，介绍如何发布自己的开源框架到CocoaPods，并分析遇到的问题
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/HomePage/2018/01/26/如何发布自己的开源框架到CocoaPods/">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
