@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/HomePage/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/HomePage/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/HomePage/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="小程序," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/HomePage/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="小程序学习第一天，内容主要是框架的介绍、文件结构、工程配置以及页面跳转">
+<meta name="keywords" content="小程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小程序第一天">
+<meta property="og:url" content="https://github.com/WuOtto/HomePage/2018/01/29/小程序第一天/index.html">
+<meta property="og:site_name" content="Otto&#39;s blog">
+<meta property="og:description" content="小程序学习第一天，内容主要是框架的介绍、文件结构、工程配置以及页面跳转">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://mp.weixin.qq.com/debug/wxadoc/dev/image/mina-lifecycle.png?t=2018125">
+<meta property="og:updated_time" content="2018-01-30T02:12:31.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小程序第一天">
+<meta name="twitter:description" content="小程序学习第一天，内容主要是框架的介绍、文件结构、工程配置以及页面跳转">
+<meta name="twitter:image" content="https://mp.weixin.qq.com/debug/wxadoc/dev/image/mina-lifecycle.png?t=2018125">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/HomePage/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Otto'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/WuOtto/HomePage/2018/01/29/小程序第一天/"/>
+
+
+
+
+
+  <title>小程序第一天 | Otto's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/HomePage/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Otto's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">既然选择了远方，便只顾风雨兼程</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/HomePage/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/HomePage/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/HomePage/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2018/01/29/小程序第一天/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="otto">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Otto's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">小程序第一天</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-29T22:09:43+08:00">
+                2018-01-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  小程序学习第一天，内容主要是框架的介绍、文件结构、工程配置以及页面跳转
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h3><p>框架的核心是一个响应的数据绑定系统。<br>整个系统分为两块<code>视图层(View)</code>和<code>逻辑层(App Service)</code>  </p>
+<h4 id="例如"><a href="#例如" class="headerlink" title="例如"></a>例如</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;!-- This is our View --&gt;</div><div class="line">&lt;view&gt; Hello &#123;&#123;name&#125;&#125;! &lt;/view&gt;</div><div class="line">&lt;button bindtap=&quot;changeName&quot;&gt; Click me! &lt;/button&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">// This is our App Service.</div><div class="line">// This is our data.</div><div class="line">var helloData = &#123;</div><div class="line">  name: &apos;WeChat&apos;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// Register a Page.</div><div class="line">Page(&#123;</div><div class="line">  data: helloData,</div><div class="line">  changeName: function(e) &#123;</div><div class="line">    // sent data change to view</div><div class="line">    this.setData(&#123;</div><div class="line">      name: &apos;MINA&apos;</div><div class="line">    &#125;)</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<ul>
+<li>开发者通过框架将逻辑层数据中的 name 与视图层的 name 进行了绑定，所以在页面一打开的时候会显示 Hello WeChat!</li>
+<li>当点击按钮的时候，视图层会发送 changeName 的事件给逻辑层，逻辑层找到对应的事件处理函数</li>
+<li>逻辑层执行了<code>setData</code>的操作，将<code>name</code>从<code>Wechat</code>变为<code>MINA</code>，因为该数据和视图层已经绑定了，所以视图层会自动改变<code>name</code>的值。</li>
+</ul>
+<h3 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">一个小程序主体部分由三个文件组成，必须放在项目的根目录</div></pre></td></tr></table></figure>
+<blockquote>
+<p><code>app.js</code> 处理小程序逻辑  &lt;必填&gt;<br><code>app.json</code> 小程序公共设置  &lt;必填&gt;<br><code>app.wxss</code> 小程序公共样式表  &lt;选填&gt; </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">一个小程序页面由四个文件组成</div></pre></td></tr></table></figure>
+<blockquote>
+<p><code>.js</code> 页面逻辑  &lt;必填&gt;<br><code>.wxml</code> 页面结构 &lt;必填&gt;<br><code>.json</code> 页面配置  &lt;选填&gt;<br><code>.wxss</code> 页面样式  &lt;选填&gt; </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">描述页面的四个文件必须具有相同的路径与文件名。</div></pre></td></tr></table></figure>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p><code>app.json</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;pages&quot;: [</div><div class="line">    &quot;pages/index/index&quot;,</div><div class="line">    &quot;pages/logs/index&quot;</div><div class="line">  ],</div><div class="line">  &quot;window&quot;: &#123;</div><div class="line">    &quot;navigationBarTitleText&quot;: &quot;Demo&quot;</div><div class="line">  &#125;,</div><div class="line">  &quot;tabBar&quot;: &#123;</div><div class="line">    &quot;list&quot;: [&#123;</div><div class="line">      &quot;pagePath&quot;: &quot;pages/index/index&quot;,</div><div class="line">      &quot;text&quot;: &quot;首页&quot;</div><div class="line">    &#125;, &#123;</div><div class="line">      &quot;pagePath&quot;: &quot;pages/logs/logs&quot;,</div><div class="line">      &quot;text&quot;: &quot;日志&quot;</div><div class="line">    &#125;]</div><div class="line">  &#125;,</div><div class="line">  &quot;networkTimeout&quot;: &#123;</div><div class="line">    &quot;request&quot;: 10000,</div><div class="line">    &quot;downloadFile&quot;: 10000</div><div class="line">  &#125;,</div><div class="line">  &quot;debug&quot;: true</div><div class="line">&#125;</div><div class="line">//networkTimeout:网络超时时间</div><div class="line">//enablePullDownRefresh: 是否开启全局下拉刷新（可以在对应页面的json文件里面单独配置）</div></pre></td></tr></table></figure></p>
+<h3 id="场景值"><a href="#场景值" class="headerlink" title="场景值"></a>场景值</h3><p>在<code>app.js</code>里面可以查看小程序的场景值<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">App(&#123;</div><div class="line">  onLaunch: function (options) &#123;</div><div class="line">    console.log(&apos;小程序场景值&apos; + options.scene)</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<h3 id="setData-参数格式"><a href="#setData-参数格式" class="headerlink" title="setData() 参数格式"></a><code>setData()</code> 参数格式</h3><p>示例代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;!--index.wxml--&gt;</div><div class="line">&lt;view&gt;&#123;&#123;text&#125;&#125;&lt;/view&gt;</div><div class="line">&lt;button bindtap=&quot;changeText&quot;&gt; Change normal data &lt;/button&gt;</div><div class="line">&lt;view&gt;&#123;&#123;num&#125;&#125;&lt;/view&gt;</div><div class="line">&lt;button bindtap=&quot;changeNum&quot;&gt; Change normal num &lt;/button&gt;</div><div class="line">&lt;view&gt;&#123;&#123;array[0].text&#125;&#125;&lt;/view&gt;</div><div class="line">&lt;button bindtap=&quot;changeItemInArray&quot;&gt; Change Array data &lt;/button&gt;</div><div class="line">&lt;view&gt;&#123;&#123;object.text&#125;&#125;&lt;/view&gt;</div><div class="line">&lt;button bindtap=&quot;changeItemInObject&quot;&gt; Change Object data &lt;/button&gt;</div><div class="line">&lt;view&gt;&#123;&#123;newField.text&#125;&#125;&lt;/view&gt;</div><div class="line">&lt;button bindtap=&quot;addNewField&quot;&gt; Add new data &lt;/button&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">//index.js</div><div class="line">Page(&#123;</div><div class="line">  data: &#123;</div><div class="line">    text: &apos;init data&apos;,</div><div class="line">    num: 0,</div><div class="line">    array: [&#123;text: &apos;init data&apos;&#125;],</div><div class="line">    object: &#123;</div><div class="line">      text: &apos;init data&apos;</div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  changeText: function() &#123;</div><div class="line">    // this.data.text = &apos;changed data&apos;  // bad, it can not work</div><div class="line">    this.setData(&#123;</div><div class="line">      text: &apos;changed data&apos;</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  changeNum: function() &#123;</div><div class="line">    this.data.num = 1</div><div class="line">    this.setData(&#123;</div><div class="line">      num: this.data.num</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  changeItemInArray: function() &#123;</div><div class="line">    // you can use this way to modify a danamic data path</div><div class="line">    this.setData(&#123;</div><div class="line">      &apos;array[0].text&apos;:&apos;changed data&apos;</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  changeItemInObject: function()&#123;</div><div class="line">    this.setData(&#123;</div><div class="line">      &apos;object.text&apos;: &apos;changed data&apos;</div><div class="line">    &#125;);</div><div class="line">  &#125;,</div><div class="line">  addNewField: function() &#123;</div><div class="line">    this.setData(&#123;</div><div class="line">      &apos;newField.text&apos;: &apos;new data&apos;</div><div class="line">    &#125;)</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<h3 id="Page实例的生命周期"><a href="#Page实例的生命周期" class="headerlink" title="Page实例的生命周期"></a><code>Page</code>实例的生命周期</h3><p><img src="https://mp.weixin.qq.com/debug/wxadoc/dev/image/mina-lifecycle.png?t=2018125" alt=""></p>
+<h4 id="一个简单的示例程序"><a href="#一个简单的示例程序" class="headerlink" title="一个简单的示例程序"></a>一个简单的示例程序</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;!--index.wxml--&gt;</div><div class="line"></div><div class="line">&lt;button type=&quot;default&quot; loading=&quot;&#123;&#123;loading&#125;&#125;&quot; bindtap=&quot;default&quot;&gt; refresh &lt;/button&gt;</div><div class="line"></div><div class="line">&lt;view&gt; Hello &#123;&#123;name&#125;&#125;! &lt;/view&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">//index.js</div><div class="line">//获取应用实例</div><div class="line">const app = getApp()</div><div class="line"></div><div class="line"></div><div class="line">Page(&#123;</div><div class="line">  </div><div class="line">  /**</div><div class="line">   * 页面的初始数据</div><div class="line">   */</div><div class="line">  data: &#123;</div><div class="line">    text: &apos;init data&apos;,</div><div class="line">    num: 0,</div><div class="line">    name: &apos;WeChat&apos;,</div><div class="line">    array: [&#123; text: &apos;init data&apos; &#125;],</div><div class="line">    object: &#123;</div><div class="line">      text: &apos;init data&apos;</div><div class="line">    &#125; </div><div class="line">  &#125;,</div><div class="line">  default: function (e) &#123;</div><div class="line">    var name = this.data.name</div><div class="line">    if (name == &apos;MiNa&apos;)&#123;</div><div class="line">      this.setData(&#123;</div><div class="line">        name: &apos;WeChat&apos;</div><div class="line">      &#125;)</div><div class="line">    &#125;else&#123;</div><div class="line">      this.setData(&#123;</div><div class="line">        name: &apos;MiNa&apos;</div><div class="line">      &#125;)</div><div class="line">    &#125;</div><div class="line">    this.setData(&#123;</div><div class="line">      loading: !this.data.loading,</div><div class="line">      </div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  jumpToView:function()&#123;</div><div class="line">    wx.navigateTo(&#123;</div><div class="line">      url: &apos;../view/view&apos;,</div><div class="line">    &#125;)</div><div class="line">  &#125;</div><div class="line"></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<h3 id="页面跳转"><a href="#页面跳转" class="headerlink" title="页面跳转"></a>页面跳转</h3><h4 id="push新页面"><a href="#push新页面" class="headerlink" title="push新页面"></a>push新页面</h4><p>调用 API <code>wx.navigateTo</code> 或使用组件 <code>&lt;navigator open-type=&quot;navigateTo&quot;/&gt;</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">保留当前页面，跳转到应用内的某个页面，使用wx.navigateBack可以返回到原页面。</div><div class="line"></div><div class="line">wx.navigateTo(&#123;</div><div class="line">      url: &apos;../logs/logs&apos;,</div><div class="line">    &#125;)</div></pre></td></tr></table></figure>
+<h4 id="页面重定向"><a href="#页面重定向" class="headerlink" title="页面重定向"></a>页面重定向</h4><p>调用 API <code>wx.redirectTo</code> 或使用组件 <code>&lt;navigator open-type=&quot;redirectTo&quot;/&gt;</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">关闭当前页面，跳转到应用内的某个页面。</div><div class="line"></div><div class="line">wx.redirectTo(&#123;</div><div class="line">      url: &apos;../logs/logs&apos;,</div><div class="line">    &#125;)</div></pre></td></tr></table></figure>
+<h4 id="页面返回"><a href="#页面返回" class="headerlink" title="页面返回"></a>页面返回</h4><p>调用 API <code>wx.navigateBack</code> 或使用组件<code>&lt;navigator open-type=&quot;navigateBack&quot;&gt;</code>或用户按左上角返回按钮</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">关闭当前页面，返回上一页面或多级页面。可通过 getCurrentPages()) 获取当前的页面栈，决定需要返回几层。。</div><div class="line">//delta 返回的页面数，如果delta大于现有页面数，则返回到首页</div><div class="line">wx.navigateBack(&#123;</div><div class="line">  delta: 2</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<h4 id="Tab切换"><a href="#Tab切换" class="headerlink" title="Tab切换"></a>Tab切换</h4><p>调用 API <code>wx.switchTab</code> 或使用组件 <code>&lt;navigator open-type=&quot;switchTab&quot;/&gt;</code> 或用户切换 Tab</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面</div><div class="line"></div><div class="line">wx.switchTab(&#123;</div><div class="line">  url: &apos;/index&apos;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<h4 id="重启动"><a href="#重启动" class="headerlink" title="重启动"></a>重启动</h4><p>调用 API <code>wx.reLaunch</code> 或使用组件 <code>&lt;navigator open-type=&quot;reLaunch&quot;/&gt;</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">关闭所有页面，打开到应用内的某个页面。</div><div class="line">wx.reLaunch(&#123;</div><div class="line">  url: &apos;test?id=1&apos;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/HomePage/tags/小程序/" rel="tag"># 小程序</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/HomePage/2018/01/26/如何发布自己的开源框架到CocoaPods/" rel="next" title="如何发布自己的开源框架到CocoaPods">
+                <i class="fa fa-chevron-left"></i> 如何发布自己的开源框架到CocoaPods
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG"
+               alt="otto" />
+          <p class="site-author-name" itemprop="name">otto</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/HomePage/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/HomePage/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/WuOtto" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#框架"><span class="nav-number">1.</span> <span class="nav-text">框架</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#例如"><span class="nav-number">1.1.</span> <span class="nav-text">例如</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件结构"><span class="nav-number">2.</span> <span class="nav-text">文件结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">3.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#场景值"><span class="nav-number">4.</span> <span class="nav-text">场景值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setData-参数格式"><span class="nav-number">5.</span> <span class="nav-text">setData() 参数格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Page实例的生命周期"><span class="nav-number">6.</span> <span class="nav-text">Page实例的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一个简单的示例程序"><span class="nav-number">6.1.</span> <span class="nav-text">一个简单的示例程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#页面跳转"><span class="nav-number">7.</span> <span class="nav-text">页面跳转</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#push新页面"><span class="nav-number">7.1.</span> <span class="nav-text">push新页面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#页面重定向"><span class="nav-number">7.2.</span> <span class="nav-text">页面重定向</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#页面返回"><span class="nav-number">7.3.</span> <span class="nav-text">页面返回</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Tab切换"><span class="nav-number">7.4.</span> <span class="nav-text">Tab切换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重启动"><span class="nav-number">7.5.</span> <span class="nav-text">重启动</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  © 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">otto</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/HomePage/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/HomePage/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/HomePage/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/HomePage/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/HomePage/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/HomePage/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/HomePage/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/HomePage/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
