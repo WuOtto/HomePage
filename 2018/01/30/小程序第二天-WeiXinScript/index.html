@@ -78,7 +78,7 @@
 <link href="/HomePage/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="server," />
+  <meta name="keywords" content="小程序," />
 
 
 
@@ -94,20 +94,18 @@
 
 
 
-<meta name="description" content="Mac自带的本地服务器Apache使用指南，可用于APP本地调试。">
-<meta name="keywords" content="server">
+<meta name="description" content="WXS是小程序的一套脚本语言，结合`WXML`，可以构建出页面的结构">
+<meta name="keywords" content="小程序">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mac本地服务器Apache使用">
-<meta property="og:url" content="https://github.com/WuOtto/HomePage/2017/08/08/Mac本地服务器Apache使用/index.html">
+<meta property="og:title" content="小程序第二天(WeiXin Script)">
+<meta property="og:url" content="https://github.com/WuOtto/HomePage/2018/01/30/小程序第二天-WeiXinScript/index.html">
 <meta property="og:site_name" content="Otto&#39;s blog">
-<meta property="og:description" content="Mac自带的本地服务器Apache使用指南，可用于APP本地调试。">
+<meta property="og:description" content="WXS是小程序的一套脚本语言，结合`WXML`，可以构建出页面的结构">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://omjdi9fe0.bkt.clouddn.com/Apache_1.png">
-<meta property="og:updated_time" content="2017-08-15T08:18:43.000Z">
+<meta property="og:updated_time" content="2018-02-01T08:52:37.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Mac本地服务器Apache使用">
-<meta name="twitter:description" content="Mac自带的本地服务器Apache使用指南，可用于APP本地调试。">
-<meta name="twitter:image" content="http://omjdi9fe0.bkt.clouddn.com/Apache_1.png">
+<meta name="twitter:title" content="小程序第二天(WeiXin Script)">
+<meta name="twitter:description" content="WXS是小程序的一套脚本语言，结合`WXML`，可以构建出页面的结构">
 
 
 
@@ -136,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/WuOtto/HomePage/2017/08/08/Mac本地服务器Apache使用/"/>
+  <link rel="canonical" href="https://github.com/WuOtto/HomePage/2018/01/30/小程序第二天-WeiXinScript/"/>
 
 
 
 
 
-  <title>Mac本地服务器Apache使用 | Otto's blog</title>
+  <title>小程序第二天(WeiXin Script) | Otto's blog</title>
   
 
 
@@ -265,7 +263,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/08/08/Mac本地服务器Apache使用/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2018/01/30/小程序第二天-WeiXinScript/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="otto">
@@ -282,7 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Mac本地服务器Apache使用</h1>
+          <h1 class="post-title" itemprop="name headline">小程序第二天(WeiXin Script)</h1>
         
 
         <div class="post-meta">
@@ -294,8 +292,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T16:47:40+08:00">
-                2017-08-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-30T22:01:18+08:00">
+                2018-01-30
               </time>
             
 
@@ -319,7 +317,7 @@
 
           
               <div class="post-description">
-                  Mac自带的本地服务器Apache使用指南，可用于APP本地调试。
+                  WXS是小程序的一套脚本语言，结合`WXML`，可以构建出页面的结构
               </div>
           
 
@@ -336,14 +334,10 @@
       
 
       
-        <h3 id="在控制台开启服务"><a href="#在控制台开启服务" class="headerlink" title="在控制台开启服务"></a>在控制台开启服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">开启:  sudo apachectl start</div><div class="line"></div><div class="line">重启:  sudo apachectl restart</div><div class="line"></div><div class="line">关闭:  sudo apachectl stop</div></pre></td></tr></table></figure>
-<h4 id="启动后，在浏览器中输入-http-127-0-0-1-或者-http-localhost-如果看到-It-Works-页面："><a href="#启动后，在浏览器中输入-http-127-0-0-1-或者-http-localhost-如果看到-It-Works-页面：" class="headerlink" title="启动后，在浏览器中输入 http://127.0.0.1/ 或者 http://localhost  如果看到 It Works! 页面："></a>启动后，在浏览器中输入 <a href="http://127.0.0.1/" target="_blank" rel="external">http://127.0.0.1/</a> 或者 <a href="http://localhost" target="_blank" rel="external">http://localhost</a>  如果看到 It Works! 页面：</h4><p><img src="http://omjdi9fe0.bkt.clouddn.com/Apache_1.png" alt=""></p>
-<h5 id="那么Apache-就启动成功了，站点的根目录为系统级根目录"><a href="#那么Apache-就启动成功了，站点的根目录为系统级根目录" class="headerlink" title="那么Apache 就启动成功了，站点的根目录为系统级根目录"></a>那么Apache 就启动成功了，站点的根目录为系统级根目录</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/Library/WebServer/Documents</div></pre></td></tr></table></figure>
-<p>启动后，你可以通过编辑 /etc/apache2/httpd.conf 文件来修改 Apache 配置。</p>
-<h4 id="访问服务器文件"><a href="#访问服务器文件" class="headerlink" title="访问服务器文件"></a>访问服务器文件</h4><p>1.将一个json文件（test.json）放到服务器路径下</p>
-<p>2.用浏览器访问 <a href="http://127.0.0.1/test" target="_blank" rel="external">http://127.0.0.1/test</a> 或者<br><a href="http://localhost/test" target="_blank" rel="external">http://localhost/test</a> </p>
-<p>在浏览器中访问时，中文可能会出现乱码，但在项目中请求回来，打印在控制台的是正常的。</p>
-
+        <h3 id="WXS"><a href="#WXS" class="headerlink" title="WXS"></a><a href="https://mp.weixin.qq.com/debug/wxadoc/dev/framework/view/wxs/" target="_blank" rel="external">WXS</a></h3><p><code>WXS（WeiXin Script）</code>是小程序的一套脚本语言，结合<code>WXML</code>，可以构建出页面的结构。</p>
+<h4 id="页面渲染"><a href="#页面渲染" class="headerlink" title="页面渲染"></a>页面渲染</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;!--wxml--&gt;</div><div class="line">&lt;wxs module=&quot;m1&quot;&gt;</div><div class="line">var msg = &quot;hello world&quot;;</div><div class="line"></div><div class="line">module.exports.message = msg;</div><div class="line">&lt;/wxs&gt;</div><div class="line"></div><div class="line">&lt;view&gt; &#123;&#123;m1.message&#125;&#125; &lt;/view&gt;</div></pre></td></tr></table></figure>
+<h4 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// page.js</div><div class="line">Page(&#123;</div><div class="line">  data: &#123;</div><div class="line">    array: [1, 2, 3, 4, 5, 1, 2, 3, 4]</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">&lt;!--wxml--&gt;</div><div class="line">&lt;!-- 下面的 getMax 函数，接受一个数组，且返回数组中最大的元素的值 --&gt;</div><div class="line">&lt;wxs module=&quot;m1&quot;&gt;</div><div class="line">var getMax = function(array) &#123;</div><div class="line">  var max = undefined;</div><div class="line">  for (var i = 0; i &lt; array.length; ++i) &#123;</div><div class="line">    max = max === undefined ? </div><div class="line">      array[i] : </div><div class="line">      (max &gt;= array[i] ? max : array[i]);</div><div class="line">  &#125;</div><div class="line">  return max;</div><div class="line">&#125;</div><div class="line"></div><div class="line">module.exports.getMax = getMax;</div><div class="line">&lt;/wxs&gt;</div><div class="line"></div><div class="line">&lt;!-- 调用 wxs 里面的 getMax 函数，参数为 page.js 里面的 array --&gt;</div><div class="line">&lt;view&gt; &#123;&#123;m1.getMax(array)&#125;&#125; &lt;/view&gt;</div></pre></td></tr></table></figure>
       
     </div>
     
@@ -360,7 +354,7 @@
       
         <div class="post-tags">
           
-            <a href="/HomePage/tags/server/" rel="tag"># server</a>
+            <a href="/HomePage/tags/小程序/" rel="tag"># 小程序</a>
           
         </div>
       
@@ -373,8 +367,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/HomePage/2016/09/11/iOS开发中方法延迟执行的几种方式/" rel="next" title="iOS开发中方法延迟执行的几种方式">
-                <i class="fa fa-chevron-left"></i> iOS开发中方法延迟执行的几种方式
+              <a href="/HomePage/2018/01/30/小程序第二天-视图层/" rel="next" title="小程序第二天(视图层)">
+                <i class="fa fa-chevron-left"></i> 小程序第二天(视图层)
               </a>
             
           </div>
@@ -382,10 +376,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/HomePage/2017/08/08/七牛云qshell的安装及使用/" rel="prev" title="七牛云qshell的安装及使用">
-                七牛云qshell的安装及使用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -523,7 +513,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#在控制台开启服务"><span class="nav-number">1.</span> <span class="nav-text">在控制台开启服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#启动后，在浏览器中输入-http-127-0-0-1-或者-http-localhost-如果看到-It-Works-页面："><span class="nav-number">1.1.</span> <span class="nav-text">启动后，在浏览器中输入 http://127.0.0.1/ 或者 http://localhost  如果看到 It Works! 页面：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#那么Apache-就启动成功了，站点的根目录为系统级根目录"><span class="nav-number">1.1.1.</span> <span class="nav-text">那么Apache 就启动成功了，站点的根目录为系统级根目录</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#访问服务器文件"><span class="nav-number">1.2.</span> <span class="nav-text">访问服务器文件</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#WXS"><span class="nav-number">1.</span> <span class="nav-text">WXS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#页面渲染"><span class="nav-number">1.1.</span> <span class="nav-text">页面渲染</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据处理"><span class="nav-number">1.2.</span> <span class="nav-text">数据处理</span></a></li></ol></li></ol></div>
             
 
           </div>
