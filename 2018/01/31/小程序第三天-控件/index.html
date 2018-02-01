@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/HomePage/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/HomePage/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/HomePage/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="小程序," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/HomePage/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="小程序中一些常用控件的简单使用。">
+<meta name="keywords" content="小程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小程序第三天(控件)">
+<meta property="og:url" content="https://github.com/WuOtto/HomePage/2018/01/31/小程序第三天-控件/index.html">
+<meta property="og:site_name" content="Otto&#39;s blog">
+<meta property="og:description" content="小程序中一些常用控件的简单使用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-01T08:59:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="小程序第三天(控件)">
+<meta name="twitter:description" content="小程序中一些常用控件的简单使用。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/HomePage/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Otto'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://github.com/WuOtto/HomePage/2018/01/31/小程序第三天-控件/"/>
+
+
+
+
+
+  <title>小程序第三天(控件) | Otto's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/HomePage/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Otto's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">既然选择了远方，便只顾风雨兼程</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/HomePage/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/HomePage/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/HomePage/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2018/01/31/小程序第三天-控件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="otto">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Otto's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">小程序第三天(控件)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-31T19:57:47+08:00">
+                2018-01-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  小程序中一些常用控件的简单使用。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="scroll-view"><a href="#scroll-view" class="headerlink" title="scroll-view"></a>scroll-view</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">&lt;!--垂直滚动，这里必须设置高度--&gt;</div><div class="line">&lt;scroll-view scroll-y=&quot;true&quot; style=&quot;height: 200px&quot; enable-back-to-top=&quot;true&quot;&gt;</div><div class="line">    &lt;view style=&quot;background: red; width: 100px; height: 100px&quot; &gt;&lt;/view&gt;</div><div class="line">    &lt;view style=&quot;background: green; width: 100px; height: 100px&quot;&gt;&lt;/view&gt;</div><div class="line">    &lt;view style=&quot;background: blue; width: 100px; height: 100px&quot;&gt;&lt;/view&gt;</div><div class="line">    &lt;view style=&quot;background: yellow; width: 100px; height: 100px&quot;&gt;&lt;/view&gt;</div><div class="line">    &lt;button bindtap=&apos;btnClick&apos; id=&apos;1&apos;&gt;OneBtn&lt;/button&gt;</div><div class="line">    &lt;button bindtap=&apos;btnClick&apos; id=&apos;2&apos;&gt;TwoBtn&lt;/button&gt;</div><div class="line">    &lt;button bindtap=&apos;btnClick&apos; id=&apos;3&apos;&gt;ThreeBtn&lt;/button&gt;</div><div class="line">&lt;/scroll-view&gt;</div><div class="line"></div><div class="line">&lt;!--  white-space</div><div class="line">  normal: 正常无变化(默认处理方式.文本自动处理换行.假如抵达容器边界内容会转到下一行)</div><div class="line">  pre: 保持HTML源代码的空格与换行,等同与pre标签</div><div class="line">  nowrap: 强制文本在一行,除非遇到br换行标签</div><div class="line">  pre-wrap: 同pre属性,但是遇到超出容器范围的时候会自动换行</div><div class="line">  pre-line: 同pre属性,但是遇到连续空格会被看作一个空格</div><div class="line">  inherit: 继承</div><div class="line">--&gt;</div><div class="line">&lt;!--水平滚动--&gt;</div><div class="line">&lt;scroll-view scroll-x=&quot;true&quot; style=&quot; white-space: nowrap; display: flex&quot; &gt;</div><div class="line">&lt;!--  display: inline-block--&gt;</div><div class="line">  &lt;view style=&quot;background: red; width: 200px; height: 200px; display: inline-block&quot; &gt;&lt;/view&gt;</div><div class="line">  &lt;view style=&quot;background: green; width: 200px; height: 100px; display: inline-block&quot;&gt;&lt;/view&gt;</div><div class="line">  &lt;view style=&quot;background: blue; width: 200px; height: 200px; display: inline-block&quot;&gt;&lt;/view&gt;</div><div class="line">  &lt;view style=&quot;background: yellow; width: 200px; height: 100px; display: inline-block&quot;&gt;&lt;/view&gt;</div><div class="line">  &lt;button bindtap=&apos;btnClick&apos; style=&apos;width:100px&apos; id=&apos;4&apos;&gt;click Me&lt;/button&gt;</div><div class="line">&lt;/scroll-view&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">btnClick:function(e)&#123;</div><div class="line">    console.log(e.target.id + &quot;btnClick&quot;)</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="form"><a href="#form" class="headerlink" title="form"></a>form</h3><p>表单，将组件内的用户输入的<code>&lt;switch/&gt; &lt;input/&gt; &lt;checkbox/&gt; &lt;slider/&gt; &lt;radio/&gt; &lt;picker/&gt;</code> 提交。</p>
+<p>当点击 <code>&lt;form/&gt;</code>表单中 formType 为 submit 的 <code>&lt;button/&gt;</code> 组件时，会将表单组件中的 value 值进行提交，需要在表单组件中加上 name 来作为 key。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">&lt;form bindsubmit=&quot;formSubmit&quot; bindreset=&quot;formReset&quot;&gt;</div><div class="line">  &lt;view class=&quot;section section_gap&quot;&gt;</div><div class="line">    &lt;view class=&quot;section__title&quot;&gt;switch&lt;/view&gt;</div><div class="line">    &lt;switch name=&quot;switch&quot;/&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">  &lt;view class=&quot;section section_gap&quot;&gt;</div><div class="line">    &lt;view class=&quot;section__title&quot;&gt;slider&lt;/view&gt;</div><div class="line">    &lt;slider name=&quot;slider&quot; show-value &gt;&lt;/slider&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line"></div><div class="line">  &lt;view class=&quot;section&quot;&gt;</div><div class="line">    &lt;view class=&quot;section__title&quot;&gt;input&lt;/view&gt;</div><div class="line">    &lt;input name=&quot;input&quot; placeholder=&quot;please input here&quot; /&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">  &lt;view class=&quot;section section_gap&quot;&gt;</div><div class="line">    &lt;view class=&quot;section__title&quot;&gt;radio&lt;/view&gt;</div><div class="line">    &lt;radio-group name=&quot;radio-group&quot;&gt;</div><div class="line">      &lt;label&gt;&lt;radio value=&quot;radio1&quot;/&gt;radio1&lt;/label&gt;</div><div class="line">      &lt;label&gt;&lt;radio value=&quot;radio2&quot;/&gt;radio2&lt;/label&gt;</div><div class="line">    &lt;/radio-group&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">  &lt;view class=&quot;section section_gap&quot;&gt;</div><div class="line">    &lt;view class=&quot;section__title&quot;&gt;checkbox&lt;/view&gt;</div><div class="line">    &lt;checkbox-group name=&quot;checkbox&quot;&gt;</div><div class="line">      &lt;label&gt;&lt;checkbox value=&quot;checkbox1&quot;/&gt;checkbox1&lt;/label&gt;</div><div class="line">      &lt;label&gt;&lt;checkbox value=&quot;checkbox2&quot;/&gt;checkbox2&lt;/label&gt;</div><div class="line">    &lt;/checkbox-group&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">  &lt;view class=&quot;btn-area&quot;&gt;</div><div class="line">    &lt;button formType=&quot;submit&quot;&gt;Submit&lt;/button&gt;</div><div class="line">    &lt;button formType=&quot;reset&quot;&gt;Reset&lt;/button&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">formSubmit: function (e) &#123;</div><div class="line">    console.log(&apos;form发生了submit事件，携带数据为：&apos;, e.detail.value)</div><div class="line"></div><div class="line">  &#125;,</div><div class="line">  formReset: function () &#123;</div><div class="line">    console.log(&apos;form发生了reset事件&apos;)</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="input"><a href="#input" class="headerlink" title="input"></a>input</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input placeholder=&quot;这是一个可以自动聚焦的input&quot; auto-focus/&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input placeholder=&quot;这个只有在按钮点击的时候才聚焦&quot; focus=&quot;&#123;&#123;focus&#125;&#125;&quot; /&gt;</div><div class="line">  &lt;view class=&quot;btn-area&quot;&gt;</div><div class="line">    &lt;button bindtap=&quot;bindButtonTap&quot;&gt;使得输入框获取焦点&lt;/button&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input  maxlength=&quot;10&quot; placeholder=&quot;最大输入长度10&quot; /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;view class=&quot;section__title&quot;&gt;你输入的是：&#123;&#123;inputValue&#125;&#125;&lt;/view&gt;</div><div class="line">  &lt;input  bindinput=&quot;bindKeyInput&quot; placeholder=&quot;输入同步到view中&quot;/&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input  bindinput=&quot;bindReplaceInput&quot; placeholder=&quot;连续的两个1会变成2&quot; /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input password type=&quot;number&quot; /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input password type=&quot;text&quot; /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input type=&quot;digit&quot; placeholder=&quot;带小数点的数字键盘&quot;/&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input type=&quot;idcard&quot; placeholder=&quot;身份证输入键盘&quot; /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;input placeholder-style=&quot;color:red&quot; placeholder=&quot;占位符字体是红色的&quot; /&gt;</div><div class="line">&lt;/view&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">data: &#123;</div><div class="line">    focus: false,</div><div class="line">    inputValue: &apos;&apos;</div><div class="line">  &#125;,</div><div class="line">  bindButtonTap: function () &#123;</div><div class="line">    this.setData(&#123;</div><div class="line">      focus: true</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  bindKeyInput: function (e) &#123;</div><div class="line">    this.setData(&#123;</div><div class="line">      inputValue: e.detail.value</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  bindReplaceInput: function (e) &#123;</div><div class="line">    var value = e.detail.value</div><div class="line">    var pos = e.detail.cursor</div><div class="line">    if (pos != -1) &#123;</div><div class="line">      //光标在中间</div><div class="line">      var left = e.detail.value.slice(0, pos)</div><div class="line">      //计算光标的位置</div><div class="line">      pos = left.replace(/11/g, &apos;2&apos;).length</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //直接返回对象，可以对输入进行过滤处理，同时可以控制光标的位置</div><div class="line">    return &#123;</div><div class="line">      value: value.replace(/11/g, &apos;2&apos;),</div><div class="line">      cursor: pos</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //或者直接返回字符串,光标在最后边</div><div class="line">    //return value.replace(/11/g,&apos;2&apos;),</div><div class="line">  &#125;,</div></pre></td></tr></table></figure>
+<h3 id="label"><a href="#label" class="headerlink" title="label"></a>label</h3><p>用来改进表单组件的可用性，将控件放在该标签下，当点击时，就会触发对应的控件。<br>目前可以绑定的控件有：<code>&lt;button/&gt;</code>, <code>&lt;checkbox/&gt;</code>, <code>&lt;radio/&gt;</code>, <code>&lt;switch/&gt;</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&lt;view class=&quot;section section_gap&quot;&gt;</div><div class="line">&lt;view class=&quot;section__title&quot;&gt;表单组件在label内&lt;/view&gt;</div><div class="line">&lt;checkbox-group class=&quot;group&quot; bindchange=&quot;checkboxChange&quot;&gt;</div><div class="line">  &lt;view class=&quot;label-1&quot; wx:for=&quot;&#123;&#123;checkboxItems&#125;&#125;&quot;&gt;</div><div class="line">    &lt;label&gt;</div><div class="line">      &lt;checkbox hidden value=&quot;&#123;&#123;item.name&#125;&#125;&quot; checked=&quot;&#123;&#123;item.checked&#125;&#125;&quot;&gt;&lt;/checkbox&gt;</div><div class="line">      &lt;view class=&quot;label-1__icon&quot;&gt;</div><div class="line">        &lt;view class=&quot;label-1__icon-checked&quot; style=&quot;opacity:&#123;&#123;item.checked ? 1: 0&#125;&#125;&quot;&gt;&lt;/view&gt;</div><div class="line">      &lt;/view&gt;</div><div class="line">      &lt;text class=&quot;label-1__text&quot;&gt;&#123;&#123;item.value&#125;&#125;&lt;/text&gt;</div><div class="line">    &lt;/label&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">&lt;/checkbox-group&gt;</div><div class="line">&lt;/view&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">.label-1, .label-2&#123;</div><div class="line">    margin-bottom: 15px;</div><div class="line">&#125;</div><div class="line">.label-1__text, .label-2__text &#123;</div><div class="line">    display: inline-block;</div><div class="line">    vertical-align: middle;</div><div class="line">&#125;</div><div class="line"></div><div class="line">.label-1__icon &#123;</div><div class="line">    position: relative;</div><div class="line">    margin-right: 10px;</div><div class="line">    display: inline-block;</div><div class="line">    vertical-align: middle;</div><div class="line">    width: 18px;</div><div class="line">    height: 18px;</div><div class="line">    background: #fcfff4;</div><div class="line">&#125;</div><div class="line"></div><div class="line">.label-1__icon-checked &#123;</div><div class="line">    position: absolute;</div><div class="line">    top: 3px;</div><div class="line">    left: 3px;</div><div class="line">    width: 12px;</div><div class="line">    height: 12px;</div><div class="line">    background: #1aad19;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">data: &#123;</div><div class="line">    checkboxItems: [</div><div class="line">      &#123; name: &apos;USA&apos;, value: &apos;美国&apos; &#125;,</div><div class="line">      &#123; name: &apos;CHN&apos;, value: &apos;中国&apos;, checked: &apos;true&apos; &#125;,</div><div class="line">      &#123; name: &apos;BRA&apos;, value: &apos;巴西&apos; &#125;,</div><div class="line">      &#123; name: &apos;JPN&apos;, value: &apos;日本&apos;, checked: &apos;true&apos; &#125;,</div><div class="line">      &#123; name: &apos;ENG&apos;, value: &apos;英国&apos; &#125;,</div><div class="line">      &#123; name: &apos;TUR&apos;, value: &apos;法国&apos; &#125;,</div><div class="line">    ],</div><div class="line">    radioItems: [</div><div class="line">      &#123; name: &apos;USA&apos;, value: &apos;美国&apos; &#125;,</div><div class="line">      &#123; name: &apos;CHN&apos;, value: &apos;中国&apos;, checked: &apos;true&apos; &#125;,</div><div class="line">      &#123; name: &apos;BRA&apos;, value: &apos;巴西&apos; &#125;,</div><div class="line">      &#123; name: &apos;JPN&apos;, value: &apos;日本&apos; &#125;,</div><div class="line">      &#123; name: &apos;ENG&apos;, value: &apos;英国&apos; &#125;,</div><div class="line">      &#123; name: &apos;TUR&apos;, value: &apos;法国&apos; &#125;,</div><div class="line">    ],</div><div class="line">    hidden: false</div><div class="line">  &#125;,</div><div class="line">  checkboxChange: function (e) &#123;</div><div class="line">    var checked = e.detail.value</div><div class="line">    var changed = &#123;&#125;</div><div class="line">    for (var i = 0; i &lt; this.data.checkboxItems.length; i++) &#123;</div><div class="line">      if (checked.indexOf(this.data.checkboxItems[i].name) !== -1) &#123;</div><div class="line">        changed[&apos;checkboxItems[&apos; + i + &apos;].checked&apos;] = true</div><div class="line">      &#125; else &#123;</div><div class="line">        changed[&apos;checkboxItems[&apos; + i + &apos;].checked&apos;] = false</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    this.setData(changed)</div><div class="line">  &#125;,</div><div class="line">  radioChange: function (e) &#123;</div><div class="line">    var checked = e.detail.value</div><div class="line">    var changed = &#123;&#125;</div><div class="line">    for (var i = 0; i &lt; this.data.radioItems.length; i++) &#123;</div><div class="line">      if (checked.indexOf(this.data.radioItems[i].name) !== -1) &#123;</div><div class="line">        changed[&apos;radioItems[&apos; + i + &apos;].checked&apos;] = true</div><div class="line">      &#125; else &#123;</div><div class="line">        changed[&apos;radioItems[&apos; + i + &apos;].checked&apos;] = false</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    this.setData(changed)</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="picker"><a href="#picker" class="headerlink" title="picker"></a>picker</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;view class=&quot;section__title&quot;&gt;普通选择器&lt;/view&gt;</div><div class="line">  &lt;picker bindchange=&quot;bindPickerChange&quot; value=&quot;&#123;&#123;index&#125;&#125;&quot; range=&quot;&#123;&#123;array&#125;&#125;&quot;&gt;</div><div class="line">    &lt;view class=&quot;picker&quot;&gt;</div><div class="line">      当前选择：&#123;&#123;array[index]&#125;&#125;</div><div class="line">    &lt;/view&gt;</div><div class="line">  &lt;/picker&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;view class=&quot;section__title&quot;&gt;多列选择器&lt;/view&gt;</div><div class="line">  &lt;picker mode=&quot;multiSelector&quot; bindchange=&quot;bindMultiPickerChange&quot; bindcolumnchange=&quot;bindMultiPickerColumnChange&quot; value=&quot;&#123;&#123;multiIndex&#125;&#125;&quot; range=&quot;&#123;&#123;multiArray&#125;&#125;&quot;&gt;</div><div class="line">    &lt;view class=&quot;picker&quot;&gt;</div><div class="line">      当前选择：&#123;&#123;multiArray[0][multiIndex[0]]&#125;&#125;，&#123;&#123;multiArray[1][multiIndex[1]]&#125;&#125;，&#123;&#123;multiArray[2][multiIndex[2]]&#125;&#125;</div><div class="line">    &lt;/view&gt;</div><div class="line">  &lt;/picker&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;view class=&quot;section__title&quot;&gt;时间选择器&lt;/view&gt;</div><div class="line">  &lt;picker mode=&quot;time&quot; value=&quot;&#123;&#123;time&#125;&#125;&quot; start=&quot;09:01&quot; end=&quot;21:01&quot; bindchange=&quot;bindTimeChange&quot;&gt;</div><div class="line">    &lt;view class=&quot;picker&quot;&gt;</div><div class="line">      当前选择: &#123;&#123;time&#125;&#125;</div><div class="line">    &lt;/view&gt;</div><div class="line">  &lt;/picker&gt;</div><div class="line">&lt;/view&gt;</div><div class="line"></div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;view class=&quot;section__title&quot;&gt;日期选择器&lt;/view&gt;</div><div class="line">  &lt;picker mode=&quot;date&quot; value=&quot;&#123;&#123;date&#125;&#125;&quot; start=&quot;2015-09-01&quot; end=&quot;2017-09-01&quot; bindchange=&quot;bindDateChange&quot;&gt;</div><div class="line">    &lt;view class=&quot;picker&quot;&gt;</div><div class="line">      当前选择: &#123;&#123;date&#125;&#125;</div><div class="line">    &lt;/view&gt;</div><div class="line">  &lt;/picker&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;view class=&quot;section__title&quot;&gt;省市区选择器&lt;/view&gt;</div><div class="line">  &lt;picker mode=&quot;region&quot; bindchange=&quot;bindRegionChange&quot; value=&quot;&#123;&#123;region&#125;&#125;&quot; custom-item=&quot;&#123;&#123;customItem&#125;&#125;&quot;&gt;</div><div class="line">    &lt;view class=&quot;picker&quot;&gt;</div><div class="line">      当前选择：&#123;&#123;region[0]&#125;&#125;，&#123;&#123;region[1]&#125;&#125;，&#123;&#123;region[2]&#125;&#125;</div><div class="line">    &lt;/view&gt;</div><div class="line">  &lt;/picker&gt;</div><div class="line">&lt;/view&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">.picker&#123;</div><div class="line">  height: 60px;</div><div class="line">  background-color: mediumturquoise;</div><div class="line">  color: red;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div></pre></td><td class="code"><pre><div class="line">data: &#123;</div><div class="line">    array: [&apos;美国&apos;, &apos;中国&apos;, &apos;巴西&apos;, &apos;日本&apos;],</div><div class="line">    objectArray: [</div><div class="line">      &#123;</div><div class="line">        id: 0,</div><div class="line">        name: &apos;美国&apos;</div><div class="line">      &#125;,</div><div class="line">      &#123;</div><div class="line">        id: 1,</div><div class="line">        name: &apos;中国&apos;</div><div class="line">      &#125;,</div><div class="line">      &#123;</div><div class="line">        id: 2,</div><div class="line">        name: &apos;巴西&apos;</div><div class="line">      &#125;,</div><div class="line">      &#123;</div><div class="line">        id: 3,</div><div class="line">        name: &apos;日本&apos;</div><div class="line">      &#125;</div><div class="line">    ],</div><div class="line">    index: 0,</div><div class="line">    multiArray: [[&apos;无脊柱动物&apos;, &apos;脊柱动物&apos;], [&apos;扁性动物&apos;, &apos;线形动物&apos;, &apos;环节动物&apos;, &apos;软体动物&apos;, &apos;节肢动物&apos;], [&apos;猪肉绦虫&apos;, &apos;吸血虫&apos;]],</div><div class="line">    objectMultiArray: [</div><div class="line">      [</div><div class="line">        &#123;</div><div class="line">          id: 0,</div><div class="line">          name: &apos;无脊柱动物&apos;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          id: 1,</div><div class="line">          name: &apos;脊柱动物&apos;</div><div class="line">        &#125;</div><div class="line">      ], [</div><div class="line">        &#123;</div><div class="line">          id: 0,</div><div class="line">          name: &apos;扁性动物&apos;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          id: 1,</div><div class="line">          name: &apos;线形动物&apos;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          id: 2,</div><div class="line">          name: &apos;环节动物&apos;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          id: 3,</div><div class="line">          name: &apos;软体动物&apos;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          id: 3,</div><div class="line">          name: &apos;节肢动物&apos;</div><div class="line">        &#125;</div><div class="line">      ], [</div><div class="line">        &#123;</div><div class="line">          id: 0,</div><div class="line">          name: &apos;猪肉绦虫&apos;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">          id: 1,</div><div class="line">          name: &apos;吸血虫&apos;</div><div class="line">        &#125;</div><div class="line">      ]</div><div class="line">    ],</div><div class="line">    multiIndex: [0, 0, 0],</div><div class="line">    date: &apos;2016-09-01&apos;,</div><div class="line">    time: &apos;12:01&apos;,</div><div class="line">    region: [&apos;广东省&apos;, &apos;广州市&apos;, &apos;海珠区&apos;],</div><div class="line">    customItem: &apos;全部&apos;</div><div class="line">  &#125;,</div><div class="line">  btnClick:function(e)&#123;</div><div class="line">    console.log(e.target.id + &quot;btnClick&quot;)</div><div class="line">  &#125;,</div><div class="line">  bindPickerChange: function (e) &#123;</div><div class="line">    console.log(&apos;picker发送选择改变，携带值为&apos;, e.detail.value)</div><div class="line">    this.setData(&#123;</div><div class="line">      index: e.detail.value</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  bindMultiPickerChange: function (e) &#123;</div><div class="line">    console.log(&apos;picker发送选择改变，携带值为&apos;, e.detail.value)</div><div class="line">    this.setData(&#123;</div><div class="line">      multiIndex: e.detail.value</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  bindMultiPickerColumnChange: function (e) &#123;</div><div class="line">    console.log(&apos;修改的列为&apos;, e.detail.column, &apos;，值为&apos;, e.detail.value);</div><div class="line">    var data = &#123;</div><div class="line">      multiArray: this.data.multiArray,</div><div class="line">      multiIndex: this.data.multiIndex</div><div class="line">    &#125;;</div><div class="line">    data.multiIndex[e.detail.column] = e.detail.value;</div><div class="line">    switch (e.detail.column) &#123;</div><div class="line">      case 0:</div><div class="line">        switch (data.multiIndex[0]) &#123;</div><div class="line">          case 0:</div><div class="line">            data.multiArray[1] = [&apos;扁性动物&apos;, &apos;线形动物&apos;, &apos;环节动物&apos;, &apos;软体动物&apos;, &apos;节肢动物&apos;];</div><div class="line">            data.multiArray[2] = [&apos;猪肉绦虫&apos;, &apos;吸血虫&apos;];</div><div class="line">            break;</div><div class="line">          case 1:</div><div class="line">            data.multiArray[1] = [&apos;鱼&apos;, &apos;两栖动物&apos;, &apos;爬行动物&apos;];</div><div class="line">            data.multiArray[2] = [&apos;鲫鱼&apos;, &apos;带鱼&apos;];</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        data.multiIndex[1] = 0;</div><div class="line">        data.multiIndex[2] = 0;</div><div class="line">        break;</div><div class="line">      case 1:</div><div class="line">        switch (data.multiIndex[0]) &#123;</div><div class="line">          case 0:</div><div class="line">            switch (data.multiIndex[1]) &#123;</div><div class="line">              case 0:</div><div class="line">                data.multiArray[2] = [&apos;猪肉绦虫&apos;, &apos;吸血虫&apos;];</div><div class="line">                break;</div><div class="line">              case 1:</div><div class="line">                data.multiArray[2] = [&apos;蛔虫&apos;];</div><div class="line">                break;</div><div class="line">              case 2:</div><div class="line">                data.multiArray[2] = [&apos;蚂蚁&apos;, &apos;蚂蟥&apos;];</div><div class="line">                break;</div><div class="line">              case 3:</div><div class="line">                data.multiArray[2] = [&apos;河蚌&apos;, &apos;蜗牛&apos;, &apos;蛞蝓&apos;];</div><div class="line">                break;</div><div class="line">              case 4:</div><div class="line">                data.multiArray[2] = [&apos;昆虫&apos;, &apos;甲壳动物&apos;, &apos;蛛形动物&apos;, &apos;多足动物&apos;];</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">            break;</div><div class="line">          case 1:</div><div class="line">            switch (data.multiIndex[1]) &#123;</div><div class="line">              case 0:</div><div class="line">                data.multiArray[2] = [&apos;鲫鱼&apos;, &apos;带鱼&apos;];</div><div class="line">                break;</div><div class="line">              case 1:</div><div class="line">                data.multiArray[2] = [&apos;青蛙&apos;, &apos;娃娃鱼&apos;];</div><div class="line">                break;</div><div class="line">              case 2:</div><div class="line">                data.multiArray[2] = [&apos;蜥蜴&apos;, &apos;龟&apos;, &apos;壁虎&apos;];</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">        data.multiIndex[2] = 0;</div><div class="line">        console.log(data.multiIndex);</div><div class="line">        break;</div><div class="line">    &#125;</div><div class="line">    this.setData(data);</div><div class="line">  &#125;,</div><div class="line">  bindDateChange: function (e) &#123;</div><div class="line">    console.log(&apos;picker发送选择改变，携带值为&apos;, e.detail.value)</div><div class="line">    this.setData(&#123;</div><div class="line">      date: e.detail.value</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  bindTimeChange: function (e) &#123;</div><div class="line">    console.log(&apos;picker发送选择改变，携带值为&apos;, e.detail.value)</div><div class="line">    this.setData(&#123;</div><div class="line">      time: e.detail.value</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  bindRegionChange: function (e) &#123;</div><div class="line">    console.log(&apos;picker发送选择改变，携带值为&apos;, e.detail.value)</div><div class="line">    this.setData(&#123;</div><div class="line">      region: e.detail.value</div><div class="line">    &#125;)</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="textarea"><a href="#textarea" class="headerlink" title="textarea"></a>textarea</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;textarea bindblur=&quot;bindTextAreaBlur&quot; auto-height placeholder=&quot;自动变高&quot; /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;textarea placeholder=&quot;placeholder颜色是红色的&quot; placeholder-style=&quot;color:red;&quot;  /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;textarea placeholder=&quot;这是一个可以自动聚焦的textarea&quot; auto-focus /&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;textarea placeholder=&quot;这个只有在按钮点击的时候才聚焦&quot; focus=&quot;&#123;&#123;focus&#125;&#125;&quot; /&gt;</div><div class="line">  &lt;view class=&quot;btn-area&quot;&gt;</div><div class="line">    &lt;button bindtap=&quot;bindButtonTap&quot;&gt;使得输入框获取焦点&lt;/button&gt;</div><div class="line">  &lt;/view&gt;</div><div class="line">&lt;/view&gt;</div><div class="line">&lt;view class=&quot;section&quot;&gt;</div><div class="line">  &lt;form bindsubmit=&quot;bindFormSubmit&quot;&gt;</div><div class="line">    &lt;textarea placeholder=&quot;form 中的 textarea&quot; name=&quot;textarea&quot;/&gt;</div><div class="line">    &lt;button form-type=&quot;submit&quot;&gt; 提交 &lt;/button&gt;</div><div class="line">  &lt;/form&gt;</div><div class="line">&lt;/view&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">Page(&#123;</div><div class="line">  data: &#123;</div><div class="line">    height: 20,</div><div class="line">    focus: false</div><div class="line">  &#125;,</div><div class="line">  bindButtonTap: function() &#123;</div><div class="line">    this.setData(&#123;</div><div class="line">      focus: true</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div><div class="line">  bindTextAreaBlur: function(e) &#123;</div><div class="line">    console.log(e.detail.value)</div><div class="line">  &#125;,</div><div class="line">  bindFormSubmit: function(e) &#123;</div><div class="line">    console.log(e.detail.value.textarea)</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/HomePage/tags/小程序/" rel="tag"># 小程序</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/HomePage/2018/01/30/小程序第二天-WeiXinScript/" rel="next" title="小程序第二天(WeiXin Script)">
+                <i class="fa fa-chevron-left"></i> 小程序第二天(WeiXin Script)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG"
+               alt="otto" />
+          <p class="site-author-name" itemprop="name">otto</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/HomePage/archives/">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/HomePage/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/WuOtto" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#scroll-view"><span class="nav-number">1.</span> <span class="nav-text">scroll-view</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#form"><span class="nav-number">2.</span> <span class="nav-text">form</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#input"><span class="nav-number">3.</span> <span class="nav-text">input</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#label"><span class="nav-number">4.</span> <span class="nav-text">label</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#picker"><span class="nav-number">5.</span> <span class="nav-text">picker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#textarea"><span class="nav-number">6.</span> <span class="nav-text">textarea</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  © 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">otto</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/HomePage/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/HomePage/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/HomePage/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/HomePage/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/HomePage/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/HomePage/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/HomePage/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/HomePage/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/HomePage/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
