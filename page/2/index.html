@@ -508,6 +508,132 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/09/25/Xcode9导入文件问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="otto">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Otto's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/HomePage/2017/09/25/Xcode9导入文件问题/" itemprop="url">Xcode9导入文件问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-25T17:18:37+08:00">
+                2017-09-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>在使用Xcode9.0过程中，出现了往工程中拖入文件无法使用的问题，问题的原因与解决方法如下：</p>
+<h3 id="导入文件成功，却无法使用文件的原因"><a href="#导入文件成功，却无法使用文件的原因" class="headerlink" title="导入文件成功，却无法使用文件的原因"></a>导入文件成功，却无法使用文件的原因</h3><p>添加文件的时候，明明都有勾选，但是在工程中却无法使用。<br><img src="http://upload-images.jianshu.io/upload_images/1518534-0e32aa514303e1c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="addFile_1.png"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1518534-becb43e0c4fcdff8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="addFile_2.png"><br>这是因为文件导入成功，但是Xcode9.0没有关联Target Membership。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1518534-ec9ce851d3e36ef5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="addFile_3.png"></p>
+<h3 id="三种解决方法"><a href="#三种解决方法" class="headerlink" title="三种解决方法"></a>三种解决方法</h3><h4 id="1-导入文件的时候，不要拖进工程，用Add-File操作"><a href="#1-导入文件的时候，不要拖进工程，用Add-File操作" class="headerlink" title="1.导入文件的时候，不要拖进工程，用Add File操作"></a>1.导入文件的时候，不要拖进工程，用Add File操作</h4><p><img src="http://upload-images.jianshu.io/upload_images/1518534-7a6363da57f4510c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="addFile_4.png"></p>
+<h4 id="2-也可以选择去工程中文件的信息那里手动勾选Target-Membership（2333-orz"><a href="#2-也可以选择去工程中文件的信息那里手动勾选Target-Membership（2333-orz" class="headerlink" title="2.也可以选择去工程中文件的信息那里手动勾选Target Membership（2333 orz"></a>2.也可以选择去工程中文件的信息那里手动勾选Target Membership（2333 orz</h4><p><img src="http://upload-images.jianshu.io/upload_images/1518534-4683347f52ded87a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="addFile_5.png"></p>
+<h4 id="3-直接把图片拖到Assets-xcassets资源管理器下"><a href="#3-直接把图片拖到Assets-xcassets资源管理器下" class="headerlink" title="3.直接把图片拖到Assets.xcassets资源管理器下"></a>3.直接把图片拖到Assets.xcassets资源管理器下</h4><p><img src="http://upload-images.jianshu.io/upload_images/1518534-94203477186de5a3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="addFile_6.png"></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/09/04/用Python建立最简单的web服务器/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1367,130 +1493,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/08/08/七牛云qshell的安装及使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="otto">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Otto's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/08/08/七牛云qshell的安装及使用/" itemprop="url">七牛云qshell的安装及使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T16:58:51+08:00">
-                2017-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          简述七牛云工具qshell的安装及使用
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/HomePage/2017/08/08/七牛云qshell的安装及使用/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1541,7 +1543,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/HomePage/archives/">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">23</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
