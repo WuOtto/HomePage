@@ -78,7 +78,7 @@
 <link href="/HomePage/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="iOS," />
 
 
 
@@ -94,13 +94,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Otto&#39;s blog">
-<meta property="og:url" content="https://github.com/WuOtto/HomePage/page/3/index.html">
+<meta name="description" content="简介沙盒（NSHomeDirectory()）中总共有四个文件夹，documents、tmp、app、Library;手动保存的文件在documents文件里;Nsuserdefaults保存的文件在tmp文件夹里; Documents目录：你应该将所有的应用程序数据文件写入到这个目录下。这个目录用于存储用户数据或其它应该定期备份的信息。 AppName.app目录：这是应用程序的程序包目录，包含">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS沙盒目录文件操作">
+<meta property="og:url" content="https://github.com/WuOtto/HomePage/2017/06/15/iOS沙盒目录文件操作/index.html">
 <meta property="og:site_name" content="Otto&#39;s blog">
+<meta property="og:description" content="简介沙盒（NSHomeDirectory()）中总共有四个文件夹，documents、tmp、app、Library;手动保存的文件在documents文件里;Nsuserdefaults保存的文件在tmp文件夹里; Documents目录：你应该将所有的应用程序数据文件写入到这个目录下。这个目录用于存储用户数据或其它应该定期备份的信息。 AppName.app目录：这是应用程序的程序包目录，包含">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-14T10:24:09.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Otto&#39;s blog">
+<meta name="twitter:title" content="iOS沙盒目录文件操作">
+<meta name="twitter:description" content="简介沙盒（NSHomeDirectory()）中总共有四个文件夹，documents、tmp、app、Library;手动保存的文件在documents文件里;Nsuserdefaults保存的文件在tmp文件夹里; Documents目录：你应该将所有的应用程序数据文件写入到这个目录下。这个目录用于存储用户数据或其它应该定期备份的信息。 AppName.app目录：这是应用程序的程序包目录，包含">
 
 
 
@@ -129,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/WuOtto/HomePage/page/3/"/>
+  <link rel="canonical" href="https://github.com/WuOtto/HomePage/2017/06/15/iOS沙盒目录文件操作/"/>
 
 
 
 
 
-  <title>Otto's blog</title>
+  <title>iOS沙盒目录文件操作 | Otto's blog</title>
   
 
 
@@ -160,9 +165,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -245,379 +248,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/08/08/七牛云qshell的安装及使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="otto">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Otto's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/08/08/七牛云qshell的安装及使用/" itemprop="url">七牛云qshell的安装及使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T16:58:51+08:00">
-                2017-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          简述七牛云工具qshell的安装及使用
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/HomePage/2017/08/08/七牛云qshell的安装及使用/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/08/08/Mac本地服务器Apache使用/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="otto">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Otto's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/08/08/Mac本地服务器Apache使用/" itemprop="url">Mac本地服务器Apache使用</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T16:47:40+08:00">
-                2017-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          Mac自带的本地服务器Apache使用指南，可用于APP本地调试。
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/HomePage/2017/08/08/Mac本地服务器Apache使用/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2017/07/29/iOS获取当前连接的wifi信息/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="otto">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Otto's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/07/29/iOS获取当前连接的wifi信息/" itemprop="url">iOS获取当前连接的wifi信息</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-29T18:19:09+08:00">
-                2017-07-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="导入框架CaptiveNetwork"><a href="#导入框架CaptiveNetwork" class="headerlink" title="导入框架CaptiveNetwork"></a>导入框架CaptiveNetwork</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#import &lt;SystemConfiguration/CaptiveNetwork.h&gt;</div></pre></td></tr></table></figure>
-<h3 id="获取当前连接的wifi信息"><a href="#获取当前连接的wifi信息" class="headerlink" title="获取当前连接的wifi信息"></a>获取当前连接的wifi信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">// 只能获取当前的SSID</div><div class="line">- (id)fetchSSIDInfo</div><div class="line">&#123;</div><div class="line">NSString *currentSSID = @&quot;&quot;;</div><div class="line">CFArrayRef myArray = CNCopySupportedInterfaces();</div><div class="line">if (myArray != nil)&#123;</div><div class="line">NSDictionary* myDict = (__bridge NSDictionary *) CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(myArray, 0));</div><div class="line">if (myDict!=nil)&#123;</div><div class="line">currentSSID=[myDict valueForKey:@&quot;SSID&quot;];</div><div class="line">&#125; else &#123;</div><div class="line">currentSSID=@&quot;&lt;&lt;NONE&gt;&gt;&quot;;</div><div class="line">&#125;</div><div class="line">&#125; else &#123;</div><div class="line">currentSSID=@&quot;&lt;&lt;NONE&gt;&gt;&quot;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">NSArray *ifs = (__bridge id)CNCopySupportedInterfaces();</div><div class="line">NSLog(@&quot;%s: Supported interfaces: %@&quot;, __func__, ifs);</div><div class="line">id info = nil;</div><div class="line">for (NSString *ifnam in ifs) &#123;</div><div class="line">info = (__bridge id)CNCopyCurrentNetworkInfo((CFStringRef)CFBridgingRetain(ifnam));</div><div class="line">if (info &amp;&amp; [info count]) &#123;</div><div class="line">break;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">NSLog(@&quot;wifi info %@&quot;,info);</div><div class="line"></div><div class="line">return info;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wifi info &#123;</div><div class="line">BSSID = &quot;a4:2b:8c:92:47:3c&quot;;</div><div class="line">SSID = &quot;XF-WORLD&quot;;</div><div class="line">SSIDDATA = &lt;58462d57 4f524c44&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
 
   
 
@@ -647,9 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2017/06/15/iOS沙盒目录文件操作/" itemprop="url">iOS沙盒目录文件操作</a></h1>
+          <h1 class="post-title" itemprop="name headline">iOS沙盒目录文件操作</h1>
         
 
         <div class="post-meta">
@@ -699,9 +330,7 @@
       
 
       
-        
-          
-            <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>沙盒（NSHomeDirectory()）中总共有四个文件夹，<code>documents</code>、<code>tmp</code>、<code>app</code>、<code>Library</code>;<br>手动保存的文件在documents文件里;<br>Nsuserdefaults保存的文件在tmp文件夹里;</p>
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>沙盒（NSHomeDirectory()）中总共有四个文件夹，<code>documents</code>、<code>tmp</code>、<code>app</code>、<code>Library</code>;<br>手动保存的文件在documents文件里;<br>Nsuserdefaults保存的文件在tmp文件夹里;</p>
 <h3 id="Documents目录："><a href="#Documents目录：" class="headerlink" title="Documents目录："></a>Documents目录：</h3><p>你应该将所有的应用程序数据文件写入到这个目录下。这个目录用于存储用户数据或其它应该定期备份的信息。</p>
 <h3 id="AppName-app目录："><a href="#AppName-app目录：" class="headerlink" title="AppName.app目录："></a>AppName.app目录：</h3><p>这是应用程序的程序包目录，包含应用程序的本身。由于应用程序必须经过签名，所以您在运行时不能对这个目录中的内容进行修改，否则可能会使应用程序无法启动。</p>
 <h3 id="Library目录："><a href="#Library目录：" class="headerlink" title="Library目录："></a>Library目录：</h3><p>这个目录下有两个子目录：Caches 和 Preferences</p>
@@ -719,8 +348,6 @@
 <p>统计caches目录下所有log文件的总大小<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">_IMCacheSize = 0;</div><div class="line">while (filename = [e nextObject]) &#123;</div><div class="line"></div><div class="line">if ([[filename pathExtension] isEqualToString:extension]) &#123;</div><div class="line"></div><div class="line">NSDictionary *IMfileDic = [_fileManager attributesOfItemAtPath:cachesDir error:NULL];</div><div class="line">_IMCacheSize += IMfileDic.fileSize/1024.0;</div><div class="line"></div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>获取Documents目录路径的方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);</div><div class="line">NSString *docDir = [paths objectAtIndex:0];</div><div class="line">//取得一个目录下得所有文件名</div><div class="line">NSArray *files = [fm subpathsAtPath: docDir];</div><div class="line">NSLog(@&quot;files = %@&quot;,files);</div><div class="line"></div><div class="line">文件重命名：（利用fm移动到当前路径，替换文件名即可）</div><div class="line">[_fileManager moveItemAtPath:_path toPath:newPath error:nil];</div></pre></td></tr></table></figure></p>
 
-          
-        
       
     </div>
     
@@ -735,142 +362,40 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/WuOtto/HomePage/HomePage/2016/09/11/iOS开发中方法延迟执行的几种方式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="otto">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Otto's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/HomePage/2016/09/11/iOS开发中方法延迟执行的几种方式/" itemprop="url">iOS开发中方法延迟执行的几种方式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-11T14:18:34+08:00">
-                2016-09-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/HomePage/tags/iOS/" rel="tag"># iOS</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
+      
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
       
-        
-          <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>项目开发中经常会用到方法的延时调用，下面列举常用的几种实现方式：</p>
-<p>1.performSelector</p>
-<p>2.NSTimer</p>
-<p>3.NSThread线程的sleep</p>
-<p>4.GCD<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/HomePage/2016/09/11/iOS开发中方法延迟执行的几种方式/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/HomePage/2016/09/11/iOS开发中方法延迟执行的几种方式/" rel="next" title="iOS开发中方法延迟执行的几种方式">
+                <i class="fa fa-chevron-left"></i> iOS开发中方法延迟执行的几种方式
+              </a>
+            
           </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
 
-    
+          <span class="post-nav-divider"></span>
 
-    
-
-    
-
-    <footer class="post-footer">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/HomePage/2017/07/29/iOS获取当前连接的wifi信息/" rel="prev" title="iOS获取当前连接的wifi信息">
+                iOS获取当前连接的wifi信息 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -880,14 +405,11 @@
   </article>
 
 
-    
-  </section>
 
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/HomePage/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/HomePage/">1</a><a class="page-number" href="/HomePage/page/2/">2</a><span class="page-number current">3</span>
-  </nav>
-
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -895,6 +417,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -915,8 +441,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://ouem5hcj9.bkt.clouddn.com/myBlogAvatar_0.JPG"
@@ -982,6 +517,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Documents目录："><span class="nav-number">2.</span> <span class="nav-text">Documents目录：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AppName-app目录："><span class="nav-number">3.</span> <span class="nav-text">AppName.app目录：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Library目录："><span class="nav-number">4.</span> <span class="nav-text">Library目录：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Preferences-目录："><span class="nav-number">4.1.</span> <span class="nav-text">Preferences 目录：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Caches-目录："><span class="nav-number">4.2.</span> <span class="nav-text">Caches 目录：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tmp-目录："><span class="nav-number">5.</span> <span class="nav-text">tmp 目录：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取这些目录路径的方法："><span class="nav-number">6.</span> <span class="nav-text">获取这些目录路径的方法：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1，获取根目录路径的函数："><span class="nav-number">6.1.</span> <span class="nav-text">1，获取根目录路径的函数：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2，获取Documents目录路径的方法："><span class="nav-number">6.2.</span> <span class="nav-text">2，获取Documents目录路径的方法：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3，获取Caches目录路径的方法："><span class="nav-number">6.3.</span> <span class="nav-text">3，获取Caches目录路径的方法：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4，获取tmp目录路径的方法："><span class="nav-number">6.4.</span> <span class="nav-text">4，获取tmp目录路径的方法：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5，获取应用程序程序包中资源文件路径的方法："><span class="nav-number">6.5.</span> <span class="nav-text">5，获取应用程序程序包中资源文件路径的方法：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSFileManager-文件管理"><span class="nav-number">7.</span> <span class="nav-text">NSFileManager(文件管理)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1094,10 +645,10 @@
 
 
   
-    <script type="text/javascript" src="/HomePage/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/HomePage/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/HomePage/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
