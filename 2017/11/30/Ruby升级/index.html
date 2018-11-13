@@ -102,13 +102,13 @@
 <meta property="og:site_name" content="Otto&#39;s blog">
 <meta property="og:description" content="简介使用RVM也就是Ruby Version Manager,Ruby版本管理器来升级ruby，RVM包含了Ruby的版本管理和Gem库管理(gemset)">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://ouem5hcj9.bkt.clouddn.com/rubyVersionList.png">
-<meta property="og:image" content="http://ouem5hcj9.bkt.clouddn.com/rubyFailed.png">
-<meta property="og:updated_time" content="2017-11-30T03:43:11.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuOtto/imgSrc/master/rubyVersionList.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/WuOtto/imgSrc/master/rubyFailed.png">
+<meta property="og:updated_time" content="2018-11-13T06:17:28.027Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ruby升级">
 <meta name="twitter:description" content="简介使用RVM也就是Ruby Version Manager,Ruby版本管理器来升级ruby，RVM包含了Ruby的版本管理和Gem库管理(gemset)">
-<meta name="twitter:image" content="http://ouem5hcj9.bkt.clouddn.com/rubyVersionList.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/WuOtto/imgSrc/master/rubyVersionList.png">
 
 
 
@@ -350,9 +350,9 @@
 <p>如果出现版本号，说明已经安装成功了。</p>
 <h3 id="使用RVM升级Ruby"><a href="#使用RVM升级Ruby" class="headerlink" title="使用RVM升级Ruby"></a>使用RVM升级Ruby</h3><p>1.查看当前ruby版本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ruby -v</div></pre></td></tr></table></figure></p>
 <p>2.列出已知ruby版本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rvm list known</div></pre></td></tr></table></figure></p>
-<p><img src="http://ouem5hcj9.bkt.clouddn.com/rubyVersionList.png" alt="image"></p>
+<p><img src="https://raw.githubusercontent.com/WuOtto/imgSrc/master/rubyVersionList.png" alt="image"></p>
 <p>3.安装ruby2.3.0<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rvm install 2.3.0</div></pre></td></tr></table></figure></p>
-<p><img src="http://ouem5hcj9.bkt.clouddn.com/rubyFailed.png" alt="image"></p>
+<p><img src="https://raw.githubusercontent.com/WuOtto/imgSrc/master/rubyFailed.png" alt="image"></p>
 <p>如果出现如图所示情况，原因可能有几个：<br> 1.没有安装Homebrew，通过以下命令安装：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</div></pre></td></tr></table></figure></p>
 <p> 2.已安装homebrew，则需要更新homebrew：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">brew update</div><div class="line">等待更新完成之后，执行命令</div><div class="line">rvm get head</div><div class="line">等待命令完成之后再次更新ruby</div></pre></td></tr></table></figure></p>
 <p> 3.这里有人出现的情况是，当时没反应，但是过了几天之后就可以了orz。</p>
