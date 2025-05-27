@@ -1,0 +1,211 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iOS App Icon Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    input, button, label {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #preview {
+      max-width: 300px;
+      max-height: 300px;
+      margin: 20px auto;
+      display: none;
+    }
+    #status {
+      color: green;
+      font-weight: bold;
+    }
+    #error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>iOS App Icon 生成器</h1>
+  <p>上传一张512x512或更大的图片（建议正方形、无透明背景）</p>
+  <input type="file" id="imageInput" accept="image/*">
+  <br>
+  <label>
+    <input type="checkbox" id="supportIpad" checked> 支持iPad图标
+  </label>
+  <br>
+  <img id="preview" alt="预览">
+  <br>
+  <button onclick="generateIcons()">生成并下载</button>
+  <p id="status"></p>
+  <p id="error"></p>
+
+  <script>
+    // iPhone尺寸：
+    // - Notification: 20pt@2x (40x40px), 20pt@3x (60x60px)
+    // - Settings: 29pt@2x (58x58px), 29pt@3x (87x87px)
+    // - Spotlight: 40pt@2x (80x80px), 40pt@3x (120x120px)
+    // - Home Screen: 60pt@2x (120x120px), 60pt@3x (180x180px)
+    // iPad尺寸（可选）：
+    // - Notification: 20pt@2x (40x40px)
+    // - Settings: 29pt@2x (58x58px)
+    // - Spotlight: 40pt@2x (80x80px)
+    // - Home Screen: 76pt@2x (152x152px), 83.5pt@2x (167x167px)
+    // App Store：1024x1024@1x
+    // 注：iOS 18不要求1倍图，20pt尺寸为Xcode模板兼容性添加
+    // 图片要求：至少512x512像素，建议正方形、无透明背景
+    const baseSizes = [
+      { idiom: "iphone", size: 20, scale: 2, filename: "Icon-20@2x.png" }, // iPhone Notification
+      { idiom: "iphone", size: 20, scale: 3, filename: "Icon-20@3x.png" }, // iPhone Notification
+      { idiom: "iphone", size: 29, scale: 2, filename: "Icon-29@2x.png" }, // Settings
+      { idiom: "iphone", size: 29, scale: 3, filename: "Icon-29@3x.png" }, // Settings
+      { idiom: "iphone", size: 40, scale: 2, filename: "Icon-40@2x.png" }, // Spotlight
+      { idiom: "iphone", size: 40, scale: 3, filename: "Icon-40@3x.png" }, // Spotlight
+      { idiom: "iphone", size: 60, scale: 2, filename: "Icon-60@2x.png" }, // Home Screen
+      { idiom: "iphone", size: 60, scale: 3, filename: "Icon-60@3x.png" }, // Home Screen
+      { idiom: "ios-marketing", size: 1024, scale: 1, filename: "Icon-1024.png" } // App Store
+    ];
+
+    const ipadSizes = [
+      { idiom: "ipad", size: 20, scale: 2, filename: "Icon-20@2x.png" }, // iPad Notification
+      { idiom: "ipad", size: 29, scale: 2, filename: "Icon-29@2x.png" }, // Settings
+      { idiom: "ipad", size: 40, scale: 2, filename: "Icon-40@2x.png" }, // Spotlight
+      { idiom: "ipad", size: 76, scale: 2, filename: "Icon-76@2x.png" }, // Home Screen
+      { idiom: "ipad", size: 83.5, scale: 2, filename: "Icon-83.5@2x.png" } // iPad Pro Home Screen
+    ];
+
+    const imageInput = document.getElementById('imageInput');
+    const supportIpad = document.getElementById('supportIpad');
+    const preview = document.getElementById('preview');
+    const status = document.getElementById('status');
+    const error = document.getElementById('error');
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const img = new Image();
+        img.onload = () => {
+          if (img.width < 512 || img.height < 512) {
+            error.textContent = '图片尺寸需至少512x512';
+            preview.style.display = 'none';
+          } else {
+            preview.src = img.src;
+            preview.style.display = 'block';
+            error.textContent = '';
+            status.textContent = '图片已加载，点击生成按钮';
+          }
+        };
+        img.src = URL.createObjectURL(file);
+      }
+    });
+
+    async function generateIcons() {
+      status.textContent = '正在生成图标...';
+      error.textContent = '';
+      const file = imageInput.files[0];
+      if (!file) {
+        error.textContent = '请先选择一张图片';
+        status.textContent = '';
+        return;
+      }
+
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise((resolve) => { img.onload = resolve; });
+
+      if (img.width < 512 || img.height < 512) {
+        error.textContent = '图片尺寸需至少512x512';
+        status.textContent = '';
+        return;
+      }
+
+      const sizes = supportIpad.checked ? [...baseSizes, ...ipadSizes] : baseSizes;
+      const zip = new JSZip();
+      const folder = zip.folder("AppIcon.appiconset");
+
+      for (const size of sizes) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const pixelSize = size.size * size.scale;
+        canvas.width = pixelSize;
+        canvas.height = pixelSize;
+        ctx.drawImage(img, 0, 0, pixelSize, pixelSize);
+        const dataUrl = canvas.toDataURL('image/png');
+        const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+        folder.file(size.filename, base64Data, { base64: true });
+      }
+
+      const contentsJson = {
+        images: sizes.map(size => ({
+          idiom: size.idiom,
+          size: `${size.size}x${size.size}`,
+          scale: `${size.scale}x`,
+          filename: size.filename
+        })),
+        info: {
+          version: 1,
+          author: "xcode"
+        }
+      };
+      folder.file("Contents.json", JSON.stringify(contentsJson, null, 2));
+
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        saveAs(content, "AppIcon.appiconset.zip");
+        status.textContent = '图标生成成功，已下载ZIP文件！包含iPhone和iPad Notification图标。';
+      }).catch((err) => {
+        error.textContent = '生成失败：' + err.message;
+        status.textContent = '';
+      });
+    }
+  </script>
+</body>
+</html>

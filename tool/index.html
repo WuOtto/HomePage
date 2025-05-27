@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开发者工具列表</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #333;
+    }
+    .tool-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .tool-card {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      width: 300px;
+      text-align: left;
+      transition: transform 0.2s;
+    }
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .tool-card h2 {
+      font-size: 1.5em;
+      margin: 0 0 10px;
+      color: #333;
+    }
+    .tool-card p {
+      font-size: 1em;
+      color: #666;
+      margin: 0 0 15px;
+    }
+    .tool-card a {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .tool-card a:hover {
+      background: #218838;
+    }
+    @media (max-width: 600px) {
+      .tool-card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>开发者工具列表</h1>
+  <p>以下是我们的开发者工具集合，助力iOS开发和其他任务。更多工具即将推出！</p>
+  <div class="tool-list">
+    <div class="tool-card">
+      <h2>iOS App Icon 生成器</h2>
+      <p>上传一张512x512或更大的图片（建议正方形、无透明背景），生成Xcode所需的App Icon和Contents.json，支持iPhone和iPad（包括Notification图标）。</p>
+      <a href="./ios-app-icon-generator.html">使用工具</a>
+    </div>
+    <!-- 未来工具可在此添加 -->
+  </div>
+</body>
+</html>
