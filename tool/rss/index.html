@@ -1,0 +1,397 @@
+<script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                    headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+    }
+</script>
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS订阅器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media'
+        };
+    </script>
+</head>
+
+<body
+    class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-400 min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+    <div class="max-w-2xl w-full bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-500 mb-4 text-center">RSS订阅器</h1>
+
+        <!-- 输入RSS feed URL和别名 -->
+        <div class="mb-4">
+            <input id="rssUrl" type="text" placeholder="输入RSS Feed URL"
+                class="w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-400 border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+            <input id="rssAlias" type="text" placeholder="输入RSS别名"
+                class="w-full p-2 border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-400 border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+            <div class="flex gap-2">
+                <button id="fetchRss" onclick="fetchRSS()"
+                    class="flex-1 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 dark:bg-blue-800 dark:hover:bg-blue-900">
+                    获取RSS
+                </button>
+                <button onclick="clearCache()"
+                    class="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-800 px-4"
+                    title="清理缓存">
+                    清理
+                </button>
+            </div>
+        </div>
+
+        <!-- 已保存的RSS链接 -->
+        <div id="savedRssList" class="mb-4 space-y-2"></div>
+
+        <!-- 显示RSS feed内容 -->
+        <div id="rssContent" class="space-y-4"></div>
+    </div>
+
+    <script>
+        // 初始化：加载已保存的RSS链接
+        function loadSavedRss() {
+            const savedRss = JSON.parse(localStorage.getItem('rssUrls') || '[]');
+            const rssList = document.getElementById('savedRssList');
+            rssList.innerHTML = '';
+            if (savedRss.length === 0) {
+                rssList.innerHTML = '<p class="text-gray-400 dark:text-gray-600">暂无保存的RSS链接</p>';
+                return;
+            }
+            savedRss.forEach((item, index) => {
+                const displayName = item.alias && item.alias.trim() ? item.alias : item.url;
+                const rssItem = document.createElement('div');
+                rssItem.className = 'flex flex-col bg-gray-200 dark:bg-gray-800 p-3 rounded';
+                rssItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-800 dark:text-gray-500 truncate flex-1">${displayName}</span>
+                        <div class="flex space-x-2">
+                            <button 
+                                onclick="editAlias(${index})" 
+                                class="text-green-400 dark:text-green-600 hover:underline"
+                            >
+                                编辑别名
+                            </button>
+                            <button 
+                                onclick="testRss('${item.url}', ${index})" 
+                                class="text-yellow-400 dark:text-yellow-600 hover:underline"
+                            >
+                                测试
+                            </button>
+                            <button 
+                                onclick="fetchRSS('${item.url}')" 
+                                class="text-blue-400 dark:text-blue-600 hover:underline"
+                            >
+                                加载
+                            </button>
+                            <button 
+                                onclick="deleteRssUrl(${index})" 
+                                class="text-red-400 dark:text-red-600 hover:underline"
+                            >
+                                删除
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-600 truncate mt-1">URL: ${item.url}</p>
+                `;
+                rssList.appendChild(rssItem);
+            });
+        }
+
+        // 编辑RSS别名
+        function editAlias(index) {
+            const savedRss = JSON.parse(localStorage.getItem('rssUrls') || '[]');
+            const newAlias = prompt('请输入新的别名（留空则使用URL）', savedRss[index].alias || '');
+            if (newAlias !== null) {
+                savedRss[index].alias = newAlias.trim() || '';
+                localStorage.setItem('rssUrls', JSON.stringify(savedRss));
+                loadSavedRss();
+            }
+        }
+
+        // 删除RSS链接
+        function deleteRssUrl(index) {
+            const savedRss = JSON.parse(localStorage.getItem('rssUrls') || '[]');
+            savedRss.splice(index, 1);
+            localStorage.setItem('rssUrls', JSON.stringify(savedRss));
+            loadSavedRss();
+        }
+
+        // 测试RSS链接是否有效
+        async function testRss(url, index) {
+            const rssItem = document.querySelectorAll('#savedRssList > div')[index];
+            const statusText = document.createElement('p');
+            statusText.className = 'text-sm mt-1';
+            rssItem.appendChild(statusText);
+            statusText.textContent = '测试中...';
+            statusText.classList.add('text-gray-400');
+
+            try {
+                const response = await fetchWithRetry(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`, 2);
+                const data = await response.json();
+
+                console.log('测试RSS响应:', data);
+
+                // 更宽松的检查逻辑
+                if (data && (data.status === 'ok' || (data.items && data.items.length > 0))) {
+                    statusText.textContent = '有效';
+                    statusText.classList.replace('text-gray-400', 'text-green-600');
+                } else {
+                    throw new Error(data.message || 'RSS 源返回无效数据');
+                }
+            } catch (error) {
+                console.error('测试RSS失败:', error);
+                statusText.textContent = `无效: ${error.message}`;
+                statusText.classList.replace('text-gray-400', 'text-red-600');
+            }
+            setTimeout(() => statusText.remove(), 5000); // 5秒后移除状态提示
+        }
+
+        // 带重试的 fetch 函数
+        async function fetchWithRetry(url, retries) {
+            for (let i = 0; i <= retries; i++) {
+                try {
+                    const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response;
+                } catch (error) {
+                    if (i === retries) throw error;
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // 等待1秒后重试
+                }
+            }
+        }
+
+        // 清理HTML内容并移除图片
+        function cleanHtmlForPreview(htmlContent) {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+
+                // 移除所有图片标签
+                const images = doc.querySelectorAll('img');
+                images.forEach(img => img.remove());
+
+                // 移除其他媒体元素
+                const media = doc.querySelectorAll('video, audio, iframe, embed, object');
+                media.forEach(el => el.remove());
+
+                // 获取纯文本内容
+                return doc.body.textContent || doc.body.innerText || '';
+            } catch (error) {
+                console.error('清理HTML失败:', error);
+                // 如果解析失败，使用正则表达式简单清理
+                return htmlContent.replace(/<img[^>]*>/gi, '').replace(/<[^>]*>/g, '');
+            }
+        }
+
+        // 清理旧的RSS缓存数据
+        function cleanupOldRssCache() {
+            const keys = Object.keys(localStorage);
+            const rssItemKeys = keys.filter(key => key.startsWith('rss_item_'));
+
+            // 如果RSS缓存项超过50个，删除最旧的
+            if (rssItemKeys.length > 50) {
+                rssItemKeys.sort().slice(0, rssItemKeys.length - 50).forEach(key => {
+                    localStorage.removeItem(key);
+                });
+            }
+        }
+
+        // 安全存储到localStorage
+        function safeSetItem(key, value) {
+            try {
+                // 限制描述内容长度，避免存储过大的数据
+                const maxLength = 50000; // 50KB限制
+                const truncatedValue = value.length > maxLength ? value.substring(0, maxLength) + '...[内容已截断]' : value;
+                localStorage.setItem(key, truncatedValue);
+                return true;
+            } catch (error) {
+                console.warn('localStorage存储失败:', error);
+                // 尝试清理缓存后重试
+                cleanupOldRssCache();
+                try {
+                    const maxLength = 20000; // 更小的限制
+                    const truncatedValue = value.length > maxLength ? value.substring(0, maxLength) + '...[内容已截断]' : value;
+                    localStorage.setItem(key, truncatedValue);
+                    return true;
+                } catch (retryError) {
+                    console.error('localStorage存储重试失败:', retryError);
+                    return false;
+                }
+            }
+        }
+
+        // 获取并显示RSS内容，同时保存RSS URL和别名
+        async function fetchRSS(url = null) {
+            const rssUrl = url || document.getElementById('rssUrl').value.trim();
+            const rssAlias = document.getElementById('rssAlias').value.trim();
+            if (!rssUrl) {
+                alert('请输入有效的RSS URL');
+                return;
+            }
+
+            // 清理旧缓存
+            cleanupOldRssCache();
+
+            // 保存RSS URL和别名到localStorage
+            const savedRss = JSON.parse(localStorage.getItem('rssUrls') || '[]');
+            if (!savedRss.some(item => item.url === rssUrl)) {
+                savedRss.push({ url: rssUrl, alias: rssAlias || '' });
+                localStorage.setItem('rssUrls', JSON.stringify(savedRss));
+                loadSavedRss();
+            }
+
+            const rssContent = document.getElementById('rssContent');
+            rssContent.innerHTML = '<p class="text-gray-400 dark:text-gray-600">加载中...</p>';
+
+            try {
+                const response = await fetchWithRetry(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`, 2);
+                const data = await response.json();
+
+                console.log('RSS API 响应:', data);
+
+                // 更宽松的错误检查
+                if (!data || (data.status && data.status !== 'ok')) {
+                    console.warn('RSS API 返回状态:', data.status, '消息:', data.message);
+                    // 如果有数据但状态不是ok，仍然尝试处理
+                    if (!data.items || data.items.length === 0) {
+                        throw new Error(`RSS 源返回错误: ${data.message || '未知错误'}`);
+                    }
+                }
+
+                // 确保有feed和items数据
+                const feed = data.feed || {};
+                const items = data.items || [];
+
+                console.log(`RSS Feed 包含 ${items.length} 条内容`, items);
+
+                rssContent.innerHTML = '';
+                const feedTitle = document.createElement('h2');
+                feedTitle.className = 'text-xl font-semibold text-gray-900 dark:text-gray-500';
+                feedTitle.textContent = feed.title || '未提供标题';
+                rssContent.appendChild(feedTitle);
+
+                if (items.length === 0) {
+                    rssContent.innerHTML += '<p class="text-gray-400 dark:text-gray-600">此RSS Feed没有内容</p>';
+                    return;
+                }
+
+                items.forEach((item, index) => {
+                    console.log(`渲染条目 ${index + 1}:`, item);
+                    const article = document.createElement('div');
+                    article.className = 'border-b border-gray-300 dark:border-gray-700 py-4';
+                    const title = item.title || '无标题';
+                    const description = item.description || '无描述';
+                    const pubDate = item.pubDate ? new Date(item.pubDate).toLocaleDateString('zh-CN') : '无日期';
+                    const link = item.link || '#';
+
+                    // 安全存储description到localStorage
+                    const itemKey = `rss_item_${Date.now()}_${index}`;
+                    const stored = safeSetItem(itemKey, description);
+
+                    // 清理描述内容，移除图片和HTML标签
+                    const cleanedDescription = cleanHtmlForPreview(description);
+
+                    if (!stored) {
+                        // 如果存储失败，直接在URL中传递截断的描述
+                        const shortDescription = description.substring(0, 500) + '...[内容过长，无法完整显示]';
+                        const encodedData = encodeURIComponent(JSON.stringify({
+                            title,
+                            pubDate,
+                            link,
+                            description: shortDescription,
+                            itemKey: null
+                        }));
+                        article.innerHTML = `
+                            <h3 class="text-lg font-medium text-gray-700 dark:text-gray-500">
+                                <a href="detail.html?data=${encodedData}" target="_blank" rel="noopener noreferrer">${title}</a>
+                            </h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-600">${pubDate}</p>
+                            <p class="text-gray-700 dark:text-gray-500">${cleanedDescription.substring(0, 150)}...</p>
+                            <p class="text-xs text-orange-500 dark:text-orange-600">注意：内容过长，详情页面可能显示不完整</p>
+                        `;
+                    } else {
+                        // 正常存储成功
+                        const encodedData = encodeURIComponent(JSON.stringify({ title, pubDate, link, itemKey }));
+                        article.innerHTML = `
+                            <h3 class="text-lg font-medium text-gray-700 dark:text-gray-500">
+                                <a href="detail.html?data=${encodedData}" target="_blank" rel="noopener noreferrer">${title}</a>
+                            </h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-600">${pubDate}</p>
+                            <p class="text-gray-700 dark:text-gray-500">${cleanedDescription.substring(0, 150)}...</p>
+                        `;
+                    }
+
+                    rssContent.appendChild(article);
+                });
+
+                // 清空输入框
+                document.getElementById('rssUrl').value = '';
+                document.getElementById('rssAlias').value = '';
+            } catch (error) {
+                console.error('获取RSS失败:', error);
+                let errorMessage = '错误: 无法获取RSS feed';
+                if (error.name === 'TimeoutError') {
+                    errorMessage = '错误: 网络超时，请检查网络或稍后重试';
+                } else if (error.message.includes('HTTP')) {
+                    errorMessage = `错误: ${error.message}`;
+                } else if (error.message.includes('quota')) {
+                    errorMessage = '错误: 存储空间不足，请清理浏览器缓存后重试';
+                } else if (error.message) {
+                    errorMessage = `错误: ${error.message}`;
+                }
+                rssContent.innerHTML = `<p class="text-red-500 dark:text-red-600">${errorMessage}</p>`;
+            }
+        }
+
+        // 清理所有RSS缓存
+        function clearCache() {
+            if (confirm('确定要清理所有RSS缓存数据吗？这将删除所有已缓存的文章内容。')) {
+                const keys = Object.keys(localStorage);
+                const rssItemKeys = keys.filter(key => key.startsWith('rss_item_'));
+                rssItemKeys.forEach(key => localStorage.removeItem(key));
+                alert(`已清理 ${rssItemKeys.length} 个缓存项`);
+            }
+        }
+
+        window.onload = loadSavedRss;
+    </script>
+</body>
+
+</html>

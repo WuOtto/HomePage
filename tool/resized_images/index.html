@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量调整图片尺寸</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --input-bg: #ffffff;
+            --input-border: #cccccc;
+            --button-bg: #4CAF50;
+            --button-hover: #45a049;
+            --button-text: #ffffff;
+            --border-color: #dddddd;
+            --preview-bg: #f9f9f9;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #ffffff;
+                --input-bg: #2d2d2d;
+                --input-border: #555555;
+                --button-bg: #4CAF50;
+                --button-hover: #5cbf60;
+                --button-text: #ffffff;
+                --border-color: #555555;
+                --preview-bg: #2d2d2d;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        h1,
+        h2 {
+            color: var(--text-color);
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: var(--preview-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 2px solid var(--input-border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"] {
+            padding: 8px;
+            margin: 5px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 2px solid var(--input-border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--button-bg);
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .preview-item {
+            text-align: center;
+            background-color: var(--preview-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .preview-item:hover {
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .preview-item img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .preview-item a {
+            color: var(--button-bg);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border: 2px solid var(--button-bg);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .preview-item a:hover {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>批量调整图片尺寸</h1>
+
+    <div class="input-section">
+        <label>选择图片（可多选）:</label><br>
+        <input type="file" id="imageInput" accept="image/*" multiple><br><br>
+
+        <label>目标尺寸:</label><br>
+        宽度: <input type="number" id="widthInput" min="1" value="300"> px<br>
+        高度: <input type="number" id="heightInput" min="1" value="300"> px<br><br>
+
+        <button onclick="resizeImages()">调整图片尺寸</button>
+        <button onclick="downloadAll()">一键下载所有图片</button>
+    </div>
+
+    <h2>预览</h2>
+    <div id="preview" class="preview-container"></div>
+
+    <script>
+        let resizedImages = [];
+
+        function resizeImages() {
+            const files = document.getElementById('imageInput').files;
+            const width = parseInt(document.getElementById('widthInput').value);
+            const height = parseInt(document.getElementById('heightInput').value);
+            const preview = document.getElementById('preview');
+
+            // 清空预览区域和存储的图片
+            preview.innerHTML = '';
+            resizedImages = [];
+
+            if (files.length === 0) {
+                alert('请先选择图片！');
+                return;
+            }
+            if (!width || !height) {
+                alert('请输入有效的宽度和高度！');
+                return;
+            }
+
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        // 创建canvas
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+
+                        // 绘制调整后的图片
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // 获取原文件名（去掉扩展名）并改为png格式
+                        const originalName = file.name.replace(/\.[^/.]+$/, "");
+                        const resizedFileName = `${originalName}.png`;
+
+                        // 创建预览元素
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-item';
+
+                        // 显示调整后的图片
+                        const previewImg = document.createElement('img');
+                        previewImg.src = canvas.toDataURL('image/png');
+                        previewItem.appendChild(previewImg);
+
+                        // 显示文件名
+                        const fileName = document.createElement('p');
+                        fileName.textContent = resizedFileName;
+                        fileName.style.fontSize = '12px';
+                        fileName.style.color = 'var(--text-color)';
+                        fileName.style.margin = '5px 0';
+                        previewItem.appendChild(fileName);
+
+                        // 添加下载链接
+                        const downloadLink = document.createElement('a');
+                        const imageData = canvas.toDataURL('image/png', 1.0);
+                        downloadLink.href = imageData;
+                        downloadLink.download = resizedFileName;
+                        downloadLink.textContent = '下载';
+                        downloadLink.style.display = 'block';
+                        previewItem.appendChild(downloadLink);
+
+                        // 存储调整后的图片数据
+                        resizedImages.push({
+                            data: imageData,
+                            name: resizedFileName
+                        });
+
+                        preview.appendChild(previewItem);
+                    };
+                    img.src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function downloadAll() {
+            if (resizedImages.length === 0) {
+                alert('请先调整图片尺寸！');
+                return;
+            }
+
+            const zip = new JSZip();
+
+            resizedImages.forEach((image, index) => {
+                // 移除data URL前缀并转换为二进制
+                const base64 = image.data.replace(/^data:image\/png;base64,/, '');
+                zip.file(image.name, base64, { base64: true });
+            });
+
+            zip.generateAsync({ type: 'blob' }).then(function (content) {
+                saveAs(content, 'resized_images.zip');
+            });
+        }
+    </script>
+</body>
+
+</html>

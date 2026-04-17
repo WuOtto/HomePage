@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日期时间计算器</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+      --result-bg: #e8f5e9;
+      --result-border: #c3e6cb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --result-bg: #1e4620;
+        --result-border: #2d5f2e;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .calculator-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .calculator-card h2 {
+      margin: 0 0 15px 0;
+      color: var(--text-color);
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+
+    .calc-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .calc-row input[type="date"],
+    .calc-row input[type="number"],
+    .calc-row select {
+      padding: 8px 12px;
+      font-size: 0.95em;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease;
+    }
+
+    .calc-row input[type="date"] {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .calc-row input[type="number"] {
+      width: 80px;
+    }
+
+    .calc-row select {
+      min-width: 60px;
+    }
+
+    .calc-row input:focus,
+    .calc-row select:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .separator {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .btn-calc {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: var(--button-bg);
+      color: white;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-calc:hover {
+      background-color: var(--button-hover);
+    }
+
+    .result-box {
+      margin-top: 15px;
+      padding: 12px 15px;
+      background: var(--result-bg);
+      border: 1px solid var(--result-border);
+      border-radius: 4px;
+      display: none;
+      font-size: 0.95em;
+      line-height: 1.8;
+    }
+
+    .result-box.show {
+      display: block;
+    }
+
+    .result-box span {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .result-detail {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--card-border);
+      color: var(--text-secondary);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .calc-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .calc-row input[type="date"],
+      .calc-row input[type="number"],
+      .calc-row select {
+        width: 100%;
+      }
+
+      .separator {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>日期时间计算器</h1>
+    <p class="subtitle">计算日期间隔、日期加减、工作日计算</p>
+
+    <!-- 日期间隔计算 -->
+    <div class="calculator-card">
+      <h2>日期间隔</h2>
+      <div class="calc-row">
+        <input type="date" id="intervalStart" />
+        <span class="separator">至</span>
+        <input type="date" id="intervalEnd" />
+        <button class="btn-calc" onclick="calculateInterval()">计算</button>
+      </div>
+      <div id="intervalResult" class="result-box">
+        <span id="intervalDays">0</span> 天 = 
+        <span id="intervalWeeks">0</span> 周 = 
+        <span id="intervalMonths">0</span> 月 = 
+        <span id="intervalYears">0</span> 年
+        <div class="result-detail">详细：<span id="intervalDetail">-</span></div>
+      </div>
+    </div>
+
+    <!-- 日期加减计算 -->
+    <div class="calculator-card">
+      <h2>日期加减</h2>
+      <div class="calc-row">
+        <input type="date" id="baseDate" />
+        <select id="operation">
+          <option value="add">+</option>
+          <option value="subtract">-</option>
+        </select>
+        <input type="number" id="amount" value="1" min="0" />
+        <select id="unit">
+          <option value="days">天</option>
+          <option value="weeks">周</option>
+          <option value="months">月</option>
+          <option value="years">年</option>
+        </select>
+        <button class="btn-calc" onclick="calculateAddSubtract()">计算</button>
+      </div>
+      <div id="addResult" class="result-box">
+        结果：<span id="resultDate">-</span> (<span id="resultWeekday">-</span>)
+      </div>
+    </div>
+
+    <!-- 工作日计算 -->
+    <div class="calculator-card">
+      <h2>工作日计算</h2>
+      <div class="calc-row">
+        <input type="date" id="workdayStart" />
+        <span class="separator">至</span>
+        <input type="date" id="workdayEnd" />
+        <button class="btn-calc" onclick="calculateWorkdays()">计算</button>
+      </div>
+      <div id="workdayResult" class="result-box">
+        总计 <span id="workdayTotal">0</span> 天，
+        工作日 <span id="workdayCount">0</span> 天，
+        周末 <span id="weekendCount">0</span> 天
+      </div>
+    </div>
+
+    <div style="text-align: center;">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    // 初始化日期为今天
+    function initDates() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('intervalStart').value = today;
+      document.getElementById('intervalEnd').value = today;
+      document.getElementById('baseDate').value = today;
+      document.getElementById('workdayStart').value = today;
+      document.getElementById('workdayEnd').value = today;
+    }
+
+    // 计算日期间隔
+    function calculateInterval() {
+      const start = new Date(document.getElementById('intervalStart').value);
+      const end = new Date(document.getElementById('intervalEnd').value);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        alert('请选择有效的日期');
+        return;
+      }
+
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffWeeks = Math.floor(diffDays / 7);
+      const diffMonths = Math.floor(diffDays / 30.44);
+      const diffYears = Math.floor(diffDays / 365.25);
+
+      // 计算详细的年月日
+      let years = 0, months = 0, days = 0;
+      let tempDate = new Date(start);
+      const endTime = end.getTime();
+
+      while (tempDate.getTime() < endTime) {
+        const nextYear = new Date(tempDate);
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+        if (nextYear.getTime() <= endTime) {
+          years++;
+          tempDate = nextYear;
+        } else {
+          break;
+        }
+      }
+
+      while (tempDate.getTime() < endTime) {
+        const nextMonth = new Date(tempDate);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        if (nextMonth.getTime() <= endTime) {
+          months++;
+          tempDate = nextMonth;
+        } else {
+          break;
+        }
+      }
+
+      days = Math.ceil((endTime - tempDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      document.getElementById('intervalDays').textContent = diffDays;
+      document.getElementById('intervalWeeks').textContent = diffWeeks;
+      document.getElementById('intervalMonths').textContent = diffMonths;
+      document.getElementById('intervalYears').textContent = diffYears;
+      document.getElementById('intervalDetail').textContent = 
+        `${years}年 ${months}个月 ${days}天`;
+
+      document.getElementById('intervalResult').classList.add('show');
+    }
+
+    // 计算日期加减
+    function calculateAddSubtract() {
+      const baseDate = new Date(document.getElementById('baseDate').value);
+      const operation = document.getElementById('operation').value;
+      const amount = parseInt(document.getElementById('amount').value);
+      const unit = document.getElementById('unit').value;
+
+      if (isNaN(baseDate.getTime())) {
+        alert('请选择有效的日期');
+        return;
+      }
+
+      const resultDate = new Date(baseDate);
+      const multiplier = operation === 'add' ? 1 : -1;
+
+      switch (unit) {
+        case 'days':
+          resultDate.setDate(resultDate.getDate() + (amount * multiplier));
+          break;
+        case 'weeks':
+          resultDate.setDate(resultDate.getDate() + (amount * 7 * multiplier));
+          break;
+        case 'months':
+          resultDate.setMonth(resultDate.getMonth() + (amount * multiplier));
+          break;
+        case 'years':
+          resultDate.setFullYear(resultDate.getFullYear() + (amount * multiplier));
+          break;
+      }
+
+      const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+      const weekday = weekdays[resultDate.getDay()];
+
+      document.getElementById('resultDate').textContent = 
+        resultDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      document.getElementById('resultWeekday').textContent = weekday;
+
+      document.getElementById('addResult').classList.add('show');
+    }
+
+    // 计算工作日
+    function calculateWorkdays() {
+      const start = new Date(document.getElementById('workdayStart').value);
+      const end = new Date(document.getElementById('workdayEnd').value);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        alert('请选择有效的日期');
+        return;
+      }
+
+      let workdays = 0;
+      let weekends = 0;
+      const current = new Date(start);
+
+      while (current <= end) {
+        const dayOfWeek = current.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          workdays++;
+        } else {
+          weekends++;
+        }
+        current.setDate(current.getDate() + 1);
+      }
+
+      const totalDays = workdays + weekends;
+
+      document.getElementById('workdayTotal').textContent = totalDays;
+      document.getElementById('workdayCount').textContent = workdays;
+      document.getElementById('weekendCount').textContent = weekends;
+
+      document.getElementById('workdayResult').classList.add('show');
+    }
+
+    // 页面加载时初始化
+    window.onload = initDates;
+  </script>
+</body>
+
+</html>

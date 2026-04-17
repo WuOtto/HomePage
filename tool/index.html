@@ -1,62 +1,116 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>开发者工具列表</title>
   <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+      }
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 20px;
       text-align: center;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+
     h1 {
       font-size: 2.5em;
-      color: #333;
+      color: var(--text-color);
     }
+
+    p {
+      color: var(--text-secondary);
+    }
+
+    .category-section {
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+
+    .category-title {
+      font-size: 1.8em;
+      color: var(--text-color);
+      text-align: left;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--button-bg);
+    }
+
     .tool-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
     }
+
     .tool-card {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 20px;
-      width: 300px;
       text-align: left;
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.3s ease, border-color 0.3s ease;
     }
+
     .tool-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px var(--shadow);
     }
+
     .tool-card h2 {
       font-size: 1.5em;
       margin: 0 0 10px;
-      color: #333;
+      color: var(--text-color);
     }
+
     .tool-card p {
       font-size: 1em;
-      color: #666;
+      color: var(--text-secondary);
       margin: 0 0 15px;
     }
+
     .tool-card a {
       display: inline-block;
       padding: 10px 20px;
-      background: #28a745;
+      background: var(--button-bg);
       color: white;
       text-decoration: none;
       border-radius: 5px;
       font-weight: bold;
+      transition: background-color 0.2s ease;
     }
+
     .tool-card a:hover {
-      background: #218838;
+      background: var(--button-hover);
     }
+
     @media (max-width: 600px) {
       .tool-card {
         width: 100%;
@@ -64,16 +118,147 @@
     }
   </style>
 </head>
+
 <body>
   <h1>开发者工具列表</h1>
   <p>以下是我们的开发者工具集合，助力iOS开发和其他任务。更多工具即将推出！</p>
-  <div class="tool-list">
-    <div class="tool-card">
-      <h2>iOS App Icon 生成器</h2>
-      <p>上传一张512x512或更大的图片（建议正方形、无透明背景），生成Xcode所需的App Icon和Contents.json，支持iPhone和iPad（包括Notification图标）。</p>
-      <a href="./ios-app-icon-generator.html">使用工具</a>
+
+  <!-- 编码转换类 -->
+  <div class="category-section">
+    <h2 class="category-title">📝 编码转换</h2>
+    <div class="tool-list">
+      <div class="tool-card">
+        <h2>文字加密解密工具</h2>
+        <p>支持Base64编码/解码、URL编码/解码和MD5加密，简单易用的文本处理工具，支持暗黑模式。</p>
+        <a href="./text-encryptor.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>进制转换工具</h2>
+        <p>支持二进制、八进制、十进制、十六进制之间的相互转换，实时转换，支持大数值和负数。</p>
+        <a href="./base-converter.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>Hex转换工具</h2>
+        <p>将十六进制编码的字符串转换为可读的文本，或者将普通文本转换为十六进制格式。</p>
+        <a href="./hex-converter.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>ASCII码对照表</h2>
+        <p>完整的ASCII字符编码对照表，包含十进制、十六进制、八进制、二进制及字符说明，支持搜索过滤。</p>
+        <a href="./ascii-table.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>Unicode字符列表</h2>
+        <p>显示Unicode字符列表，支持分类筛选、搜索和一键复制，包含常用符号、表情符号、数学运算符等。</p>
+        <a href="./unicode-list.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>颜色转换工具</h2>
+        <p>HEX、RGB、HSL颜色格式互转，支持颜色选择器和实时预览，一键复制各种格式。</p>
+        <a href="./color-converter.html">使用工具</a>
+      </div>
     </div>
-    <!-- 未来工具可在此添加 -->
+  </div>
+
+  <!-- 文本处理类 -->
+  <div class="category-section">
+    <h2 class="category-title">✏️ 文本处理</h2>
+    <div class="tool-list">
+      <div class="tool-card">
+        <h2>文本对比工具</h2>
+        <p>比较两段文本的差异，支持逐行对比和高亮显示，自动统计新增、删除和未改变的行数。</p>
+        <a href="./text-diff.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>JSON格式化工具</h2>
+        <p>格式化、压缩、验证JSON数据，支持语法检查和一键复制，开发调试必备工具。</p>
+        <a href="./json-formatter.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>JSON转iOS模型</h2>
+        <p>将JSON数据转换为iOS开发的Objective-C或Swift模型代码，支持嵌套对象和数组类型推断。</p>
+        <a href="./json-to-ios-model.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>字数统计工具</h2>
+        <p>实时统计文本的字数、字符数、行数，支持中英文分别统计和详细分析。</p>
+        <a href="./word-counter.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>Markdown阅读器</h2>
+        <p>极简风格，打开网页后，拖放 md 文件到网页中即可阅读。</p>
+        <a href="./md_reader/index.html">使用工具</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 日期时间类 -->
+  <div class="category-section">
+    <h2 class="category-title">⏰ 日期时间</h2>
+    <div class="tool-list">
+      <div class="tool-card">
+        <h2>日期时间计算器</h2>
+        <p>计算日期间隔、日期加减、工作日计算等，支持多种时间单位转换和详细统计。</p>
+        <a href="./date-calculator.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>时间戳转换工具</h2>
+        <p>Unix时间戳与日期时间相互转换，支持秒和毫秒，显示本地时间、UTC时间和北京时间。</p>
+        <a href="./timestamp-converter.html">使用工具</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 生成器类 -->
+  <div class="category-section">
+    <h2 class="category-title">🎲 生成器</h2>
+    <div class="tool-list">
+      <div class="tool-card">
+        <h2>随机字符串生成器</h2>
+        <p>生成安全的随机密码、Token等，支持自定义长度和字符类型，带密码强度评估。</p>
+        <a href="./random-string-generator.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>二维码生成器</h2>
+        <p>将文本、网址等内容生成二维码，支持自定义尺寸和容错率，可下载PNG图片。</p>
+        <a href="./qrcode-generator.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>iOS App Icon 生成器</h2>
+        <p>上传一张512x512或更大的图片（建议正方形、无透明背景），生成Xcode所需的App Icon和Contents.json，支持iPhone和iPad（包括Notification图标）。</p>
+        <a href="./ios-app-icon-generator.html">使用工具</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 其他工具类 -->
+  <div class="category-section">
+    <h2 class="category-title">🛠️ 其他工具</h2>
+    <div class="tool-list">
+      <div class="tool-card">
+        <h2>图片尺寸计算器</h2>
+        <p>计算图片按比例缩放后的显示尺寸，支持已知宽度求高度或已知高度求宽度，自动计算缩放比例。</p>
+        <a href="./image-size-calculator.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>简单计算器</h2>
+        <p>支持基本四则运算和数学函数的实时计算器，左侧输入表达式，右侧显示结果，支持暗黑模式。</p>
+        <a href="./calculator.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>RSS阅读器</h2>
+        <p>RSS订阅</p>
+        <a href="./rss/index.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>批量图片处理</h2>
+        <p>输入尺寸批量修改图片</p>
+        <a href="./resized_images/index.html">使用工具</a>
+      </div>
+      <!-- 未来工具可在此添加 -->
+    </div>
+  </div>
   </div>
 </body>
+
 </html>

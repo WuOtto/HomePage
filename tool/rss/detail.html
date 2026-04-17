@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章详情</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media'
+        };
+    </script>
+</head>
+
+<body
+    class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-400 min-h-screen flex flex-col items-center p-4 transition-colors duration-200">
+    <div class="max-w-3xl w-full bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-700 dark:text-gray-500 mb-6 text-center">文章详情</h1>
+
+        <!-- 模式切换按钮 -->
+        <div class="flex justify-center mb-6">
+            <button id="toggleImages" onclick="toggleImages()"
+                class="w-48 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 dark:bg-blue-800 dark:hover:bg-blue-900 transition-colors">
+                显示图片
+            </button>
+        </div>
+
+        <!-- 文章内容 -->
+        <div id="articleContent"
+            class="space-y-4 bg-white dark:bg-gray-800 rounded-md p-4 border border-gray-200 dark:border-gray-700">
+        </div>
+    </div>
+
+    <script>
+        let imagesHidden = true; // 默认隐藏图片
+
+        // 获取URL参数
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // 清理无关 HTML 标签
+        function cleanDescription(description) {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(description, 'text/html');
+                // 移除广告、登录提示等无关内容
+                const unwanted = doc.querySelectorAll('.nfzm-article-jumbotron, .nfzm-content__footer, .nfzm-content__originalTips, .nfzm-content__tags');
+                unwanted.forEach(el => el.remove());
+                // 移除注释
+                const comments = doc.createNodeIterator(doc.body, Node.COMMENT_NODE);
+                let comment;
+                while (comment = comments.nextNode()) {
+                    comment.remove();
+                }
+                return doc.body.innerHTML;
+            } catch (error) {
+                console.error('清理描述失败:', error);
+                return description; // 回退到原始描述
+            }
+        }
+
+        // 加载文章内容
+        function loadArticle() {
+            const encodedData = getQueryParam('data');
+            const articleContent = document.getElementById('articleContent');
+            articleContent.innerHTML = '<p class="text-gray-400 dark:text-gray-600">加载中...</p>';
+
+            if (!encodedData) {
+                articleContent.innerHTML = '<p class="text-red-400 dark:text-red-600">错误: 未提供文章数据</p>';
+                return;
+            }
+
+            try {
+                const item = JSON.parse(decodeURIComponent(encodedData));
+                const { title = '无标题', pubDate = '无日期', link = '#', itemKey, description: fallbackDescription } = item;
+
+                let description;
+
+                // 如果有itemKey，从localStorage获取；否则使用fallback描述
+                if (itemKey) {
+                    description = localStorage.getItem(itemKey) || fallbackDescription || '无描述';
+                    // 清理 localStorage
+                    if (itemKey) {
+                        localStorage.removeItem(itemKey);
+                    }
+                } else {
+                    description = fallbackDescription || '无描述';
+                }
+
+                // 清理描述中的无关内容
+                const cleanedDescription = cleanDescription(description);
+
+                // 创建内容容器
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = `
+                    <h2 class="text-xl font-semibold text-gray-600 dark:text-gray-500 mb-3">${title}</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-600 mb-2">${pubDate}</p>
+                    <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-700 hover:underline mb-3 inline-block">访问原文</a>
+                    <div id="mainContent" class="text-gray-500 dark:text-gray-500 text-base leading-relaxed">${cleanedDescription}</div>
+                `;
+                articleContent.innerHTML = '';
+                articleContent.appendChild(contentDiv);
+
+                // 应用图片隐藏状态
+                applyImageMode();
+            } catch (error) {
+                console.error('加载文章失败:', error);
+                articleContent.innerHTML = `<p class="text-red-400 dark:text-red-600">错误: 无法加载文章内容 (${error.message})</p>`;
+            }
+        }
+
+        // 屏蔽/显示图片
+        function toggleImages() {
+            imagesHidden = !imagesHidden;
+            document.getElementById('toggleImages').textContent = imagesHidden ? '显示图片' : '屏蔽图片';
+            applyImageMode();
+        }
+
+        // 应用图片隐藏状态
+        function applyImageMode() {
+            const mainContent = document.getElementById('mainContent');
+            if (!mainContent) return;
+
+            // 屏蔽图片
+            const images = mainContent.querySelectorAll('img');
+            images.forEach(img => {
+                img.style.display = imagesHidden ? 'none' : 'block';
+            });
+        }
+
+        // 页面加载时获取文章
+        window.onload = loadArticle;
+    </script>
+</body>
+
+</html>

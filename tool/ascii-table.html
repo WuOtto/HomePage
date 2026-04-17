@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCII码对照表</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --table-header-bg: #28a745;
+      --table-row-even: #f9f9f9;
+      --table-row-hover: #e8f5e9;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --search-bg: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --table-header-bg: #28a745;
+        --table-row-even: #2d2d2d;
+        --table-row-hover: #3a4a3a;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --search-bg: #3a3a3a;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    .search-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .search-container input {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      font-size: 1em;
+      border: 2px solid var(--card-border);
+      border-radius: 5px;
+      background-color: var(--search-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease;
+    }
+
+    .search-container input:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+      overflow-x: auto;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95em;
+    }
+
+    thead {
+      background-color: var(--table-header-bg);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th {
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    td {
+      padding: 10px 8px;
+      text-align: center;
+      border-bottom: 1px solid var(--card-border);
+      transition: background-color 0.2s ease;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--table-row-even);
+    }
+
+    tbody tr:hover {
+      background-color: var(--table-row-hover);
+    }
+
+    .char-display {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .description {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .info-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .info-section h3 {
+      margin-top: 0;
+      color: var(--text-color);
+    }
+
+    .info-section ul {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .table-container {
+        padding: 10px;
+      }
+
+      table {
+        font-size: 0.85em;
+      }
+
+      th, td {
+        padding: 8px 4px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>ASCII码对照表</h1>
+  <p class="subtitle">完整的ASCII字符编码对照表，包含十进制、十六进制、八进制、二进制及字符说明</p>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="搜索字符、十进制、十六进制或描述...">
+  </div>
+
+  <div class="table-container">
+    <table id="asciiTable">
+      <thead>
+        <tr>
+          <th>十进制</th>
+          <th>十六进制</th>
+          <th>八进制</th>
+          <th>二进制</th>
+          <th>字符</th>
+          <th>描述</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-section">
+    <h3>说明</h3>
+    <ul>
+      <li><strong>0-31</strong>：控制字符，用于控制设备或特殊功能</li>
+      <li><strong>32-126</strong>：可打印字符，包括数字、字母、标点符号等</li>
+      <li><strong>127</strong>：DEL删除字符</li>
+      <li>可以在搜索框中输入任意内容进行过滤查找</li>
+    </ul>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="./index.html" class="back-link">返回工具列表</a>
+  </div>
+
+  <script>
+    const asciiData = [
+      { dec: 0, char: 'NUL', desc: '空字符 (Null)' },
+      { dec: 1, char: 'SOH', desc: '标题开始 (Start of Heading)' },
+      { dec: 2, char: 'STX', desc: '正文开始 (Start of Text)' },
+      { dec: 3, char: 'ETX', desc: '正文结束 (End of Text)' },
+      { dec: 4, char: 'EOT', desc: '传输结束 (End of Transmission)' },
+      { dec: 5, char: 'ENQ', desc: '请求 (Enquiry)' },
+      { dec: 6, char: 'ACK', desc: '确认 (Acknowledge)' },
+      { dec: 7, char: 'BEL', desc: '响铃 (Bell)' },
+      { dec: 8, char: 'BS', desc: '退格 (Backspace)' },
+      { dec: 9, char: 'HT', desc: '水平制表符 (Horizontal Tab)' },
+      { dec: 10, char: 'LF', desc: '换行 (Line Feed)' },
+      { dec: 11, char: 'VT', desc: '垂直制表符 (Vertical Tab)' },
+      { dec: 12, char: 'FF', desc: '换页 (Form Feed)' },
+      { dec: 13, char: 'CR', desc: '回车 (Carriage Return)' },
+      { dec: 14, char: 'SO', desc: '移出 (Shift Out)' },
+      { dec: 15, char: 'SI', desc: '移入 (Shift In)' },
+      { dec: 16, char: 'DLE', desc: '数据链路转义 (Data Link Escape)' },
+      { dec: 17, char: 'DC1', desc: '设备控制1 (Device Control 1)' },
+      { dec: 18, char: 'DC2', desc: '设备控制2 (Device Control 2)' },
+      { dec: 19, char: 'DC3', desc: '设备控制3 (Device Control 3)' },
+      { dec: 20, char: 'DC4', desc: '设备控制4 (Device Control 4)' },
+      { dec: 21, char: 'NAK', desc: '否定应答 (Negative Acknowledge)' },
+      { dec: 22, char: 'SYN', desc: '同步空闲 (Synchronous Idle)' },
+      { dec: 23, char: 'ETB', desc: '传输块结束 (End of Trans. Block)' },
+      { dec: 24, char: 'CAN', desc: '取消 (Cancel)' },
+      { dec: 25, char: 'EM', desc: '媒介结束 (End of Medium)' },
+      { dec: 26, char: 'SUB', desc: '替换 (Substitute)' },
+      { dec: 27, char: 'ESC', desc: '转义 (Escape)' },
+      { dec: 28, char: 'FS', desc: '文件分隔符 (File Separator)' },
+      { dec: 29, char: 'GS', desc: '组分隔符 (Group Separator)' },
+      { dec: 30, char: 'RS', desc: '记录分隔符 (Record Separator)' },
+      { dec: 31, char: 'US', desc: '单元分隔符 (Unit Separator)' },
+      { dec: 32, char: ' ', desc: '空格 (Space)' },
+      { dec: 127, char: 'DEL', desc: '删除 (Delete)' }
+    ];
+
+    // 生成可打印字符 (33-126)
+    for (let i = 33; i <= 126; i++) {
+      let desc = '';
+      if (i >= 48 && i <= 57) desc = '数字';
+      else if (i >= 65 && i <= 90) desc = '大写字母';
+      else if (i >= 97 && i <= 122) desc = '小写字母';
+      else desc = '符号';
+      
+      asciiData.push({
+        dec: i,
+        char: String.fromCharCode(i),
+        desc: desc
+      });
+    }
+
+    // 排序
+    asciiData.sort((a, b) => a.dec - b.dec);
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        
+        const hex = item.dec.toString(16).toUpperCase().padStart(2, '0');
+        const oct = item.dec.toString(8).padStart(3, '0');
+        const bin = item.dec.toString(2).padStart(8, '0');
+        
+        row.innerHTML = `
+          <td>${item.dec}</td>
+          <td>0x${hex}</td>
+          <td>${oct}</td>
+          <td>${bin}</td>
+          <td class="char-display">${item.char}</td>
+          <td class="description">${item.desc}</td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+
+    function filterTable() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      if (!searchTerm) {
+        renderTable(asciiData);
+        return;
+      }
+
+      const filtered = asciiData.filter(item => {
+        const hex = item.dec.toString(16).toLowerCase().padStart(2, '0');
+        const hexWith0x = '0x' + hex;
+        const oct = item.dec.toString(8).padStart(3, '0');
+        const bin = item.dec.toString(2).padStart(8, '0');
+        
+        return item.dec.toString().includes(searchTerm) ||
+               hex.includes(searchTerm) ||
+               hexWith0x.includes(searchTerm) ||
+               oct.includes(searchTerm) ||
+               bin.includes(searchTerm) ||
+               item.char.toLowerCase().includes(searchTerm) ||
+               item.desc.toLowerCase().includes(searchTerm);
+      });
+
+      renderTable(filtered);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filterTable);
+
+    // 初始化表格
+    renderTable(asciiData);
+  </script>
+</body>
+
+</html>

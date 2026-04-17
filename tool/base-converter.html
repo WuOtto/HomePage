@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>进制转换工具</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --input-bg: #ffffff;
+      --input-border: #cccccc;
+      --input-focus: #28a745;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --error-color: #dc3545;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --input-focus: #34ce57;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --error-color: #ff6b6b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    .converter-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      font-size: 1.1em;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      border: 2px solid var(--input-border);
+      border-radius: 5px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease, background-color 0.3s ease;
+      font-family: 'Courier New', monospace;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--input-focus);
+    }
+
+    .input-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .input-group .hint {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .input-group .error {
+      font-size: 0.9em;
+      color: var(--error-color);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 20px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .info-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .info-section h3 {
+      margin-top: 0;
+      color: var(--text-color);
+    }
+
+    .info-section ul {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .converter-container {
+        padding: 20px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>进制转换工具</h1>
+  <p class="subtitle">支持二进制、八进制、十进制、十六进制之间的相互转换</p>
+
+  <div class="converter-container">
+    <div class="input-group">
+      <label for="binary">二进制 (Binary)</label>
+      <textarea id="binary" placeholder="请输入二进制数，例如：1010"></textarea>
+      <div class="hint">只能包含 0 和 1</div>
+      <div class="error" id="binary-error"></div>
+    </div>
+
+    <div class="input-group">
+      <label for="octal">八进制 (Octal)</label>
+      <textarea id="octal" placeholder="请输入八进制数，例如：12"></textarea>
+      <div class="hint">只能包含 0-7</div>
+      <div class="error" id="octal-error"></div>
+    </div>
+
+    <div class="input-group">
+      <label for="decimal">十进制 (Decimal)</label>
+      <textarea id="decimal" placeholder="请输入十进制数，例如：10"></textarea>
+      <div class="hint">只能包含 0-9</div>
+      <div class="error" id="decimal-error"></div>
+    </div>
+
+    <div class="input-group">
+      <label for="hexadecimal">十六进制 (Hexadecimal)</label>
+      <textarea id="hexadecimal" placeholder="请输入十六进制数，例如：A 或 0xA"></textarea>
+      <div class="hint">只能包含 0-9, A-F (不区分大小写，可选 0x 前缀)</div>
+      <div class="error" id="hex-error"></div>
+    </div>
+
+    <div class="button-group">
+      <button onclick="clearAll()">清空所有</button>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h3>使用说明</h3>
+    <ul>
+      <li>在任意一个输入框中输入数值，其他进制会自动转换</li>
+      <li>支持大数值转换</li>
+      <li>十六进制可以使用 0x 前缀，也可以不使用</li>
+      <li>输入非法字符会显示错误提示</li>
+      <li>支持负数转换（使用补码表示）</li>
+    </ul>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="./index.html" class="back-link">返回工具列表</a>
+  </div>
+
+  <script>
+    const inputs = {
+      binary: document.getElementById('binary'),
+      octal: document.getElementById('octal'),
+      decimal: document.getElementById('decimal'),
+      hexadecimal: document.getElementById('hexadecimal')
+    };
+
+    const errors = {
+      binary: document.getElementById('binary-error'),
+      octal: document.getElementById('octal-error'),
+      decimal: document.getElementById('decimal-error'),
+      hexadecimal: document.getElementById('hex-error')
+    };
+
+    let isUpdating = false;
+
+    // 验证输入
+    function validateInput(value, base) {
+      value = value.trim();
+      if (!value) return { valid: true, value: '' };
+
+      const negative = value.startsWith('-');
+      if (negative) value = value.substring(1);
+
+      switch (base) {
+        case 2:
+          if (!/^[01]+$/.test(value)) {
+            return { valid: false, error: '只能包含 0 和 1' };
+          }
+          break;
+        case 8:
+          if (!/^[0-7]+$/.test(value)) {
+            return { valid: false, error: '只能包含 0-7' };
+          }
+          break;
+        case 10:
+          if (!/^\d+$/.test(value)) {
+            return { valid: false, error: '只能包含 0-9' };
+          }
+          break;
+        case 16:
+          value = value.replace(/^0x/i, '');
+          if (!/^[0-9a-f]+$/i.test(value)) {
+            return { valid: false, error: '只能包含 0-9, A-F' };
+          }
+          break;
+      }
+
+      return { valid: true, value: (negative ? '-' : '') + value };
+    }
+
+    // 转换函数
+    function convert(value, fromBase) {
+      value = value.trim();
+      if (!value) {
+        clearOthers();
+        return;
+      }
+
+      // 移除十六进制前缀
+      if (fromBase === 16) {
+        value = value.replace(/^0x/i, '');
+      }
+
+      const validation = validateInput(value, fromBase);
+      if (!validation.valid) {
+        showError(fromBase, validation.error);
+        return;
+      }
+
+      hideAllErrors();
+
+      try {
+        // 转换为十进制
+        const decimalValue = BigInt(parseInt(value, fromBase));
+
+        isUpdating = true;
+
+        // 更新其他输入框
+        if (fromBase !== 2) {
+          inputs.binary.value = decimalValue.toString(2);
+        }
+        if (fromBase !== 8) {
+          inputs.octal.value = decimalValue.toString(8);
+        }
+        if (fromBase !== 10) {
+          inputs.decimal.value = decimalValue.toString(10);
+        }
+        if (fromBase !== 16) {
+          inputs.hexadecimal.value = decimalValue.toString(16).toUpperCase();
+        }
+
+        isUpdating = false;
+      } catch (e) {
+        showError(fromBase, '转换失败，请检查输入');
+        isUpdating = false;
+      }
+    }
+
+    function showError(base, message) {
+      const errorMap = {
+        2: errors.binary,
+        8: errors.octal,
+        10: errors.decimal,
+        16: errors.hexadecimal
+      };
+      const errorElement = errorMap[base];
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+      }
+    }
+
+    function hideAllErrors() {
+      Object.values(errors).forEach(error => {
+        error.style.display = 'none';
+      });
+    }
+
+    function clearOthers() {
+      isUpdating = true;
+      Object.values(inputs).forEach(input => {
+        input.value = '';
+      });
+      isUpdating = false;
+    }
+
+    function clearAll() {
+      clearOthers();
+      hideAllErrors();
+    }
+
+    // 添加事件监听
+    inputs.binary.addEventListener('input', (e) => {
+      if (!isUpdating && e.target.value) convert(e.target.value, 2);
+      else if (!e.target.value) clearOthers();
+    });
+
+    inputs.octal.addEventListener('input', (e) => {
+      if (!isUpdating && e.target.value) convert(e.target.value, 8);
+      else if (!e.target.value) clearOthers();
+    });
+
+    inputs.decimal.addEventListener('input', (e) => {
+      if (!isUpdating && e.target.value) convert(e.target.value, 10);
+      else if (!e.target.value) clearOthers();
+    });
+
+    inputs.hexadecimal.addEventListener('input', (e) => {
+      if (!isUpdating && e.target.value) convert(e.target.value, 16);
+      else if (!e.target.value) clearOthers();
+    });
+  </script>
+</body>
+
+</html>

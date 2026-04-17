@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --calculator-bg: #f8f9fa;
+            --input-bg: #ffffff;
+            --input-border: #e1e5e9;
+            --result-bg: #f8f9fa;
+            --result-border: #e1e5e9;
+            --button-bg: #007bff;
+            --button-hover: #0056b3;
+            --clear-bg: #dc3545;
+            --clear-hover: #c82333;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #ffffff;
+                --calculator-bg: #2d2d2d;
+                --input-bg: #3a3a3a;
+                --input-border: #555555;
+                --result-bg: #3a3a3a;
+                --result-border: #555555;
+                --button-bg: #0d6efd;
+                --button-hover: #0b5ed7;
+                --clear-bg: #dc3545;
+                --clear-hover: #bb2d3b;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 40px 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .calculator {
+            background-color: var(--calculator-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px var(--shadow);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            min-height: 500px;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .input-area {
+            flex: 1;
+            background-color: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 16px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            color: var(--text-color);
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .input-area:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .input-area::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--button-bg);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background-color: var(--clear-bg);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--clear-hover);
+            transform: translateY(-1px);
+        }
+
+        .result-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .result-display {
+            flex: 1;
+            background-color: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 16px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            color: var(--text-color);
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .result-line {
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+
+        .result-line.error {
+            color: var(--clear-bg);
+        }
+
+
+
+        @media (max-width: 768px) {
+            .calculator {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="container">
+        <h1>简单计算器</h1>
+
+        <div class="calculator">
+            <div class="input-section">
+                <h2>输入表达式</h2>
+                <textarea class="input-area" id="inputArea"
+                    placeholder="输入数学表达式，每行一个：&#10;2 + 3&#10;10 * 5&#10;100 / 4&#10;(5 + 3) * 2"></textarea>
+            </div>
+
+            <div class="result-section">
+                <h2>计算结果</h2>
+                <div class="result-display" id="resultDisplay"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const inputArea = document.getElementById('inputArea');
+        const resultDisplay = document.getElementById('resultDisplay');
+
+        // 安全计算函数 - 只支持基础四则运算
+        function safeEval(expression) {
+            try {
+                // 移除空白字符
+                expression = expression.trim();
+                if (!expression) return null;
+
+                // 只允许数字、运算符和括号
+                const allowedChars = /^[0-9+\-*/().\s]+$/;
+                if (!allowedChars.test(expression)) {
+                    throw new Error('只支持基础运算符 + - * / ( )');
+                }
+
+                // 使用 Function 构造器进行安全计算
+                const result = new Function(`"use strict"; return (${expression})`)();
+
+                if (typeof result !== 'number' || !isFinite(result)) {
+                    throw new Error('计算结果无效');
+                }
+
+                return result;
+            } catch (error) {
+                throw new Error(`计算错误: ${error.message}`);
+            }
+        }
+
+        // 实时计算函数
+        function calculateRealTime() {
+            const input = inputArea.value;
+            const lines = input.split('\n');
+
+            if (lines.length === 0 || lines.every(line => line.trim() === '')) {
+                resultDisplay.textContent = '';
+                return;
+            }
+
+            let results = [];
+
+            lines.forEach((line, index) => {
+                const expression = line.trim();
+                if (!expression) {
+                    results.push('');
+                    return;
+                }
+
+                try {
+                    const result = safeEval(expression);
+                    if (result !== null) {
+                        results.push(formatResult(result));
+                    } else {
+                        results.push('');
+                    }
+                } catch (error) {
+                    results.push(`错误: ${error.message.replace('计算错误: ', '')}`);
+                }
+            });
+
+            resultDisplay.textContent = results.join('\n');
+        }
+
+        // 格式化结果
+        function formatResult(result) {
+            if (Number.isInteger(result)) {
+                return result.toString();
+            } else {
+                // 保留合适的小数位数
+                if (Math.abs(result) >= 1000000 || Math.abs(result) < 0.001) {
+                    return result.toExponential(6);
+                } else {
+                    return parseFloat(result.toFixed(10)).toString();
+                }
+            }
+        }
+
+        // 监听输入变化
+        inputArea.addEventListener('input', calculateRealTime);
+        inputArea.addEventListener('paste', () => {
+            setTimeout(calculateRealTime, 10);
+        });
+    </script>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="./index.html" style="display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: background-color 0.2s ease;">返回工具列表</a>
+    </div>
+</body>
+
+</html>

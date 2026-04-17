@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片尺寸计算器</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+      --accent-color: #007bff;
+      --result-bg: #e7f3ff;
+      --result-border: #b3d9ff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary: #6c757d;
+        --button-secondary-hover: #868e96;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --accent-color: #4dabf7;
+        --result-bg: #1a2d3d;
+        --result-border: #2a4d6d;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .calculator-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .input-field {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .input-field input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease;
+    }
+
+    .input-field input:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .input-field input[readonly] {
+      background-color: var(--card-border);
+      cursor: not-allowed;
+    }
+
+    .unit {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      margin-top: 4px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: white;
+    }
+
+    .btn-primary {
+      background: var(--button-bg);
+    }
+
+    .btn-primary:hover {
+      background: var(--button-hover);
+    }
+
+    .btn-secondary {
+      background: var(--button-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    .result-card {
+      background: var(--result-bg);
+      border: 2px solid var(--result-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .result-title {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--accent-color);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .result-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .result-label {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .result-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: var(--accent-color);
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    }
+
+    .formula-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .formula-title {
+      font-size: 1em;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-color);
+    }
+
+    .formula {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      padding: 12px;
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .info-box {
+      background: var(--card-bg);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 4px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .info-box h3 {
+      margin: 0 0 10px 0;
+      color: var(--accent-color);
+      font-size: 1em;
+    }
+
+    .info-box p {
+      margin: 5px 0;
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      line-height: 1.6;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .calculator-card {
+        padding: 20px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .input-field {
+        min-width: auto;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>📐 图片尺寸计算器</h1>
+    <p class="subtitle">计算图片按比例缩放后的显示尺寸</p>
+
+    <!-- 原图尺寸输入 -->
+    <div class="calculator-card">
+      <h2 style="margin-top: 0; color: var(--text-color);">📷 原图尺寸（必填）</h2>
+      
+      <div class="input-group">
+        <label>原图尺寸</label>
+        <div class="input-row">
+          <div class="input-field">
+            <input type="number" id="originalWidth" placeholder="宽度" min="1">
+            <div class="unit">宽度 (px)</div>
+          </div>
+          <div class="input-field">
+            <input type="number" id="originalHeight" placeholder="高度" min="1">
+            <div class="unit">高度 (px)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 目标尺寸输入 -->
+    <div class="calculator-card">
+      <h2 style="margin-top: 0; color: var(--text-color);">📐 目标尺寸（任选其一）</h2>
+      
+      <div class="input-group">
+        <label>显示宽度</label>
+        <div class="input-field">
+          <input type="number" id="targetWidth" placeholder="输入显示宽度" min="1">
+          <div class="unit">像素 (px) - 输入此项将计算高度</div>
+        </div>
+      </div>
+
+      <div class="input-group" style="margin-top: 15px;">
+        <label>或显示高度</label>
+        <div class="input-field">
+          <input type="number" id="targetHeight" placeholder="输入显示高度" min="1">
+          <div class="unit">像素 (px) - 输入此项将计算宽度</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" onclick="calculate()">🔍 开始计算</button>
+        <button class="btn btn-secondary" onclick="resetForm()">🔄 重置</button>
+      </div>
+    </div>
+
+    <!-- 计算结果 -->
+    <div class="result-card" id="resultCard" style="display: none;">
+      <div class="formula-section" style="margin-top: 0; padding-top: 0; border-top: none;">
+        <div class="formula-title">📝 计算公式</div>
+        <div class="formula" id="formulaDisplay"></div>
+      </div>
+    </div>
+
+    <div style="text-align: center;">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    // 主计算函数
+    function calculate() {
+      const originalWidth = parseFloat(document.getElementById('originalWidth').value);
+      const originalHeight = parseFloat(document.getElementById('originalHeight').value);
+      const targetWidth = parseFloat(document.getElementById('targetWidth').value);
+      const targetHeight = parseFloat(document.getElementById('targetHeight').value);
+
+      // 验证原图尺寸
+      if (!originalWidth || !originalHeight) {
+        alert('请输入原图尺寸（宽度和高度）');
+        return;
+      }
+
+      if (originalWidth <= 0 || originalHeight <= 0) {
+        alert('原图尺寸必须大于0');
+        return;
+      }
+
+      // 验证目标尺寸（至少输入一个）
+      if (!targetWidth && !targetHeight) {
+        alert('请输入目标宽度或目标高度中的至少一个');
+        return;
+      }
+
+      if (targetWidth && targetWidth <= 0) {
+        alert('目标宽度必须大于0');
+        return;
+      }
+
+      if (targetHeight && targetHeight <= 0) {
+        alert('目标高度必须大于0');
+        return;
+      }
+
+      // 根据用户输入的值进行计算
+      if (targetWidth && !targetHeight) {
+        // 已知宽度，计算高度
+        calculateFromWidth(originalWidth, originalHeight, targetWidth);
+      } else if (!targetWidth && targetHeight) {
+        // 已知高度，计算宽度
+        calculateFromHeight(originalWidth, originalHeight, targetHeight);
+      } else if (targetWidth && targetHeight) {
+        // 两个都输入了，提示用户
+        alert('只能输入一个目标值：目标宽度或目标高度，请清空其中一个后重试');
+        return;
+      }
+    }
+
+    // 根据已知宽度计算高度
+    function calculateFromWidth(originalWidth, originalHeight, targetWidth) {
+      const calculatedHeight = originalHeight * (targetWidth / originalWidth);
+      const scale = targetWidth / originalWidth;
+
+      // 更新高度输入框
+      document.getElementById('targetHeight').value = calculatedHeight.toFixed(2);
+
+      // 显示结果
+      showResult(targetWidth, calculatedHeight, scale, originalWidth, originalHeight, 'height');
+    }
+
+    // 根据已知高度计算宽度
+    function calculateFromHeight(originalWidth, originalHeight, targetHeight) {
+      const calculatedWidth = originalWidth * (targetHeight / originalHeight);
+      const scale = calculatedWidth / originalWidth;
+
+      // 更新宽度输入框
+      document.getElementById('targetWidth').value = calculatedWidth.toFixed(2);
+
+      // 显示结果
+      showResult(calculatedWidth, targetHeight, scale, originalWidth, originalHeight, 'width');
+    }
+
+    // 显示结果
+    function showResult(targetWidth, targetHeight, scale, originalWidth, originalHeight, mode) {
+      const resultCard = document.getElementById('resultCard');
+      
+      // 显示计算公式
+      const formula = mode === 'height' 
+        ? `目标高度 = 原图高度 × (目标宽度 ÷ 原图宽度)\n         = ${originalHeight} × (${targetWidth} ÷ ${originalWidth})\n         = ${targetHeight.toFixed(2)} px\n\n缩放比例 = ${scale.toFixed(4)} = ${(scale * 100).toFixed(2)}%`
+        : `目标宽度 = 原图宽度 × (目标高度 ÷ 原图高度)\n         = ${originalWidth} × (${targetHeight} ÷ ${originalHeight})\n         = ${targetWidth.toFixed(2)} px\n\n缩放比例 = ${scale.toFixed(4)} = ${(scale * 100).toFixed(2)}%`;
+
+      document.getElementById('formulaDisplay').textContent = formula;
+
+      resultCard.style.display = 'block';
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // 重置表单
+    function resetForm() {
+      document.getElementById('originalWidth').value = '';
+      document.getElementById('originalHeight').value = '';
+      document.getElementById('targetWidth').value = '';
+      document.getElementById('targetHeight').value = '';
+      document.getElementById('resultCard').style.display = 'none';
+    }
+
+    // 监听输入变化，实时清空另一个目标输入框
+    document.getElementById('targetWidth').addEventListener('input', function() {
+      if (this.value) {
+        document.getElementById('targetHeight').value = '';
+      }
+    });
+
+    document.getElementById('targetHeight').addEventListener('input', function() {
+      if (this.value) {
+        document.getElementById('targetWidth').value = '';
+      }
+    });
+
+    // 回车键支持
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        calculate();
+      }
+    });
+
+    // 页面加载时不自动计算
+    window.onload = function() {
+      // 页面加载时不执行计算，等待用户输入
+    };
+  </script>
+</body>
+
+</html>

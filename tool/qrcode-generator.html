@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二维码生成器</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .calculator-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .calculator-card h2 {
+      margin: 0 0 15px 0;
+      color: var(--text-color);
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .form-group textarea,
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.95em;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .btn-generate {
+      width: 100%;
+      padding: 12px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-generate:hover {
+      background: var(--button-hover);
+    }
+
+    .qrcode-preview {
+      text-align: center;
+      padding: 30px;
+      background: white;
+      border-radius: 8px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrcode {
+      margin-bottom: 20px;
+    }
+
+    #qrcode canvas,
+    #qrcode img {
+      border-radius: 8px;
+    }
+
+    .download-btn {
+      padding: 10px 24px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: none;
+    }
+
+    .download-btn:hover {
+      background: var(--button-hover);
+    }
+
+    .placeholder {
+      color: var(--text-secondary);
+      font-size: 1.1em;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>二维码生成器</h1>
+    <p class="subtitle">将文本、网址等内容生成二维码</p>
+
+    <div class="calculator-card">
+      <h2>输入内容</h2>
+      <div class="form-group">
+        <label>文本内容</label>
+        <textarea id="textInput" placeholder="输入要生成二维码的内容（网址、文本等）"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>尺寸</label>
+          <select id="sizeSelect">
+            <option value="200">200 x 200</option>
+            <option value="256" selected>256 x 256</option>
+            <option value="300">300 x 300</option>
+            <option value="400">400 x 400</option>
+            <option value="512">512 x 512</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>容错率</label>
+          <select id="errorLevel">
+            <option value="L">低 (7%)</option>
+            <option value="M" selected>中 (15%)</option>
+            <option value="Q">较高 (25%)</option>
+            <option value="H">高 (30%)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-generate" onclick="generateQRCode()">生成二维码</button>
+    </div>
+
+    <div class="calculator-card">
+      <h2>二维码预览</h2>
+      <div class="qrcode-preview">
+        <div id="qrcode"></div>
+        <div class="placeholder" id="placeholder">请输入内容并点击生成</div>
+        <button class="download-btn" id="downloadBtn" onclick="downloadQRCode()">下载二维码</button>
+      </div>
+    </div>
+
+    <div style="text-align: center;">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    let qrcode = null;
+
+    function generateQRCode() {
+      const text = document.getElementById('textInput').value.trim();
+      
+      if (!text) {
+        alert('请输入要生成二维码的内容');
+        return;
+      }
+
+      const size = parseInt(document.getElementById('sizeSelect').value);
+      const errorLevel = document.getElementById('errorLevel').value;
+
+      // 清除旧的二维码
+      const qrcodeDiv = document.getElementById('qrcode');
+      qrcodeDiv.innerHTML = '';
+      
+      // 隐藏占位符，显示下载按钮
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('downloadBtn').style.display = 'inline-block';
+
+      // 生成新的二维码
+      qrcode = new QRCode(qrcodeDiv, {
+        text: text,
+        width: size,
+        height: size,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel[errorLevel]
+      });
+    }
+
+    function downloadQRCode() {
+      const canvas = document.querySelector('#qrcode canvas');
+      if (!canvas) {
+        alert('请先生成二维码');
+        return;
+      }
+
+      // 转换为图片并下载
+      const url = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
+      link.href = url;
+      link.click();
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unicode字符列表</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+    
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+      --table-header-bg: #f8f9fa;
+      --table-row-hover: #f5f5f5;
+      --category-color: #007bff;
+      --accent-emoji: #FF6B6B;
+      --accent-symbols: #4ECDC4;
+      --accent-arrows: #45B7D1;
+      --accent-math: #96CEB4;
+      --accent-currency: #FFEAA7;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary: #6c757d;
+        --button-secondary-hover: #868e96;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --table-header-bg: #3a3a3a;
+        --table-row-hover: #4a4a4a;
+        --category-color: #4dabf7;
+        --accent-emoji: #FF8787;
+        --accent-symbols: #6FE6DE;
+        --accent-arrows: #67C3D3;
+        --accent-math: #A6D8B4;
+        --accent-currency: #FFE887;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .controls-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .search-row input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    .search-row input:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-group select {
+      padding: 8px 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      font-size: 0.95em;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      color: white;
+    }
+
+    .btn-primary {
+      background: var(--button-bg);
+    }
+
+    .btn-primary:hover {
+      background: var(--button-hover);
+    }
+
+    .btn-secondary {
+      background: var(--button-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    .char-grid-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--card-border);
+    }
+
+    .section-emoji {
+      font-size: 1.5em;
+      margin-right: 10px;
+    }
+
+    .section-title {
+      font-size: 1.3em;
+      font-weight: 600;
+      color: var(--text-color);
+      flex: 1;
+    }
+
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .char-item {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .char-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--shadow);
+      border-color: var(--button-bg);
+    }
+
+    .char-item.copied {
+      background: var(--button-bg);
+      color: white;
+    }
+
+    .char-display {
+      font-size: 2em;
+      line-height: 1;
+      margin-bottom: 5px;
+      font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+      unicode-bidi: isolate;
+    }
+
+    .char-code {
+      font-size: 0.7em;
+      color: var(--text-secondary);
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+      margin-bottom: 2px;
+    }
+
+    .char-description {
+      font-size: 0.75em;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .category-emoji { border-top: 3px solid var(--accent-emoji); }
+    .category-symbols { border-top: 3px solid var(--accent-symbols); }
+    .category-arrows { border-top: 3px solid var(--accent-arrows); }
+    .category-math { border-top: 3px solid var(--accent-math); }
+    .category-currency { border-top: 3px solid var(--accent-currency); }
+    .category-basic { border-top: 3px solid var(--category-color); }
+    .category-punctuation { border-top: 3px solid var(--text-secondary); }
+
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+      overflow-x: auto;
+    }
+
+    .unicode-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+    }
+
+    .unicode-table th {
+      background: var(--table-header-bg);
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .unicode-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--card-border);
+      vertical-align: middle;
+    }
+
+    .unicode-table tr:hover {
+      background: var(--table-row-hover);
+    }
+
+    .char-display-table {
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+      min-width: 40px;
+      font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+      unicode-bidi: isolate;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .view-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .view-btn.active {
+      background: var(--button-bg);
+      color: white;
+      border-color: var(--button-bg);
+    }
+
+    .code-point {
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+      font-weight: 600;
+      color: var(--category-color);
+    }
+
+    .description {
+      color: var(--text-secondary);
+    }
+
+    .copy-btn {
+      padding: 4px 8px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 3px;
+      font-size: 0.8em;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--button-hover);
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--category-color);
+      color: white;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+
+    .stats {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--text-secondary);
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .pagination button {
+      padding: 8px 12px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: var(--button-bg);
+      color: white;
+      border-color: var(--button-bg);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination button.active {
+      background: var(--button-bg);
+      color: white;
+      border-color: var(--button-bg);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .search-row {
+        flex-direction: column;
+      }
+
+      .search-row input {
+        width: 100%;
+      }
+
+      .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .unicode-table {
+        font-size: 0.8em;
+      }
+
+      .char-display {
+        font-size: 1.2em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>✨ Unicode字符列表</h1>
+    <p class="subtitle">浏览和搜索Unicode字符，支持分类筛选和一键复制 🚀</p>
+
+    <!-- 搜索和筛选控件 -->
+    <div class="controls-card">
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="搜索字符、描述或Unicode码点...">
+        <button class="btn btn-primary" onclick="searchUnicode()">搜索</button>
+        <button class="btn btn-secondary" onclick="clearSearch()">清空</button>
+      </div>
+      
+      <div class="filter-group">
+        <select id="categorySelect" onchange="filterByCategory()">
+          <option value="">🌍 所有分类</option>
+          <option value="basic-latin">🔤 基础拉丁字母</option>
+          <option value="latin-1">📝 拉丁字母补充1</option>
+          <option value="latin-extended-a">📖 拉丁字母扩展A</option>
+          <option value="currency">💰 货币符号</option>
+          <option value="arrows">➡️ 箭头符号</option>
+          <option value="math">🔢 数学运算符</option>
+          <option value="punctuation">❕ 标点符号</option>
+          <option value="symbols">✨ 杂项符号</option>
+          <option value="emoji">😀 表情符号</option>
+        </select>
+        
+        <select id="rangeSelect" onchange="filterByRange()">
+          <option value="">所有范围</option>
+          <option value="0000-007F">ASCII (0000-007F)</option>
+          <option value="0080-00FF">拉丁字母补充1 (0080-00FF)</option>
+          <option value="0100-017F">拉丁字母扩展A (0100-017F)</option>
+          <option value="2000-206F">通用标点 (2000-206F)</option>
+          <option value="20A0-20CF">货币符号 (20A0-20CF)</option>
+          <option value="2190-21FF">箭头 (2190-21FF)</option>
+          <option value="2200-22FF">数学运算符 (2200-22FF)</option>
+          <option value="2600-26FF">杂项符号 (2600-26FF)</option>
+          <option value="1F600-1F64F">表情符号 (1F600-1F64F)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 统计信息 -->
+    <div class="stats" id="stats">
+      显示 <span id="visibleCount">0</span> 个字符，共 <span id="totalCount">0</span> 个
+    </div>
+
+    <!-- 视图切换 -->
+    <div class="view-toggle">
+      <button class="view-btn active" onclick="switchView('grid')" id="gridViewBtn">网格视图</button>
+      <button class="view-btn" onclick="switchView('table')" id="tableViewBtn">表格视图</button>
+    </div>
+
+    <!-- 网格视图容器 -->
+    <div id="gridContainer"></div>
+
+    <!-- 表格视图容器 -->
+    <div class="table-container" id="tableContainer" style="display: none;">
+      <table class="unicode-table">
+        <thead>
+          <tr>
+            <th>字符</th>
+            <th>Unicode码点</th>
+            <th>十进制</th>
+            <th>分类</th>
+            <th>描述</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="unicodeTableBody">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分页控件 -->
+    <div class="pagination" id="pagination">
+    </div>
+
+    <div style="text-align: center;">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    // Unicode字符数据
+    const unicodeData = [
+      // ASCII字符
+      { code: 0x0020, category: 'basic-latin', categoryName: '基础拉丁字母', description: '空格' },
+      { code: 0x0021, category: 'punctuation', categoryName: '标点符号', description: '感叹号' },
+      { code: 0x0022, category: 'punctuation', categoryName: '标点符号', description: '双引号' },
+      { code: 0x0023, category: 'symbols', categoryName: '杂项符号', description: '井号' },
+      { code: 0x0024, category: 'currency', categoryName: '货币符号', description: '美元符号' },
+      { code: 0x0025, category: 'symbols', categoryName: '杂项符号', description: '百分号' },
+      { code: 0x0026, category: 'symbols', categoryName: '杂项符号', description: '和号' },
+      { code: 0x0027, category: 'punctuation', categoryName: '标点符号', description: '单引号' },
+      { code: 0x0028, category: 'punctuation', categoryName: '标点符号', description: '左圆括号' },
+      { code: 0x0029, category: 'punctuation', categoryName: '标点符号', description: '右圆括号' },
+      { code: 0x002A, category: 'math', categoryName: '数学运算符', description: '星号' },
+      { code: 0x002B, category: 'math', categoryName: '数学运算符', description: '加号' },
+      { code: 0x002C, category: 'punctuation', categoryName: '标点符号', description: '逗号' },
+      { code: 0x002D, category: 'punctuation', categoryName: '标点符号', description: '连字符/减号' },
+      { code: 0x002E, category: 'punctuation', categoryName: '标点符号', description: '句点' },
+      { code: 0x002F, category: 'math', categoryName: '数学运算符', description: '斜杠' },
+      
+      // 数字
+      { code: 0x0030, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字0' },
+      { code: 0x0031, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字1' },
+      { code: 0x0032, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字2' },
+      { code: 0x0033, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字3' },
+      { code: 0x0034, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字4' },
+      { code: 0x0035, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字5' },
+      { code: 0x0036, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字6' },
+      { code: 0x0037, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字7' },
+      { code: 0x0038, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字8' },
+      { code: 0x0039, category: 'basic-latin', categoryName: '基础拉丁字母', description: '数字9' },
+      
+      // 特殊符号
+      { code: 0x00A9, category: 'symbols', categoryName: '杂项符号', description: '版权符号' },
+      { code: 0x00AE, category: 'symbols', categoryName: '杂项符号', description: '注册商标符号' },
+      { code: 0x2122, category: 'symbols', categoryName: '杂项符号', description: '商标符号' },
+      { code: 0x00AE, category: 'symbols', categoryName: '杂项符号', description: '注册商标' },
+      { code: 0x00A9, category: 'symbols', categoryName: '杂项符号', description: '版权' },
+      { code: 0x2122, category: 'symbols', categoryName: '杂项符号', description: '商标' },
+      { code: 0x00B6, category: 'symbols', categoryName: '杂项符号', description: '段落符号' },
+      { code: 0x00A7, category: 'symbols', categoryName: '杂项符号', description: '章节符号' },
+      { code: 0x2020, category: 'symbols', categoryName: '杂项符号', description: '匕首符号' },
+      { code: 0x2021, category: 'symbols', categoryName: '杂项符号', description: '双匕首符号' },
+      { code: 0x2022, category: 'symbols', categoryName: '杂项符号', description: '圆点' },
+      { code: 0x25AA, category: 'symbols', categoryName: '杂项符号', description: '小黑方块' },
+      { code: 0x25AB, category: 'symbols', categoryName: '杂项符号', description: '小白方块' },
+      { code: 0x25CF, category: 'symbols', categoryName: '杂项符号', description: '黑圆' },
+      { code: 0x25CB, category: 'symbols', categoryName: '杂项符号', description: '白圆' },
+      { code: 0x25C6, category: 'symbols', categoryName: '杂项符号', description: '黑菱形' },
+      { code: 0x25C7, category: 'symbols', categoryName: '杂项符号', description: '白菱形' },
+      
+      // 货币符号
+      { code: 0x20AC, category: 'currency', categoryName: '货币符号', description: '欧元符号' },
+      { code: 0x00A3, category: 'currency', categoryName: '货币符号', description: '英镑符号' },
+      { code: 0x00A5, category: 'currency', categoryName: '货币符号', description: '日元/人民币符号' },
+      { code: 0x20A1, category: 'currency', categoryName: '货币符号', description: '科朗符号' },
+      { code: 0x20A2, category: 'currency', categoryName: '货币符号', description: '塞地符号' },
+      { code: 0x20A3, category: 'currency', categoryName: '货币符号', description: '法郎符号' },
+      { code: 0x20A4, category: 'currency', categoryName: '货币符号', description: '里拉符号' },
+      { code: 0x20B1, category: 'currency', categoryName: '货币符号', description: '比索符号' },
+      { code: 0x20B2, category: 'currency', categoryName: '货币符号', description: '瓜拉尼符号' },
+      { code: 0x20B5, category: 'currency', categoryName: '货币符号', description: '塞地符号' },
+      { code: 0x20A9, category: 'currency', categoryName: '货币符号', description: '韩元符号' },
+      { code: 0x20AA, category: 'currency', categoryName: '货币符号', description: '新谢克尔符号' },
+      { code: 0x20AB, category: 'currency', categoryName: '货币符号', description: '越南盾符号' },
+      { code: 0x20AD, category: 'currency', categoryName: '货币符号', description: '老挝基普符号' },
+      
+      // 箭头
+      { code: 0x2190, category: 'arrows', categoryName: '箭头符号', description: '左箭头' },
+      { code: 0x2191, category: 'arrows', categoryName: '箭头符号', description: '上箭头' },
+      { code: 0x2192, category: 'arrows', categoryName: '箭头符号', description: '右箭头' },
+      { code: 0x2193, category: 'arrows', categoryName: '箭头符号', description: '下箭头' },
+      { code: 0x2194, category: 'arrows', categoryName: '箭头符号', description: '左右箭头' },
+      { code: 0x2195, category: 'arrows', categoryName: '箭头符号', description: '上下箭头' },
+      { code: 0x21A9, category: 'arrows', categoryName: '箭头符号', description: '左钩箭头' },
+      { code: 0x21AA, category: 'arrows', categoryName: '箭头符号', description: '右钩箭头' },
+      { code: 0x21B0, category: 'arrows', categoryName: '箭头符号', description: '上左箭头' },
+      { code: 0x21B1, category: 'arrows', categoryName: '箭头符号', description: '上右箭头' },
+      { code: 0x21D0, category: 'arrows', categoryName: '箭头符号', description: '双线左箭头' },
+      { code: 0x21D1, category: 'arrows', categoryName: '箭头符号', description: '双线上箭头' },
+      { code: 0x21D2, category: 'arrows', categoryName: '箭头符号', description: '双线右箭头' },
+      { code: 0x21D3, category: 'arrows', categoryName: '箭头符号', description: '双线下箭头' },
+      { code: 0x27F2, category: 'arrows', categoryName: '箭头符号', description: '顺时针箭头' },
+      { code: 0x27F3, category: 'arrows', categoryName: '箭头符号', description: '逆时针箭头' },
+      
+      // 数学运算符
+      { code: 0x00B1, category: 'math', categoryName: '数学运算符', description: '正负号' },
+      { code: 0x00D7, category: 'math', categoryName: '数学运算符', description: '乘号' },
+      { code: 0x00F7, category: 'math', categoryName: '数学运算符', description: '除号' },
+      { code: 0x2260, category: 'math', categoryName: '数学运算符', description: '不等于' },
+      { code: 0x2261, category: 'math', categoryName: '数学运算符', description: '恒等于' },
+      { code: 0x2264, category: 'math', categoryName: '数学运算符', description: '小于等于' },
+      { code: 0x2265, category: 'math', categoryName: '数学运算符', description: '大于等于' },
+      { code: 0x2211, category: 'math', categoryName: '数学运算符', description: '求和' },
+      { code: 0x222B, category: 'math', categoryName: '数学运算符', description: '积分' },
+      { code: 0x221A, category: 'math', categoryName: '数学运算符', description: '平方根' },
+      { code: 0x221E, category: 'math', categoryName: '数学运算符', description: '无穷大' },
+      { code: 0x2202, category: 'math', categoryName: '数学运算符', description: '偏导数' },
+      { code: 0x2207, category: 'math', categoryName: '数学运算符', description: '梯度' },
+      { code: 0x220F, category: 'math', categoryName: '数学运算符', description: '连乘' },
+      { code: 0x2210, category: 'math', categoryName: '数学运算符', description: '同或' },
+      { code: 0x221D, category: 'math', categoryName: '数学运算符', description: '正比于' },
+      { code: 0x2220, category: 'math', categoryName: '数学运算符', description: '角' },
+      
+      // 杂项符号
+      { code: 0x2600, category: 'symbols', categoryName: '杂项符号', description: '太阳' },
+      { code: 0x2601, category: 'symbols', categoryName: '杂项符号', description: '云' },
+      { code: 0x2602, category: 'symbols', categoryName: '杂项符号', description: '雨伞' },
+      { code: 0x2603, category: 'symbols', categoryName: '杂项符号', description: '雪人' },
+      { code: 0x2605, category: 'symbols', categoryName: '杂项符号', description: '黑星' },
+      { code: 0x2606, category: 'symbols', categoryName: '杂项符号', description: '白星' },
+      { code: 0x2615, category: 'symbols', categoryName: '杂项符号', description: '热饮' },
+      { code: 0x263A, category: 'symbols', categoryName: '杂项符号', description: '笑脸' },
+      { code: 0x263B, category: 'symbols', categoryName: '杂项符号', description: '黑脸笑脸' },
+      { code: 0x263C, category: 'symbols', categoryName: '杂项符号', description: '太阳脸' },
+      { code: 0x263D, category: 'symbols', categoryName: '杂项符号', description: '月亮' },
+      { code: 0x263E, category: 'symbols', categoryName: '杂项符号', description: '月亮脸' },
+      { code: 0x2660, category: 'symbols', categoryName: '杂项符号', description: '黑桃' },
+      { code: 0x2661, category: 'symbols', categoryName: '杂项符号', description: '红心' },
+      { code: 0x2662, category: 'symbols', categoryName: '杂项符号', description: '方块' },
+      { code: 0x2663, category: 'symbols', categoryName: '杂项符号', description: '梅花' },
+      { code: 0x2665, category: 'symbols', categoryName: '杂项符号', description: '实心红心' },
+      { code: 0x2666, category: 'symbols', categoryName: '杂项符号', description: '实心方块' },
+      { code: 0x2667, category: 'symbols', categoryName: '杂项符号', description: '实心梅花' },
+      { code: 0x2668, category: 'symbols', categoryName: '杂项符号', description: '温泉' },
+      { code: 0x2669, category: 'symbols', categoryName: '杂项符号', description: '音符' },
+      { code: 0x266A, category: 'symbols', categoryName: '杂项符号', description: '八分音符' },
+      { code: 0x266B, category: 'symbols', categoryName: '杂项符号', description: '双八分音符' },
+      { code: 0x266C, category: 'symbols', categoryName: '杂项符号', description: '十六分音符' },
+      { code: 0x266D, category: 'symbols', categoryName: '杂项符号', description: '降号' },
+      { code: 0x266E, category: 'symbols', categoryName: '杂项符号', description: '还原号' },
+      { code: 0x266F, category: 'symbols', categoryName: '杂项符号', description: '升号' },
+      
+      // 表情符号 - 更完整的集合
+      { code: 0x1F600, category: 'emoji', categoryName: '表情符号', description: '露齿笑' },
+      { code: 0x1F601, category: 'emoji', categoryName: '表情符号', description: '眯眼笑' },
+      { code: 0x1F602, category: 'emoji', categoryName: '表情符号', description: '喜极而泣' },
+      { code: 0x1F603, category: 'emoji', categoryName: '表情符号', description: '微笑脸' },
+      { code: 0x1F604, category: 'emoji', categoryName: '表情符号', description: '大笑' },
+      { code: 0x1F605, category: 'emoji', categoryName: '表情符号', description: '汗笑' },
+      { code: 0x1F606, category: 'emoji', categoryName: '表情符号', description: '闭眼笑' },
+      { code: 0x1F607, category: 'emoji', categoryName: '表情符号', description: '天使笑' },
+      { code: 0x1F609, category: 'emoji', categoryName: '表情符号', description: '眨眼' },
+      { code: 0x1F60A, category: 'emoji', categoryName: '表情符号', description: '幸福笑' },
+      { code: 0x1F60B, category: 'emoji', categoryName: '表情符号', description: '美味' },
+      { code: 0x1F60C, category: 'emoji', categoryName: '表情符号', description: '得意' },
+      { code: 0x1F60D, category: 'emoji', categoryName: '表情符号', description: '爱心眼' },
+      { code: 0x1F60E, category: 'emoji', categoryName: '表情符号', description: '墨镜' },
+      { code: 0x1F60F, category: 'emoji', categoryName: '表情符号', description: '调情' },
+      { code: 0x1F610, category: 'emoji', categoryName: '表情符号', description: '中性脸' },
+      { code: 0x1F611, category: 'emoji', categoryName: '表情符号', description: '无语' },
+      { code: 0x1F612, category: 'emoji', categoryName: '表情符号', description: '皱眉' },
+      { code: 0x1F613, category: 'emoji', categoryName: '表情符号', description: '汗' },
+      { code: 0x1F614, category: 'emoji', categoryName: '表情符号', description: '失望' },
+      { code: 0x1F615, category: 'emoji', categoryName: '表情符号', description: '困惑' },
+      { code: 0x1F616, category: 'emoji', categoryName: '表情符号', description: '为难' },
+      { code: 0x1F617, category: 'emoji', categoryName: '表情符号', description: '亲亲' },
+      { code: 0x1F618, category: 'emoji', categoryName: '表情符号', description: '飞吻' },
+      { code: 0x1F619, category: 'emoji', categoryName: '表情符号', description: '眨眼吻' },
+      { code: 0x1F61A, category: 'emoji', categoryName: '表情符号', description: '亲吻' },
+      { code: 0x1F61B, category: 'emoji', categoryName: '表情符号', description: '吐舌头' },
+      { code: 0x1F61C, category: 'emoji', categoryName: '表情符号', description: '鬼脸' },
+      { code: 0x1F61D, category: 'emoji', categoryName: '表情符号', description: '眯眼吐舌' },
+      { code: 0x1F61E, category: 'emoji', categoryName: '表情符号', description: '失望' },
+      { code: 0x1F61F, category: 'emoji', categoryName: '表情符号', description: '担心' },
+      { code: 0x1F620, category: 'emoji', categoryName: '表情符号', description: '生气' },
+      { code: 0x1F621, category: 'emoji', categoryName: '表情符号', description: '愤怒' },
+      { code: 0x1F622, category: 'emoji', categoryName: '表情符号', description: '哭泣' },
+      { code: 0x1F623, category: 'emoji', categoryName: '表情符号', description: '大哭' },
+      { code: 0x1F624, category: 'emoji', categoryName: '表情符号', description: '恼火' },
+      { code: 0x1F625, category: 'emoji', categoryName: '表情符号', description: '沮丧' },
+      { code: 0x1F626, category: 'emoji', categoryName: '表情符号', description: '郁闷' },
+      { code: 0x1F627, category: 'emoji', categoryName: '表情符号', description: '痛苦' },
+      { code: 0x1F628, category: 'emoji', categoryName: '表情符号', description: '恐惧' },
+      { code: 0x1F629, category: 'emoji', categoryName: '表情符号', description: '疲惫' },
+      { code: 0x1F62A, category: 'emoji', categoryName: '表情符号', description: '困倦' },
+      { code: 0x1F62B, category: 'emoji', categoryName: '表情符号', description: '疲惫叹气' },
+      { code: 0x1F62C, category: 'emoji', categoryName: '表情符号', description: '咬牙' },
+      { code: 0x1F62D, category: 'emoji', categoryName: '表情符号', description: '大哭' },
+      { code: 0x1F62E, category: 'emoji', categoryName: '表情符号', description: '惊讶' },
+      { code: 0x1F62F, category: 'emoji', categoryName: '表情符号', description: '震惊' },
+      { code: 0x1F630, category: 'emoji', categoryName: '表情符号', description: '冷汗' },
+      { code: 0x1F631, category: 'emoji', categoryName: '表情符号', description: '尖叫' },
+      { code: 0x1F632, category: 'emoji', categoryName: '表情符号', description: '晕倒' },
+      { code: 0x1F633, category: 'emoji', categoryName: '表情符号', description: '害羞脸红' },
+      { code: 0x1F634, category: 'emoji', categoryName: '表情符号', description: '睡着' },
+      { code: 0x1F635, category: 'emoji', categoryName: '表情符号', description: '晕' },
+      { code: 0x1F636, category: 'emoji', categoryName: '表情符号', description: '无嘴脸' },
+      { code: 0x1F637, category: 'emoji', categoryName: '表情符号', description: '戴口罩' },
+      { code: 0x1F638, category: 'emoji', categoryName: '表情符号', description: '猫脸笑' },
+      { code: 0x1F639, category: 'emoji', categoryName: '表情符号', description: '猫脸哭' },
+      { code: 0x1F63A, category: 'emoji', categoryName: '表情符号', description: '猫脸开心' },
+      { code: 0x1F63B, category: 'emoji', categoryName: '表情符号', description: '猫眼爱心' },
+      { code: 0x1F63C, category: 'emoji', categoryName: '表情符号', description: '猫脸得意' },
+      { code: 0x1F63D, category: 'emoji', categoryName: '表情符号', description: '猫脸亲亲' },
+      { code: 0x1F63E, category: 'emoji', categoryName: '表情符号', description: '猫脸皱眉' },
+      { code: 0x1F63F, category: 'emoji', categoryName: '表情符号', description: '猫脸哭' },
+      
+      // 手势符号
+      { code: 0x1F44D, category: 'emoji', categoryName: '表情符号', description: '赞' },
+      { code: 0x1F44E, category: 'emoji', categoryName: '表情符号', description: '踩' },
+      { code: 0x1F44A, category: 'emoji', categoryName: '表情符号', description: '拳头' },
+      { code: 0x270C, category: 'emoji', categoryName: '表情符号', description: '胜利手势' },
+      { code: 0x270B, category: 'emoji', categoryName: '表情符号', description: '举手' },
+      { code: 0x1F590, category: 'emoji', categoryName: '表情符号', description: '举手张开' },
+      { code: 0x270D, category: 'emoji', categoryName: '表情符号', description: 'OK手势' },
+      { code: 0x1F448, category: 'emoji', categoryName: '表情符号', description: '指左' },
+      { code: 0x1F449, category: 'emoji', categoryName: '表情符号', description: '指右' },
+      { code: 0x1F446, category: 'emoji', categoryName: '表情符号', description: '指上' },
+      { code: 0x1F447, category: 'emoji', categoryName: '表情符号', description: '指下' },
+      
+      // 动物表情
+      { code: 0x1F436, category: 'emoji', categoryName: '表情符号', description: '小狗' },
+      { code: 0x1F431, category: 'emoji', categoryName: '表情符号', description: '猫咪' },
+      { code: 0x1F42D, category: 'emoji', categoryName: '表情符号', description: '仓鼠' },
+      { code: 0x1F439, category: 'emoji', categoryName: '表情符号', description: '兔子' },
+      { code: 0x1F430, category: 'emoji', categoryName: '表情符号', description: '熊猫' },
+      { code: 0x1F438, category: 'emoji', categoryName: '表情符号', description: '青蛙' },
+      { code: 0x1F435, category: 'emoji', categoryName: '表情符号', description: '猴子' },
+      { code: 0x1F648, category: 'emoji', categoryName: '表情符号', description: '不看猴子' },
+      { code: 0x1F649, category: 'emoji', categoryName: '表情符号', description: '不听猴子' },
+      { code: 0x1F64A, category: 'emoji', categoryName: '表情符号', description: '不说猴子' },
+      
+      // 更多符号
+      { code: 0x2764, category: 'emoji', categoryName: '表情符号', description: '红心' },
+      { code: 0x1F494, category: 'emoji', categoryName: '表情符号', description: '破碎的心' },
+      { code: 0x2728, category: 'emoji', categoryName: '表情符号', description: '闪亮' },
+      { code: 0x2B50, category: 'emoji', categoryName: '表情符号', description: '星星' },
+      { code: 0x1F31F, category: 'emoji', categoryName: '表情符号', description: '闪亮星星' },
+      { code: 0x1F4A9, category: 'emoji', categoryName: '表情符号', description: '便便' },
+      { code: 0x1F34C, category: 'emoji', categoryName: '表情符号', description: '香蕉' },
+      { code: 0x1F34E, category: 'emoji', categoryName: '表情符号', description: '苹果' },
+      { code: 0x1F352, category: 'emoji', categoryName: '表情符号', description: '樱桃' },
+      { code: 0x1F34A, category: 'emoji', categoryName: '表情符号', description: '橙子' },
+      { code: 0x1F34B, category: 'emoji', categoryName: '表情符号', description: '柠檬' },
+      { code: 0x1F349, category: 'emoji', categoryName: '表情符号', description: '西瓜' },
+      { code: 0x1F447, category: 'emoji', categoryName: '表情符号', description: '指下' },
+    ];
+
+    // 全局变量
+    let filteredData = [...unicodeData];
+    let currentPage = 1;
+    let currentView = 'grid';
+    const itemsPerPage = 50;
+
+    // 初始化
+    function init() {
+      renderCurrentView();
+      updateStats();
+      setupEventListeners();
+    }
+
+    // 设置事件监听器
+    function setupEventListeners() {
+      document.getElementById('searchInput').addEventListener('input', searchUnicode);
+      document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          searchUnicode();
+        }
+      });
+    }
+
+    // 搜索功能
+    function searchUnicode() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const category = document.getElementById('categorySelect').value;
+      const range = document.getElementById('rangeSelect').value;
+      
+      filteredData = unicodeData.filter(item => {
+        let matchesSearch = true;
+        let matchesCategory = !category || item.category === category;
+        let matchesRange = true;
+        
+        if (searchTerm) {
+          const char = String.fromCharCode(item.code);
+          const hexCode = item.code.toString(16).toUpperCase().padStart(4, '0');
+          const decCode = item.code.toString();
+          matchesSearch = 
+            char.toLowerCase().includes(searchTerm) ||
+            hexCode.includes(searchTerm.toUpperCase()) ||
+            decCode.includes(searchTerm) ||
+            item.description.toLowerCase().includes(searchTerm);
+        }
+        
+        if (range) {
+          const [start, end] = range.split('-').map(hex => parseInt(hex, 16));
+          matchesRange = item.code >= start && item.code <= end;
+        }
+        
+        return matchesSearch && matchesCategory && matchesRange;
+      });
+      
+      currentPage = 1;
+      renderCurrentView();
+      updateStats();
+    }
+
+    // 分类筛选
+    function filterByCategory() {
+      searchUnicode();
+    }
+
+    // 范围筛选
+    function filterByRange() {
+      searchUnicode();
+    }
+
+    // 清空搜索
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categorySelect').value = '';
+      document.getElementById('rangeSelect').value = '';
+      filteredData = [...unicodeData];
+      currentPage = 1;
+      renderCurrentView();
+      updateStats();
+    }
+
+    // 切换视图
+    function switchView(view) {
+      currentView = view;
+      
+      // 更新按钮状态
+      document.getElementById('gridViewBtn').classList.toggle('active', view === 'grid');
+      document.getElementById('tableViewBtn').classList.toggle('active', view === 'table');
+      
+      // 切换容器显示
+      document.getElementById('gridContainer').style.display = view === 'grid' ? 'block' : 'none';
+      document.getElementById('tableContainer').style.display = view === 'table' ? 'block' : 'none';
+      
+      renderCurrentView();
+    }
+
+    // 渲染当前视图
+    function renderCurrentView() {
+      if (currentView === 'grid') {
+        renderGrid();
+      } else {
+        renderTable();
+      }
+    }
+
+    // 渲染网格
+    function renderGrid() {
+      const gridContainer = document.getElementById('gridContainer');
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageData = filteredData.slice(startIndex, endIndex);
+      
+      // 按分类分组
+      const groupedData = {};
+      pageData.forEach(item => {
+        if (!groupedData[item.category]) {
+          groupedData[item.category] = {
+            categoryName: item.categoryName,
+            emoji: getCategoryEmoji(item.category),
+            items: []
+          };
+        }
+        groupedData[item.category].items.push(item);
+      });
+      
+      let html = '';
+      
+      Object.entries(groupedData).forEach(([category, data]) => {
+        html += `
+          <div class="char-grid-container">
+            <div class="section-header">
+              <span class="section-emoji">${data.emoji}</span>
+              <h3 class="section-title">${data.categoryName}</h3>
+            </div>
+            <div class="char-grid category-${getCategoryClass(category)}">
+        `;
+        
+        data.items.forEach(item => {
+          const char = String.fromCodePoint(item.code);
+          const hexCode = item.code.toString(16).toUpperCase().padStart(4, '0');
+          
+          html += `
+            <div class="char-item" onclick="copyCharGrid('${char}', this)" title="${item.description}">
+              <div class="char-display">${char}</div>
+              <div class="char-code">U+${hexCode}</div>
+              <div class="char-description">${item.description}</div>
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+      });
+      
+      gridContainer.innerHTML = html;
+      renderPagination();
+    }
+
+    // 渲染表格
+    function renderTable() {
+      const tbody = document.getElementById('unicodeTableBody');
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageData = filteredData.slice(startIndex, endIndex);
+      
+      tbody.innerHTML = '';
+      
+      pageData.forEach(item => {
+        const row = document.createElement('tr');
+        const char = String.fromCodePoint(item.code);
+        const hexCode = item.code.toString(16).toUpperCase().padStart(4, '0');
+        const decCode = item.code.toString();
+        
+        row.innerHTML = `
+          <td class="char-display-table">${char}</td>
+          <td class="code-point">U+${hexCode}</td>
+          <td>${decCode}</td>
+          <td><span class="category-badge">${item.categoryName}</span></td>
+          <td class="description">${item.description}</td>
+          <td>
+            <button class="copy-btn" onclick="copyChar('${char}')">复制字符</button>
+            <button class="copy-btn" onclick="copyCode('${hexCode}')">复制码点</button>
+          </td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+      
+      renderPagination();
+    }
+
+    // 获取分类表情
+    function getCategoryEmoji(category) {
+      const emojiMap = {
+        'emoji': '😀',
+        'symbols': '✨',
+        'arrows': '➡️',
+        'math': '🔢',
+        'currency': '💰',
+        'punctuation': '❕',
+        'basic-latin': '🔤'
+      };
+      return emojiMap[category] || '📝';
+    }
+
+    // 获取分类样式类
+    function getCategoryClass(category) {
+      if (category === 'emoji') return 'emoji';
+      if (category === 'symbols') return 'symbols';
+      if (category === 'arrows') return 'arrows';
+      if (category === 'math') return 'math';
+      if (category === 'currency') return 'currency';
+      if (category === 'basic-latin') return 'basic';
+      if (category === 'punctuation') return 'punctuation';
+      return 'basic';
+    }
+
+    // 渲染分页
+    function renderPagination() {
+      const pagination = document.getElementById('pagination');
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      
+      pagination.innerHTML = '';
+      
+      // 上一页按钮
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '上一页';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderCurrentView();
+        }
+      };
+      pagination.appendChild(prevBtn);
+      
+      // 页码按钮
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + 4);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        pageBtn.className = i === currentPage ? 'active' : '';
+      pageBtn.onclick = () => {
+        currentPage = i;
+        renderCurrentView();
+      };
+        pagination.appendChild(pageBtn);
+      }
+      
+      // 下一页按钮
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = '下一页';
+      nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+      nextBtn.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderCurrentView();
+        }
+      };
+      pagination.appendChild(nextBtn);
+      
+      // 页面信息
+      const pageInfo = document.createElement('span');
+      pageInfo.style.marginLeft = '20px';
+      pageInfo.style.color = 'var(--text-secondary)';
+      pageInfo.textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
+      pagination.appendChild(pageInfo);
+    }
+
+    // 更新统计信息
+    function updateStats() {
+      document.getElementById('visibleCount').textContent = filteredData.length;
+      document.getElementById('totalCount').textContent = unicodeData.length;
+    }
+
+    // 复制字符
+    function copyChar(char) {
+      copyToClipboard(char, event.target);
+    }
+
+    // 网格视图复制字符
+    function copyCharGrid(char, element) {
+      // 显示复制效果
+      const originalClass = element.className;
+      element.classList.add('copied');
+      
+      copyToClipboard(char, element);
+      
+      // 恢复原状态
+      setTimeout(() => {
+        element.classList.remove('copied');
+      }, 1000);
+    }
+
+    // 复制码点
+    function copyCode(code) {
+      copyToClipboard('U+' + code, event.target);
+    }
+
+    // 复制到剪贴板
+    function copyToClipboard(text, element) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => {
+            if (element && element.tagName === 'BUTTON') {
+              const originalText = element.textContent;
+              element.textContent = '已复制';
+              setTimeout(() => {
+                element.textContent = originalText;
+              }, 1500);
+            }
+          })
+          .catch(() => fallbackCopy(text, element));
+      } else {
+        fallbackCopy(text, element);
+      }
+    }
+
+    // 备用复制方案
+    function fallbackCopy(text, element) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        if (element && element.tagName === 'BUTTON') {
+          const originalText = element.textContent;
+          element.textContent = '已复制';
+          setTimeout(() => {
+            element.textContent = originalText;
+          }, 1500);
+        }
+      } catch (err) {
+        console.error('复制失败:', err);
+      }
+      
+      document.body.removeChild(textArea);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+
+</html>

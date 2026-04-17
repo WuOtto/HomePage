@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字数统计工具</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+      --stat-bg: #e8f5e9;
+      --stat-border: #c3e6cb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --stat-bg: #1e4620;
+        --stat-border: #2d5f2e;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .editor-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .editor-card h2 {
+      margin: 0 0 15px 0;
+      font-size: 1.1em;
+      color: var(--text-color);
+    }
+
+    .editor-card textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 15px;
+      font-size: 1em;
+      font-family: inherit;
+      line-height: 1.6;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      resize: vertical;
+    }
+
+    .editor-card textarea:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--stat-bg);
+      border: 1px solid var(--stat-border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: var(--text-color);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .detail-stats {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .detail-stats h2 {
+      margin: 0 0 15px 0;
+      font-size: 1.1em;
+      color: var(--text-color);
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--text-secondary);
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: var(--text-color);
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    }
+
+    .btn-clear {
+      width: 100%;
+      padding: 10px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-clear:hover {
+      background: var(--button-hover);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stat-value {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>字数统计工具</h1>
+    <p class="subtitle">实时统计文本的字数、字符数、行数等信息</p>
+
+    <div class="editor-card">
+      <h2>输入文本</h2>
+      <textarea id="textInput" placeholder="在此输入或粘贴文本..."></textarea>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="charCount">0</div>
+        <div class="stat-label">字符数（含空格）</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="charCountNoSpace">0</div>
+        <div class="stat-label">字符数（不含空格）</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="wordCount">0</div>
+        <div class="stat-label">单词数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="lineCount">0</div>
+        <div class="stat-label">行数</div>
+      </div>
+    </div>
+
+    <div class="detail-stats">
+      <h2>详细统计</h2>
+      <div class="detail-row">
+        <span class="detail-label">中文字符数</span>
+        <span class="detail-value" id="chineseCount">0</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">英文字符数</span>
+        <span class="detail-value" id="englishCount">0</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">数字字符数</span>
+        <span class="detail-value" id="numberCount">0</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">标点符号数</span>
+        <span class="detail-value" id="punctuationCount">0</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">空格数</span>
+        <span class="detail-value" id="spaceCount">0</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">段落数</span>
+        <span class="detail-value" id="paragraphCount">0</span>
+      </div>
+    </div>
+
+    <button class="btn-clear" onclick="clearText()">清空文本</button>
+
+    <div style="text-align: center;">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    const textInput = document.getElementById('textInput');
+
+    // 实时统计
+    textInput.addEventListener('input', updateStats);
+
+    function updateStats() {
+      const text = textInput.value;
+      
+      // 基本统计
+      const charCount = text.length;
+      const charCountNoSpace = text.replace(/\s/g, '').length;
+      const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const lineCount = text ? text.split('\n').length : 0;
+      
+      // 详细统计
+      const chineseCount = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+      const englishCount = (text.match(/[a-zA-Z]/g) || []).length;
+      const numberCount = (text.match(/[0-9]/g) || []).length;
+      const punctuationCount = (text.match(/[.,;:!?，。；：！？、""''（）()[\]{}《》<>]/g) || []).length;
+      const spaceCount = (text.match(/\s/g) || []).length;
+      const paragraphCount = text.trim() ? text.trim().split(/\n\s*\n/).length : 0;
+      
+      // 更新显示
+      document.getElementById('charCount').textContent = charCount;
+      document.getElementById('charCountNoSpace').textContent = charCountNoSpace;
+      document.getElementById('wordCount').textContent = wordCount;
+      document.getElementById('lineCount').textContent = lineCount;
+      
+      document.getElementById('chineseCount').textContent = chineseCount;
+      document.getElementById('englishCount').textContent = englishCount;
+      document.getElementById('numberCount').textContent = numberCount;
+      document.getElementById('punctuationCount').textContent = punctuationCount;
+      document.getElementById('spaceCount').textContent = spaceCount;
+      document.getElementById('paragraphCount').textContent = paragraphCount;
+    }
+
+    function clearText() {
+      textInput.value = '';
+      updateStats();
+    }
+
+    // 初始化
+    updateStats();
+  </script>
+</body>
+
+</html>
