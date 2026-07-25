@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算术大挑战 - 大脑反应训练</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --card-bg: #f8f9fa;
+            --card-border: #e1e5e9;
+            --input-bg: #ffffff;
+            --button-bg: #007bff;
+            --button-hover: #0056b3;
+            --accent: #28a745;
+            --accent-hover: #218838;
+            --danger: #dc3545;
+            --danger-hover: #c82333;
+            --warning: #ffc107;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --option-bg: #ffffff;
+            --option-border: #e1e5e9;
+            --option-hover: #f0f4f8;
+            --correct-bg: #d4edda;
+            --correct-border: #28a745;
+            --wrong-bg: #f8d7da;
+            --wrong-border: #dc3545;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #ffffff;
+                --text-secondary: #cccccc;
+                --card-bg: #2d2d2d;
+                --card-border: #444444;
+                --input-bg: #3a3a3a;
+                --button-bg: #0d6efd;
+                --button-hover: #0b5ed7;
+                --accent: #2eb04a;
+                --accent-hover: #34ce57;
+                --danger: #dc3545;
+                --danger-hover: #bb2d3b;
+                --warning: #ffc107;
+                --shadow: rgba(0, 0, 0, 0.4);
+                --option-bg: #3a3a3a;
+                --option-border: #555555;
+                --option-hover: #454545;
+                --correct-bg: #1e3a28;
+                --correct-border: #2eb04a;
+                --wrong-bg: #3a1e22;
+                --wrong-border: #dc3545;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 30px 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .game-panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 32px var(--shadow);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 顶部状态栏 */
+        .game-topbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 14px;
+        }
+
+        .pause-btn {
+            background-color: var(--input-bg);
+            border: 2px solid var(--option-border);
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .pause-btn:hover {
+            border-color: var(--button-bg);
+            background-color: var(--option-hover);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            background-color: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 8px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            font-family: 'Monaco', 'Menlo', monospace;
+            line-height: 1.1;
+        }
+
+        .stat-value.score { color: var(--accent); }
+        .stat-value.combo { color: var(--warning); }
+        .stat-value.time { color: var(--button-bg); }
+        .stat-value.time.urgent { color: var(--danger); animation: pulse 0.6s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        /* 时间进度条 */
+        .time-bar-wrap {
+            height: 6px;
+            background-color: var(--card-border);
+            border-radius: 3px;
+            margin-top: 18px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+
+        .time-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--danger), var(--warning), var(--accent));
+            border-radius: 3px;
+            transition: width 1s linear;
+            width: 100%;
+        }
+
+        /* 题目区域 */
+        .question-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+        }
+
+        .question {
+            font-size: 3.4em;
+            font-weight: 700;
+            font-family: 'Monaco', 'Menlo', monospace;
+            text-align: center;
+            margin-bottom: 8px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        .question.entering {
+            animation: slideIn 0.25s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question.correct { color: var(--accent); }
+        .question.wrong { color: var(--danger); animation: shake 0.4s ease; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback {
+            height: 24px;
+            font-size: 1em;
+            font-weight: 600;
+            margin-top: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .feedback.show { opacity: 1; }
+        .feedback.good { color: var(--accent); }
+        .feedback.bad { color: var(--danger); }
+
+        /* 答案区域容器 */
+        .answer-area {
+            margin-top: 28px;
+            width: 100%;
+        }
+
+        /* 选项模式 */
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            width: 100%;
+        }
+
+        .option-btn {
+            background-color: var(--option-bg);
+            border: 2px solid var(--option-border);
+            border-radius: 12px;
+            padding: 30px 24px;
+            font-size: 1.9em;
+            font-weight: 600;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-height: 88px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: var(--option-hover);
+            border-color: var(--button-bg);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--accent);
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--danger);
+        }
+
+        .option-btn.dim {
+            opacity: 0.45;
+        }
+
+        /* 输入模式 */
+        .input-answer {
+            display: flex;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .answer-input {
+            flex: 1;
+            min-width: 0;
+            background-color: var(--option-bg);
+            border: 2px solid var(--option-border);
+            border-radius: 12px;
+            padding: 22px 20px;
+            font-size: 1.9em;
+            font-weight: 600;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: var(--text-color);
+            text-align: center;
+            outline: none;
+            transition: all 0.15s ease;
+            min-height: 88px;
+        }
+
+        .answer-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+            font-weight: 400;
+        }
+
+        .answer-input:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+
+        .answer-input.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--accent);
+        }
+
+        .answer-input.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--danger);
+            animation: shake 0.4s ease;
+        }
+
+        .answer-input:disabled {
+            cursor: default;
+            opacity: 1;
+        }
+
+        .submit-btn {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 0 28px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            min-height: 88px;
+            min-width: 96px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        /* 暂停遮罩 */
+        .pause-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .pause-content {
+            text-align: center;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .pause-content h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .pause-content .desc {
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .pause-content .btn-primary {
+            background-color: var(--accent);
+        }
+
+        /* 开始 / 结束界面 */
+        .screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .screen h2 {
+            font-size: 2em;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .screen .desc {
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            line-height: 1.7;
+            max-width: 420px;
+        }
+
+        .config-group {
+            width: 100%;
+            max-width: 440px;
+            margin-bottom: 24px;
+        }
+
+        .config-label {
+            text-align: left;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .choice-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .choice-btn {
+            flex: 1;
+            background-color: var(--input-bg);
+            border: 2px solid var(--option-border);
+            border-radius: 10px;
+            padding: 14px 8px;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--button-bg);
+        }
+
+        .choice-btn.active {
+            background-color: var(--button-bg);
+            border-color: var(--button-bg);
+            color: #fff;
+        }
+
+        .choice-btn .choice-sub {
+            display: block;
+            font-size: 0.78em;
+            font-weight: 400;
+            margin-top: 2px;
+            opacity: 0.85;
+        }
+
+        .btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.15em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px var(--shadow);
+        }
+
+        /* 结束界面统计 */
+        .result-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            width: 100%;
+            max-width: 440px;
+            margin-bottom: 24px;
+        }
+
+        .result-card {
+            background-color: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .result-card .label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .result-card .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .result-card.highlight .value { color: var(--accent); }
+
+        .new-record {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--warning), #ff9800);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 14px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* 禅模式样式 */
+        body.zen {
+            background: linear-gradient(135deg, #e8f0fe 0%, #f5ecfe 100%);
+        }
+        @media (prefers-color-scheme: dark) {
+            body.zen {
+                background: linear-gradient(135deg, #1b1f3a 0%, #2a1f3a 100%);
+            }
+        }
+
+        /* 禅模式：隐藏时间进度条与「剩余」统计 */
+        .zen-mode .time-bar-wrap,
+        .zen-mode #timeStat {
+            display: none !important;
+        }
+        .zen-mode .stats-bar {
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        /* 禅模式：答错不抖动，反馈更柔和 */
+        .zen-mode .question.wrong,
+        .zen-mode .answer-input.wrong {
+            animation: none;
+        }
+        .zen-mode .feedback.bad {
+            color: var(--text-secondary);
+        }
+
+        .hidden { display: none !important; }
+
+        /* 返回链接 */
+        .back-link {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .back-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-link a:hover {
+            background: var(--accent-hover);
+        }
+
+        .footer-tip {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            margin-top: 18px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 560px) {
+            .question { font-size: 2.6em; }
+            .option-btn { font-size: 1.5em; padding: 24px 14px; min-height: 74px; }
+            .answer-input { font-size: 1.5em; padding: 24px 14px; min-height: 74px; }
+            .submit-btn { font-size: 1em; padding: 0 20px; min-height: 74px; min-width: 80px; }
+            .stat-value { font-size: 1.3em; }
+            .game-panel { padding: 22px 18px; }
+            h1 { font-size: 1.8em; }
+            .result-stats { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧮 算术大挑战</h1>
+        <p class="subtitle">快速心算，锻炼大脑反应速度</p>
+
+        <div class="game-panel">
+            <!-- 开始界面 -->
+            <div class="screen" id="startScreen">
+                <h2>准备好了吗？</h2>
+                <p class="desc">选择模式和难度开始心算练习。挑战模式比拼速度与连击，禅模式无计时无压力，让你专注享受计算本身。</p>
+
+                <div class="config-group">
+                    <div class="config-label">模式</div>
+                    <div class="choice-row" id="gameModeRow">
+                        <button class="choice-btn active" data-gamemode="challenge">挑战模式<span class="choice-sub">计时 · 得分</span></button>
+                        <button class="choice-btn" data-gamemode="zen">禅模式<span class="choice-sub">无压力 · 专注</span></button>
+                    </div>
+                </div>
+
+                <div class="config-group">
+                    <div class="config-label">难度</div>
+                    <div class="choice-row" id="difficultyRow">
+                        <button class="choice-btn active" data-difficulty="easy">简单<span class="choice-sub">加减 · 个位</span></button>
+                        <button class="choice-btn" data-difficulty="medium">中等<span class="choice-sub">加减乘 · 两位</span></button>
+                        <button class="choice-btn" data-difficulty="hard">困难<span class="choice-sub">四则 · 大数</span></button>
+                    </div>
+                </div>
+
+                <div class="config-group" id="durationGroup">
+                    <div class="config-label">时长</div>
+                    <div class="choice-row" id="durationRow">
+                        <button class="choice-btn" data-duration="30">30秒</button>
+                        <button class="choice-btn active" data-duration="60">60秒</button>
+                        <button class="choice-btn" data-duration="120">120秒</button>
+                    </div>
+                </div>
+
+                <div class="config-group">
+                    <div class="config-label">答题方式</div>
+                    <div class="choice-row" id="answerModeRow">
+                        <button class="choice-btn active" data-mode="option">选项<span class="choice-sub">四选一</span></button>
+                        <button class="choice-btn" data-mode="input">输入<span class="choice-sub">键盘输入答案</span></button>
+                    </div>
+                </div>
+
+                <div id="bestScoreInfo" class="footer-tip" style="margin-bottom:8px;">本难度最高分：0</div>
+                <button class="btn btn-primary" id="startBtn">开始挑战</button>
+            </div>
+
+            <!-- 游戏界面 -->
+            <div class="screen hidden" id="gameScreen" style="display:flex;">
+                <div class="game-topbar">
+                    <button class="pause-btn" id="pauseBtn" title="暂停 (空格)">⏸ 暂停</button>
+                </div>
+
+                <div class="stats-bar">
+                    <div class="stat-item" id="scoreStat">
+                        <div class="stat-label" id="scoreLabel">得分</div>
+                        <div class="stat-value score" id="scoreVal">0</div>
+                    </div>
+                    <div class="stat-item" id="comboStat">
+                        <div class="stat-label" id="comboLabel">连击</div>
+                        <div class="stat-value combo" id="comboVal">0</div>
+                    </div>
+                    <div class="stat-item" id="timeStat">
+                        <div class="stat-label">剩余</div>
+                        <div class="stat-value time" id="timeVal">60</div>
+                    </div>
+                </div>
+
+                <div class="time-bar-wrap">
+                    <div class="time-bar" id="timeBar"></div>
+                </div>
+
+                <div class="question-area">
+                    <div class="question" id="question">2 + 3 = ?</div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+
+                <div class="answer-area" id="answerArea"></div>
+            </div>
+
+            <!-- 结束界面 -->
+            <div class="screen hidden" id="endScreen">
+                <div id="newRecordBadge" class="new-record hidden">🎉 新纪录！</div>
+                <h2 id="endTitle">挑战结束</h2>
+                <p class="desc" id="endDesc">来看看你的成绩</p>
+
+                <div class="result-stats">
+                    <div class="result-card highlight">
+                        <div class="label">最终得分</div>
+                        <div class="value" id="finalScore">0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="label">历史最高</div>
+                        <div class="value" id="finalBest">0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="label">答对 / 答错</div>
+                        <div class="value" id="finalCorrect">0 / 0</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="label">最高连击 / 正确率</div>
+                        <div class="value" id="finalCombo">0 / 0%</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="restartBtn">再来一局</button>
+                <button class="btn" id="changeBtn" style="background:var(--input-bg);border:2px solid var(--option-border);color:var(--text-color);margin-top:10px;">返回设置</button>
+            </div>
+
+            <!-- 暂停遮罩 -->
+            <div class="pause-overlay hidden" id="pauseOverlay">
+                <div class="pause-content">
+                    <h2>⏸ 已暂停</h2>
+                    <p class="desc">休息一下，准备好后继续挑战</p>
+                    <button class="btn btn-primary" id="resumeBtn">继续游戏</button>
+                    <button class="btn" id="quitBtn" style="background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);color:#fff;margin-top:10px;">结束本局</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-tip" id="footerTip">
+            💡 提示：连击越高，单题得分越多。答错不扣分但会清空连击。按空格可暂停/继续。
+        </div>
+
+        <div class="back-link">
+            <a href="./index.html">返回工具列表</a>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const DIFFICULTY_CONFIG = {
+                easy: {
+                    label: '简单',
+                    operations: ['+', '-'],
+                    minNum: 1, maxNum: 10,
+                    optionRange: 5,
+                    basePoints: 10
+                },
+                medium: {
+                    label: '中等',
+                    operations: ['+', '-', '×'],
+                    minNum: 2, maxNum: 50,
+                    optionRange: 12,
+                    basePoints: 15
+                },
+                hard: {
+                    label: '困难',
+                    operations: ['+', '-', '×', '÷'],
+                    minNum: 3, maxNum: 99,
+                    optionRange: 20,
+                    basePoints: 20
+                }
+            };
+
+            const $ = id => document.getElementById(id);
+            const startScreen = $('startScreen');
+            const gameScreen = $('gameScreen');
+            const endScreen = $('endScreen');
+            const gameModeRow = $('gameModeRow');
+            const difficultyRow = $('difficultyRow');
+            const durationRow = $('durationRow');
+            const durationGroup = $('durationGroup');
+            const answerModeRow = $('answerModeRow');
+            const bestScoreInfo = $('bestScoreInfo');
+            const startBtn = $('startBtn');
+            const footerTip = $('footerTip');
+            const scoreLabel = $('scoreLabel');
+            const comboLabel = $('comboLabel');
+            const restartBtn = $('restartBtn');
+            const changeBtn = $('changeBtn');
+            const scoreVal = $('scoreVal');
+            const comboVal = $('comboVal');
+            const timeVal = $('timeVal');
+            const timeBar = $('timeBar');
+            const questionEl = $('question');
+            const feedbackEl = $('feedback');
+            const answerArea = $('answerArea');
+            const pauseBtn = $('pauseBtn');
+            const resumeBtn = $('resumeBtn');
+            const quitBtn = $('quitBtn');
+            const pauseOverlay = $('pauseOverlay');
+
+            let state = {
+                gameMode: 'challenge',
+                difficulty: 'easy',
+                duration: 60,
+                answerMode: 'option',
+                score: 0,
+                combo: 0,
+                maxCombo: 0,
+                correct: 0,
+                wrong: 0,
+                timeLeft: 60,
+                currentAnswer: 0,
+                locked: false,
+                paused: false,
+                timerId: null,
+                zenStartTime: 0,
+                zenElapsed: 0
+            };
+
+            function bestKey() {
+                return 'mathgame_best_' + state.difficulty + '_' + state.duration + '_' + state.answerMode;
+            }
+
+            function getBest() {
+                const v = localStorage.getItem(bestKey());
+                return v ? parseInt(v, 10) || 0 : 0;
+            }
+
+            function setBest(val) {
+                localStorage.setItem(bestKey(), val.toString());
+            }
+
+            function updateBestInfo() {
+                bestScoreInfo.textContent = '当前设置最高分：' + getBest();
+            }
+
+            // 选择按钮
+            function bindChoice(row, key, handler) {
+                row.addEventListener('click', function (e) {
+                    const btn = e.target.closest('.choice-btn');
+                    if (!btn) return;
+                    row.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    handler(btn.dataset[key]);
+                    updateBestInfo();
+                });
+            }
+            bindChoice(difficultyRow, 'difficulty', function (val) { state.difficulty = val; });
+            bindChoice(durationRow, 'duration', function (val) { state.duration = parseInt(val, 10); });
+            bindChoice(answerModeRow, 'mode', function (val) { state.answerMode = val; });
+
+            function applyGameMode() {
+                const zen = state.gameMode === 'zen';
+                durationGroup.classList.toggle('hidden', zen);
+                bestScoreInfo.classList.toggle('hidden', zen);
+                footerTip.classList.toggle('hidden', zen);
+                startBtn.textContent = zen ? '开始练习' : '开始挑战';
+                document.body.classList.toggle('zen', zen);
+            }
+            gameModeRow.addEventListener('click', function (e) {
+                const btn = e.target.closest('.choice-btn');
+                if (!btn) return;
+                gameModeRow.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.gameMode = btn.dataset.gamemode;
+                applyGameMode();
+                updateBestInfo();
+            });
+
+            function randInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function generateQuestion() {
+                const cfg = DIFFICULTY_CONFIG[state.difficulty];
+                const op = cfg.operations[randInt(0, cfg.operations.length - 1)];
+                let a, b, answer, text;
+
+                if (op === '+') {
+                    a = randInt(cfg.minNum, cfg.maxNum);
+                    b = randInt(cfg.minNum, cfg.maxNum);
+                    answer = a + b;
+                    text = a + ' + ' + b + ' = ?';
+                } else if (op === '-') {
+                    a = randInt(cfg.minNum, cfg.maxNum);
+                    b = randInt(cfg.minNum, cfg.maxNum);
+                    if (b > a) { const t = a; a = b; b = t; }
+                    answer = a - b;
+                    text = a + ' − ' + b + ' = ?';
+                } else if (op === '×') {
+                    a = randInt(cfg.minNum, Math.min(12, cfg.maxNum));
+                    b = randInt(cfg.minNum, Math.min(12, cfg.maxNum));
+                    answer = a * b;
+                    text = a + ' × ' + b + ' = ?';
+                } else { // ÷
+                    b = randInt(2, 12);
+                    answer = randInt(cfg.minNum, Math.min(12, cfg.maxNum));
+                    a = b * answer;
+                    text = a + ' ÷ ' + b + ' = ?';
+                }
+                state.currentAnswer = answer;
+
+                questionEl.textContent = text;
+                questionEl.className = 'question entering';
+                setTimeout(() => questionEl.classList.remove('entering'), 260);
+
+                answerArea.innerHTML = '';
+                if (state.answerMode === 'option') {
+                    renderOptionAnswers(cfg);
+                } else {
+                    renderInputAnswer();
+                }
+                state.locked = false;
+            }
+
+            function renderOptionAnswers(cfg) {
+                // 生成 4 个选项
+                const options = new Set([state.currentAnswer]);
+                let guard = 0;
+                while (options.size < 4 && guard < 200) {
+                    guard++;
+                    const delta = randInt(1, cfg.optionRange);
+                    const sign = Math.random() < 0.5 ? -1 : 1;
+                    let cand = state.currentAnswer + sign * delta;
+                    if (cand < 0) cand = state.currentAnswer + delta;
+                    if (cand !== state.currentAnswer) options.add(cand);
+                }
+                let extra = 1;
+                while (options.size < 4) {
+                    options.add(state.currentAnswer + extra);
+                    extra++;
+                }
+
+                const arr = Array.from(options);
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+
+                const grid = document.createElement('div');
+                grid.className = 'options';
+                arr.forEach(val => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = val;
+                    btn.addEventListener('click', () => handleAnswer(val));
+                    grid.appendChild(btn);
+                });
+                answerArea.appendChild(grid);
+            }
+
+            function renderInputAnswer() {
+                const wrap = document.createElement('div');
+                wrap.className = 'input-answer';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.inputMode = 'numeric';
+                input.pattern = '[0-9]*';
+                input.className = 'answer-input';
+                input.placeholder = '输入答案';
+                input.autocomplete = 'off';
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        submitInput();
+                    }
+                });
+
+                const submitBtn = document.createElement('button');
+                submitBtn.className = 'submit-btn';
+                submitBtn.textContent = '提交';
+                submitBtn.addEventListener('click', submitInput);
+
+                wrap.appendChild(input);
+                wrap.appendChild(submitBtn);
+                answerArea.appendChild(wrap);
+
+                setTimeout(() => input.focus(), 0);
+            }
+
+            function submitInput() {
+                if (state.locked || state.paused) return;
+                const input = answerArea.querySelector('.answer-input');
+                if (!input) return;
+                const raw = input.value.trim();
+                if (raw === '') return;
+                const val = parseInt(raw, 10);
+                if (isNaN(val)) return;
+                handleAnswer(val);
+            }
+
+            function handleAnswer(val) {
+                if (state.locked || state.paused) return;
+                state.locked = true;
+
+                const correct = val === state.currentAnswer;
+                const zen = state.gameMode === 'zen';
+
+                if (correct) {
+                    state.correct++;
+                    if (!zen) {
+                        state.combo++;
+                        if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+                        const bonus = Math.floor(state.combo / 3); // 每3连击 +1
+                        const gained = DIFFICULTY_CONFIG[state.difficulty].basePoints + bonus;
+                        state.score += gained;
+                        questionEl.classList.add('correct');
+                        showFeedback('+' + gained + (state.combo >= 3 ? '  🔥' + state.combo : ''), true);
+                    } else {
+                        questionEl.classList.add('correct');
+                        showFeedback('✓', true);
+                    }
+                } else {
+                    state.wrong++;
+                    if (!zen) state.combo = 0;
+                    questionEl.classList.add('wrong');
+                    if (zen || state.answerMode === 'input') {
+                        showFeedback('正确答案：' + state.currentAnswer, false);
+                    } else {
+                        showFeedback('答错了，连击清零', false);
+                    }
+                }
+
+                if (state.answerMode === 'option') {
+                    const buttons = answerArea.querySelectorAll('.option-btn');
+                    buttons.forEach(b => {
+                        b.disabled = true;
+                        const bv = parseInt(b.textContent, 10);
+                        if (bv === state.currentAnswer) b.classList.add('correct');
+                        else if (!correct && bv === val) b.classList.add('wrong');
+                        else b.classList.add('dim');
+                    });
+                } else {
+                    const input = answerArea.querySelector('.answer-input');
+                    const submitBtn = answerArea.querySelector('.submit-btn');
+                    if (input) {
+                        input.disabled = true;
+                        if (correct) input.classList.add('correct');
+                        else input.classList.add('wrong');
+                    }
+                    if (submitBtn) submitBtn.disabled = true;
+                }
+
+                updateStats();
+                const delay = zen ? 800 : 650;
+                setTimeout(() => {
+                    questionEl.classList.remove('correct', 'wrong');
+                    hideFeedback();
+                    if (zen) {
+                        if (!state.paused) generateQuestion();
+                    } else {
+                        if (state.timeLeft > 0 && !state.paused) generateQuestion();
+                    }
+                }, delay);
+            }
+
+            function showFeedback(text, good) {
+                feedbackEl.textContent = text;
+                feedbackEl.className = 'feedback show ' + (good ? 'good' : 'bad');
+            }
+
+            function hideFeedback() {
+                feedbackEl.classList.remove('show');
+            }
+
+            function updateStats() {
+                if (state.gameMode === 'zen') {
+                    const total = state.correct + state.wrong;
+                    const acc = total > 0 ? Math.round((state.correct / total) * 100) : 0;
+                    scoreVal.textContent = total;
+                    comboVal.textContent = acc + '%';
+                } else {
+                    scoreVal.textContent = state.score;
+                    comboVal.textContent = state.combo;
+                }
+            }
+
+            function pauseGame() {
+                if (state.paused || state.timeLeft <= 0) return;
+                if (gameScreen.classList.contains('hidden')) return;
+                state.paused = true;
+                state.locked = true;
+                if (state.timerId) { clearInterval(state.timerId); state.timerId = null; }
+                timeBar.style.transition = 'none';
+                // 输入模式失焦，避免暂停时仍可输入
+                const inp = answerArea.querySelector('.answer-input');
+                if (inp) inp.blur();
+                pauseOverlay.classList.remove('hidden');
+            }
+
+            function resumeGame() {
+                if (!state.paused) return;
+                state.paused = false;
+                pauseOverlay.classList.add('hidden');
+                timeBar.style.transition = 'width 1s linear';
+                // 当前题目若未作答则解锁并聚焦输入框
+                if (!gameScreen.classList.contains('hidden') && !state.locked) {
+                    state.locked = false;
+                    const inp = answerArea.querySelector('.answer-input');
+                    if (inp) setTimeout(() => inp.focus(), 0);
+                }
+                if (state.timerId) clearInterval(state.timerId);
+                state.timerId = setInterval(tick, 1000);
+            }
+
+            function startGame() {
+                state.score = 0;
+                state.combo = 0;
+                state.maxCombo = 0;
+                state.correct = 0;
+                state.wrong = 0;
+                state.timeLeft = state.duration;
+                state.locked = false;
+                state.paused = false;
+                state.zenElapsed = 0;
+                pauseOverlay.classList.add('hidden');
+                timeBar.style.transition = 'width 1s linear';
+
+                const zen = state.gameMode === 'zen';
+                gameScreen.classList.toggle('zen-mode', zen);
+                document.body.classList.toggle('zen', zen);
+                if (zen) {
+                    scoreLabel.textContent = '已完成';
+                    comboLabel.textContent = '正确率';
+                    pauseBtn.textContent = '结束练习';
+                    state.zenStartTime = Date.now();
+                } else {
+                    scoreLabel.textContent = '得分';
+                    comboLabel.textContent = '连击';
+                    pauseBtn.textContent = '⏸ 暂停';
+                    timeVal.textContent = state.timeLeft;
+                    timeVal.classList.remove('urgent');
+                    timeBar.style.width = '100%';
+                }
+
+                updateStats();
+
+                startScreen.classList.add('hidden');
+                endScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+
+                generateQuestion();
+
+                if (state.timerId) clearInterval(state.timerId);
+                if (!zen) {
+                    state.timerId = setInterval(tick, 1000);
+                }
+            }
+
+            function tick() {
+                state.timeLeft--;
+                timeVal.textContent = state.timeLeft;
+                const pct = (state.timeLeft / state.duration) * 100;
+                timeBar.style.width = Math.max(0, pct) + '%';
+                if (state.timeLeft <= 10) {
+                    timeVal.classList.add('urgent');
+                }
+                if (state.timeLeft <= 0) {
+                    endGame();
+                }
+            }
+
+            function endGame() {
+                clearInterval(state.timerId);
+                state.timerId = null;
+                state.paused = false;
+                pauseOverlay.classList.add('hidden');
+                timeVal.classList.remove('urgent');
+
+                const total = state.correct + state.wrong;
+                const accuracy = total > 0 ? Math.round((state.correct / total) * 100) : 0;
+                const best = getBest();
+                const isRecord = state.score > best;
+                if (isRecord && state.score > 0) {
+                    setBest(state.score);
+                }
+                const newBest = getBest();
+
+                $('finalScore').textContent = state.score;
+                $('finalBest').textContent = newBest;
+                $('finalCorrect').textContent = state.correct + ' / ' + state.wrong;
+                $('finalCombo').textContent = state.maxCombo + ' / ' + accuracy + '%';
+
+                const badge = $('newRecordBadge');
+                if (isRecord && state.score > 0) {
+                    badge.classList.remove('hidden');
+                    $('endTitle').textContent = '太棒了！';
+                    $('endDesc').textContent = '你刷新了当前设置的最高纪录！';
+                } else if (total === 0) {
+                    badge.classList.add('hidden');
+                    $('endTitle').textContent = '时间到';
+                    $('endDesc').textContent = '一题都没答？再试一次吧！';
+                } else if (accuracy >= 90 && state.correct >= 10) {
+                    badge.classList.add('hidden');
+                    $('endTitle').textContent = '反应敏捷！';
+                    $('endDesc').textContent = '正确率很高，继续保持。';
+                } else if (accuracy < 60) {
+                    badge.classList.add('hidden');
+                    $('endTitle').textContent = '继续努力';
+                    $('endDesc').textContent = '慢一点答对，比快但答错更有效哦。';
+                } else {
+                    badge.classList.add('hidden');
+                    $('endTitle').textContent = '挑战结束';
+                    $('endDesc').textContent = '再来一局，突破自己！';
+                }
+
+                gameScreen.classList.add('hidden');
+                endScreen.classList.remove('hidden');
+            }
+
+            pauseBtn.addEventListener('click', function () {
+                if (state.gameMode === 'zen') {
+                    endGame();
+                } else {
+                    pauseGame();
+                }
+            });
+            resumeBtn.addEventListener('click', resumeGame);
+            quitBtn.addEventListener('click', function () {
+                pauseOverlay.classList.add('hidden');
+                endGame();
+            });
+            startBtn.addEventListener('click', startGame);
+            restartBtn.addEventListener('click', startGame);
+            changeBtn.addEventListener('click', function () {
+                endScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+                updateBestInfo();
+            });
+
+            // 键盘支持：空格暂停/继续；选项模式数字键 1-4 选择
+            document.addEventListener('keydown', function (e) {
+                if (gameScreen.classList.contains('hidden')) return;
+                if (e.key === ' ' || e.code === 'Space') {
+                    e.preventDefault();
+                    if (state.gameMode === 'zen') {
+                        endGame();
+                    } else if (state.paused) {
+                        resumeGame();
+                    } else {
+                        pauseGame();
+                    }
+                    return;
+                }
+                if (state.answerMode === 'input') return; // 输入模式数字交给输入框
+                if (state.locked) return;
+                const map = { '1': 0, '2': 1, '3': 2, '4': 3 };
+                const idx = map[e.key];
+                if (idx === undefined) return;
+                const btns = answerArea.querySelectorAll('.option-btn');
+                if (btns[idx]) btns[idx].click();
+            });
+
+            applyGameMode();
+            updateBestInfo();
+        })();
+    </script>
+</body>
+
+</html>

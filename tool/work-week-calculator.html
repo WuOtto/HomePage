@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大小周日历</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --today-bg: #28a745;
+      --rest-bg: #28a745;
+      --rest-color: #ffffff;
+      --work-bg: #e67e22;
+      --work-color: #ffffff;
+      --cell-hover-bg: #e8f5e9;
+      --cell-hover-border: #c3e6cb;
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --today-bg: #28a745;
+        --rest-bg: #1e7a34;
+        --rest-color: #ffffff;
+        --work-bg: #b9651a;
+        --work-color: #ffffff;
+        --cell-hover-bg: #1e4620;
+        --cell-hover-border: #2d5f2e;
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 25px;
+      font-size: 0.95em;
+    }
+
+    .settings-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 0 auto 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+      max-width: 620px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .settings-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .settings-row label.field-label {
+      color: var(--text-secondary);
+      font-size: 0.9em;
+    }
+
+    .settings-row input[type="date"] {
+      padding: 7px 10px;
+      font-size: 0.95em;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease;
+    }
+
+    .settings-row input[type="date"]:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 14px;
+    }
+
+    .radio-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      font-size: 0.95em;
+      color: var(--text-color);
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      font-size: 0.82em;
+      color: var(--text-secondary);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .legend-dot.rest {
+      background: var(--rest-bg);
+    }
+
+    .legend-dot.work {
+      background: var(--work-bg);
+    }
+
+    .calendar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .nav-btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: var(--button-bg);
+      color: white;
+      transition: background-color 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background-color: var(--button-hover);
+    }
+
+    .month-title {
+      font-size: 1.6em;
+      font-weight: 600;
+      color: var(--text-color);
+      min-width: 180px;
+      text-align: center;
+    }
+
+    .today-btn {
+      display: block;
+      margin: 0 auto 16px;
+      padding: 6px 16px;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      font-size: 0.85em;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .today-btn:hover {
+      border-color: var(--button-bg);
+      color: var(--button-bg);
+    }
+
+    .month-summary {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.85em;
+      color: var(--text-secondary);
+    }
+
+    .month-summary span {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .calendar-table th {
+      padding: 10px 0;
+      font-size: 0.9em;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--card-border);
+      text-align: center;
+    }
+
+    .calendar-table td {
+      padding: 0;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .day-cell {
+      height: 68px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+      border-radius: 6px;
+      margin: 3px;
+      transition: background-color 0.15s ease;
+      font-size: 1.05em;
+      position: relative;
+    }
+
+    .day-cell.other-month {
+      color: var(--text-color);
+      opacity: 0.4;
+    }
+
+    .day-cell.rest {
+      background: var(--rest-bg);
+      color: var(--rest-color);
+    }
+
+    .day-cell.work-sat {
+      background: var(--work-bg);
+      color: var(--work-color);
+    }
+
+    .day-cell.today {
+      box-shadow: inset 0 0 0 2px var(--button-hover);
+      font-weight: 700;
+    }
+
+    .day-num {
+      font-size: 1em;
+    }
+
+    .day-tag {
+      font-size: 0.62em;
+      margin-top: 3px;
+      font-weight: 600;
+      min-height: 1em;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .calendar-card,
+      .settings-card {
+        max-width: 100%;
+        padding: 15px;
+      }
+
+      .day-cell {
+        height: 52px;
+        font-size: 0.9em;
+      }
+
+      .month-title {
+        font-size: 1.3em;
+        min-width: 130px;
+      }
+
+      .nav-btn {
+        padding: 6px 14px;
+        font-size: 0.9em;
+      }
+
+      .settings-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .settings-row input[type="date"] {
+        width: 100%;
+      }
+
+      .radio-group {
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>大小周日历</h1>
+    <p class="subtitle">设置起始周类型，日历视图直接显示双休/单休排班（周一为每周第一天）</p>
+
+    <div class="settings-card">
+      <div class="settings-row">
+        <label class="field-label" for="startDate">起始周</label>
+        <input type="date" id="startDate" onchange="onSettingChange()" />
+        <div class="radio-group">
+          <label><input type="radio" name="baseType" value="big" checked onchange="onSettingChange()" /> 大周（双休）</label>
+          <label><input type="radio" name="baseType" value="small" onchange="onSettingChange()" /> 小周（单休）</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <button class="nav-btn" onclick="changeMonth(-1)">上个月</button>
+        <div class="month-title" id="monthTitle">-</div>
+        <button class="nav-btn" onclick="changeMonth(1)">下个月</button>
+      </div>
+
+      <button class="today-btn" onclick="goToday()">回到今天</button>
+
+      <div class="legend">
+        <span class="legend-item"><i class="legend-dot rest"></i>休息日（双休/周日）</span>
+        <span class="legend-item"><i class="legend-dot work"></i>补班日（小周周六）</span>
+      </div>
+
+      <table class="calendar-table">
+        <thead>
+          <tr>
+            <th>一</th>
+            <th>二</th>
+            <th>三</th>
+            <th>四</th>
+            <th>五</th>
+            <th>六</th>
+            <th>日</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+
+      <div class="month-summary" id="monthSummary"></div>
+    </div>
+
+    <div class="center">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    // 当前查看的月份（默认今天所在月）
+    let currentDate = new Date();
+    // 起始周的周一（由起始日期计算）
+    let startMonday = getMonday(new Date());
+    // 起始周是否为大周
+    let baseIsBig = true;
+
+    function pad(n) {
+      return n < 10 ? '0' + n : '' + n;
+    }
+
+    // 取某日所在周的周一（周一为每周第一天）
+    function getMonday(date) {
+      const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const day = d.getDay(); // 0=周日 .. 6=周六
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      return d;
+    }
+
+    // 判断某日所在周是否为大周
+    function isBigWeek(date) {
+      const cellMonday = getMonday(date);
+      // 相对起始周的周差（以7天为单位）
+      const diffWeeks = Math.round((cellMonday - startMonday) / (7 * 24 * 3600 * 1000));
+      const even = (diffWeeks % 2 === 0);
+      return even ? baseIsBig : !baseIsBig;
+    }
+
+    function isSameDay(a, b) {
+      return a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+    }
+
+    function onSettingChange() {
+      const input = document.getElementById('startDate').value;
+      if (!input) return;
+      const d = new Date(input + 'T00:00:00');
+      if (isNaN(d.getTime())) return;
+      startMonday = getMonday(d);
+      baseIsBig = document.querySelector('input[name="baseType"]:checked').value === 'big';
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const today = new Date();
+
+      document.getElementById('monthTitle').textContent =
+        year + '年 ' + (month + 1) + '月';
+
+      const firstDay = new Date(year, month, 1);
+      // 周一为第一列：把 getDay()(0=周日..6=周六) 映射到周一起始(0=周一..6=周日)
+      let firstDayIdx = firstDay.getDay() - 1;
+      if (firstDayIdx < 0) firstDayIdx = 6;
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+      const tbody = document.getElementById('calendarBody');
+      tbody.innerHTML = '';
+
+      let day = 1;
+      let nextMonthDay = 1;
+      let cellCount = 0;
+      let monthWorkSatCount = 0; // 本月补班周六数
+
+      for (let row = 0; row < 6; row++) {
+        const tr = document.createElement('tr');
+        for (let col = 0; col < 7; col++) {
+          const td = document.createElement('td');
+          const cell = document.createElement('div');
+          cell.className = 'day-cell';
+
+          let cellDate;
+          let displayDay;
+          let isOtherMonth = false;
+
+          if (cellCount < firstDayIdx) {
+            displayDay = daysInPrevMonth - (firstDayIdx - 1 - cellCount);
+            cellDate = new Date(year, month - 1, displayDay);
+            isOtherMonth = true;
+          } else if (day <= daysInMonth) {
+            displayDay = day;
+            cellDate = new Date(year, month, displayDay);
+            day++;
+          } else {
+            displayDay = nextMonthDay;
+            cellDate = new Date(year, month + 1, displayDay);
+            nextMonthDay++;
+            isOtherMonth = true;
+          }
+
+          if (isOtherMonth) cell.classList.add('other-month');
+          if (isSameDay(cellDate, today)) cell.classList.add('today');
+
+          const jsDay = cellDate.getDay(); // 0=周日 6=周六
+          const big = isBigWeek(cellDate);
+          const isSaturday = jsDay === 6;
+          const isSunday = jsDay === 0;
+          const isRest = isSunday || (big && isSaturday);
+
+          let tag = '';
+          if (isRest) {
+            cell.classList.add('rest');
+            tag = '休';
+          } else if (isSaturday) {
+            // 小周周六 = 补班
+            cell.classList.add('work-sat');
+            tag = '班';
+            if (!isOtherMonth) monthWorkSatCount++;
+          }
+
+          cell.innerHTML =
+            '<div class="day-num">' + displayDay + '</div>' +
+            '<div class="day-tag">' + tag + '</div>';
+
+          td.appendChild(cell);
+          tr.appendChild(td);
+          cellCount++;
+        }
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('monthSummary').innerHTML =
+        '本月共 <span>' + monthWorkSatCount + '</span> 个补班日（小周周六）';
+    }
+
+    function changeMonth(delta) {
+      currentDate.setMonth(currentDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    function goToday() {
+      currentDate = new Date();
+      // 同时把起始周重置为今天所在周
+      const today = new Date();
+      document.getElementById('startDate').value =
+        today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+      startMonday = getMonday(today);
+      renderCalendar();
+    }
+
+    function init() {
+      const today = new Date();
+      document.getElementById('startDate').value =
+        today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+      startMonday = getMonday(today);
+      baseIsBig = true;
+      renderCalendar();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+
+</html>

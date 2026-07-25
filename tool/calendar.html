@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日历</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --today-bg: #28a745;
+      --weekend-color: #e74c3c;
+      --other-month-color: #bbbbbb;
+      --cell-hover-bg: #e8f5e9;
+      --cell-hover-border: #c3e6cb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --today-bg: #28a745;
+        --weekend-color: #ff6b6b;
+        --other-month-color: #666666;
+        --cell-hover-bg: #1e4620;
+        --cell-hover-border: #2d5f2e;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .calendar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .nav-btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: var(--button-bg);
+      color: white;
+      transition: background-color 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background-color: var(--button-hover);
+    }
+
+    .month-title {
+      font-size: 1.6em;
+      font-weight: 600;
+      color: var(--text-color);
+      min-width: 180px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      padding: 4px 12px;
+      border-radius: 5px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .month-title:hover {
+      color: var(--button-bg);
+      background-color: var(--cell-hover-bg);
+    }
+
+    .picker-panel {
+      display: none;
+      margin: 0 auto 15px;
+      padding: 15px;
+      background: var(--bg-color);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      max-width: 360px;
+      box-shadow: 0 2px 6px var(--shadow);
+    }
+
+    .picker-panel.show {
+      display: block;
+    }
+
+    .picker-year {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .picker-nav {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-color);
+      font-size: 1.15em;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .picker-nav:hover {
+      background-color: var(--cell-hover-bg);
+      border-color: var(--button-bg);
+    }
+
+    #pickerYear {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--text-color);
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .picker-months {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .picker-month-btn {
+      padding: 8px 0;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .picker-month-btn:hover {
+      background-color: var(--cell-hover-bg);
+    }
+
+    .picker-month-btn.active {
+      background-color: var(--button-bg);
+      color: white;
+      border-color: var(--button-bg);
+    }
+
+    .today-btn {
+      display: block;
+      margin: 0 auto 20px;
+      padding: 6px 16px;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      font-size: 0.85em;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .today-btn:hover {
+      border-color: var(--button-bg);
+      color: var(--button-bg);
+    }
+
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .calendar-table th {
+      padding: 12px 0;
+      font-size: 0.9em;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--card-border);
+      text-align: center;
+    }
+
+    .calendar-table td {
+      padding: 0;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .day-cell {
+      height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 6px;
+      margin: 3px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      font-size: 1.05em;
+    }
+
+    .day-cell:hover {
+      background-color: var(--cell-hover-bg);
+      border: 1px solid var(--cell-hover-border);
+    }
+
+    .day-cell.today {
+      background-color: var(--today-bg);
+      color: white;
+      font-weight: 700;
+    }
+
+    .day-cell.today:hover {
+      background-color: var(--button-hover);
+      border-color: var(--button-hover);
+    }
+
+    .day-cell.weekend {
+      color: var(--weekend-color);
+    }
+
+    .day-cell.other-month {
+      color: var(--other-month-color);
+    }
+
+    .day-cell.selected {
+      border: 2px solid var(--button-bg);
+    }
+
+    .lunar {
+      font-size: 0.65em;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .day-cell.today .lunar {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .day-cell.other-month .lunar {
+      color: var(--other-month-color);
+    }
+
+    .info-box {
+      margin-top: 20px;
+      padding: 12px 15px;
+      background: var(--bg-color);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--text-secondary);
+      text-align: center;
+      display: none;
+    }
+
+    .info-box.show {
+      display: block;
+    }
+
+    .info-box span {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .calendar-card {
+        padding: 15px;
+      }
+
+      .day-cell {
+        height: 50px;
+        font-size: 0.9em;
+      }
+
+      .lunar {
+        font-size: 0.55em;
+      }
+
+      .month-title {
+        font-size: 1.3em;
+        min-width: 130px;
+      }
+
+      .nav-btn {
+        padding: 6px 14px;
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>日历</h1>
+    <p class="subtitle">周一为每周第一天，支持月份切换与今日高亮</p>
+
+    <div class="calendar-card">
+      <div class="calendar-header">
+        <button class="nav-btn" onclick="changeMonth(-1)">上个月</button>
+        <div class="month-title" id="monthTitle" onclick="togglePicker()">-</div>
+        <button class="nav-btn" onclick="changeMonth(1)">下个月</button>
+      </div>
+
+      <div id="pickerPanel" class="picker-panel">
+        <div class="picker-year">
+          <button class="picker-nav" onclick="changePickerYear(-1)" title="上一年">‹</button>
+          <span id="pickerYear">-</span>
+          <button class="picker-nav" onclick="changePickerYear(1)" title="下一年">›</button>
+        </div>
+        <div class="picker-months" id="pickerMonths"></div>
+      </div>
+
+      <button class="today-btn" onclick="goToday()">回到今天</button>
+
+      <table class="calendar-table">
+        <thead>
+          <tr>
+            <th>一</th>
+            <th>二</th>
+            <th>三</th>
+            <th>四</th>
+            <th>五</th>
+            <th>六</th>
+            <th>日</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody">
+        </tbody>
+      </table>
+
+      <div id="infoBox" class="info-box">
+        已选择：<span id="selectedDate">-</span>　农历：<span id="lunarDate">-</span>
+      </div>
+    </div>
+
+    <div class="center">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    let currentDate = new Date();
+    let selectedDateStr = null;
+
+    const weekHeaders = ['一', '二', '三', '四', '五', '六', '日'];
+    const weekdaysFull = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+
+    function isSameDay(a, b) {
+      return a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+    }
+
+    function pad(n) {
+      return n < 10 ? '0' + n : '' + n;
+    }
+
+    function formatDate(date) {
+      return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+    }
+
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const today = new Date();
+
+      document.getElementById('monthTitle').textContent =
+        year + '年 ' + (month + 1) + '月';
+
+      const firstDay = new Date(year, month, 1);
+      // 周一为第一列：把 getDay() (0=周日..6=周六) 映射到 周一起始 (0=周一..6=周日)
+      let firstDayIdx = firstDay.getDay() - 1;
+      if (firstDayIdx < 0) firstDayIdx = 6;
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+      const tbody = document.getElementById('calendarBody');
+      tbody.innerHTML = '';
+
+      let day = 1;
+      let nextMonthDay = 1;
+      let cellCount = 0;
+      const totalCells = 42; // 6 行 x 7 列
+
+      for (let row = 0; row < 6; row++) {
+        const tr = document.createElement('tr');
+        let rowHasDay = false;
+
+        for (let col = 0; col < 7; col++) {
+          const td = document.createElement('td');
+          const cell = document.createElement('div');
+          cell.className = 'day-cell';
+
+          let cellDate;
+          let displayDay;
+          let isOtherMonth = false;
+
+          if (cellCount < firstDayIdx) {
+            // 上个月剩余日期
+            displayDay = daysInPrevMonth - (firstDayIdx - 1 - cellCount);
+            cellDate = new Date(year, month - 1, displayDay);
+            isOtherMonth = true;
+          } else if (day <= daysInMonth) {
+            displayDay = day;
+            cellDate = new Date(year, month, displayDay);
+            day++;
+            rowHasDay = true;
+          } else {
+            displayDay = nextMonthDay;
+            cellDate = new Date(year, month + 1, displayDay);
+            nextMonthDay++;
+            isOtherMonth = true;
+          }
+
+          // 周末高亮：周日起始时 col=6 为周日，col=5 为周六
+          const jsDay = cellDate.getDay();
+          if (jsDay === 0 || jsDay === 6) {
+            cell.classList.add('weekend');
+          }
+
+          if (isOtherMonth) {
+            cell.classList.add('other-month');
+          }
+
+          if (isSameDay(cellDate, today)) {
+            cell.classList.add('today');
+          }
+
+          if (selectedDateStr && formatDate(cellDate) === selectedDateStr) {
+            cell.classList.add('selected');
+          }
+
+          const dayLabel = document.createElement('div');
+          dayLabel.textContent = displayDay;
+          cell.appendChild(dayLabel);
+
+          // 农历日（不含月份）
+          const lunarLabel = document.createElement('div');
+          lunarLabel.className = 'lunar';
+          lunarLabel.textContent = getLunarDayName(cellDate);
+          cell.appendChild(lunarLabel);
+
+          const dateStr = formatDate(cellDate);
+          cell.addEventListener('click', function () {
+            selectDate(cellDate);
+          });
+
+          td.appendChild(cell);
+          tr.appendChild(td);
+          cellCount++;
+        }
+
+        tbody.appendChild(tr);
+
+        // 如果本月不需要第6行（即没有跨入下个月），停止
+        if (!rowHasDay && nextMonthDay > 7) {
+          // 第6行全是下月日期，可以选择隐藏，这里保留以保证布局一致
+        }
+      }
+    }
+
+    function selectDate(date) {
+      selectedDateStr = formatDate(date);
+      // 如果选中的是其他月份的日期，则切换到那个月
+      if (date.getMonth() !== currentDate.getMonth() ||
+        date.getFullYear() !== currentDate.getFullYear()) {
+        currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      }
+      renderCalendar();
+
+      const infoBox = document.getElementById('infoBox');
+      document.getElementById('selectedDate').textContent =
+        selectedDateStr + ' (' + weekdaysFull[date.getDay()] + ')';
+      document.getElementById('lunarDate').textContent = getLunarLabel(date);
+      infoBox.classList.add('show');
+    }
+
+    function changeMonth(delta) {
+      currentDate.setMonth(currentDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    function goToday() {
+      currentDate = new Date();
+      selectDate(new Date());
+    }
+
+    // ===== 年月选择面板 =====
+    let pickerYear = new Date().getFullYear();
+    const PICKER_YEAR_MIN = 1900;
+    const PICKER_YEAR_MAX = 2100;
+
+    function togglePicker() {
+      const panel = document.getElementById('pickerPanel');
+      if (panel.classList.contains('show')) {
+        closePicker();
+      } else {
+        openPicker();
+      }
+    }
+
+    function openPicker() {
+      pickerYear = currentDate.getFullYear();
+      renderPicker();
+      document.getElementById('pickerPanel').classList.add('show');
+    }
+
+    function closePicker() {
+      document.getElementById('pickerPanel').classList.remove('show');
+    }
+
+    function changePickerYear(delta) {
+      pickerYear += delta;
+      if (pickerYear < PICKER_YEAR_MIN) pickerYear = PICKER_YEAR_MIN;
+      if (pickerYear > PICKER_YEAR_MAX) pickerYear = PICKER_YEAR_MAX;
+      renderPicker();
+    }
+
+    function renderPicker() {
+      document.getElementById('pickerYear').textContent = pickerYear + '年';
+      const container = document.getElementById('pickerMonths');
+      container.innerHTML = '';
+      const curYear = currentDate.getFullYear();
+      const curMonth = currentDate.getMonth() + 1;
+      for (let m = 1; m <= 12; m++) {
+        const btn = document.createElement('button');
+        btn.className = 'picker-month-btn';
+        btn.textContent = m + '月';
+        if (pickerYear === curYear && m === curMonth) {
+          btn.classList.add('active');
+        }
+        btn.addEventListener('click', function () {
+          currentDate = new Date(pickerYear, m - 1, 1);
+          renderCalendar();
+          closePicker();
+        });
+        container.appendChild(btn);
+      }
+    }
+
+    // 点击面板和标题以外区域时关闭选择面板
+    document.addEventListener('click', function (e) {
+      const panel = document.getElementById('pickerPanel');
+      const title = document.getElementById('monthTitle');
+      if (!panel || !panel.classList.contains('show')) return;
+      if (!panel.contains(e.target) && e.target !== title) {
+        closePicker();
+      }
+    });
+
+    // 农历日名（如 初一、十五、廿一），不含月份
+    function getLunarDayName(date) {
+      try {
+        const dayStr = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', {
+          day: 'numeric'
+        }).format(date);
+        const day = parseInt(dayStr, 10);
+        if (isNaN(day)) return dayStr;
+        return lunarDayToName(day);
+      } catch (e) {
+        return '';
+      }
+    }
+
+    // 将农历日数字转为传统中文名
+    function lunarDayToName(day) {
+      const digits = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+      if (day === 10) return '初十';
+      if (day < 10) return '初' + digits[day];
+      if (day < 20) return '十' + digits[day - 10];
+      if (day === 20) return '二十';
+      if (day < 30) return '廿' + digits[day - 20];
+      return '三十';
+    }
+
+    // 农历日期显示（去掉数字年份，农历日用中文，如 丙午年五月十一）
+    function getLunarLabel(date) {
+      try {
+        // 年+月（去掉开头的数字年份，保留丙午年等干支年名）
+        const ym = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', {
+          year: 'numeric',
+          month: 'long'
+        }).format(date).replace(/^\d+年?/, '').trim();
+        // 农历日（中文，如 十一、廿一、初一）
+        const dayName = getLunarDayName(date);
+        return ym + dayName;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    // 初始化：渲染日历并默认选中今天，显示今天的农历
+    window.onload = function () {
+      const today = new Date();
+      selectDate(today);
+    };
+  </script>
+</body>
+
+</html>
