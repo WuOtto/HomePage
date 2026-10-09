@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英文大小写转换工具</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary: #6c757d;
+        --button-secondary-hover: #868e96;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .editor-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .editor-card h2 {
+      margin: 0 0 15px 0;
+      font-size: 1.1em;
+      color: var(--text-color);
+    }
+
+    .editor-card textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 15px;
+      font-size: 1em;
+      font-family: inherit;
+      line-height: 1.6;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      resize: vertical;
+    }
+
+    .editor-card textarea:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      color: white;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--button-bg);
+    }
+
+    .btn-primary:hover {
+      background: var(--button-hover);
+    }
+
+    .btn-secondary {
+      background: var(--button-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    .btn-full {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .action-row .btn {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 15px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 100px;
+    }
+
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.85em;
+      margin-top: 4px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--button-bg);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px var(--shadow);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .button-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .action-row {
+        flex-direction: column;
+      }
+
+      .action-row .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toast" id="toast">已复制到剪贴板</div>
+
+  <div class="container">
+    <h1>英文大小写转换工具</h1>
+    <p class="subtitle">支持多种英文大小写转换模式，一键转换文本格式</p>
+
+    <div class="editor-card">
+      <h2>输入文本</h2>
+      <textarea id="textInput" placeholder="在此输入或粘贴英文文本，例如：Hello World, welcome to the CASE CONVERTER!"></textarea>
+    </div>
+
+    <div class="button-grid">
+      <button class="btn btn-primary" onclick="convertToUpperCase()">全部大写 (UPPERCASE)</button>
+      <button class="btn btn-primary" onclick="convertToLowerCase()">全部小写 (lowercase)</button>
+      <button class="btn btn-primary" onclick="convertToTitleCase()">首字母大写 (Title Case)</button>
+      <button class="btn btn-primary" onclick="convertToSentenceCase()">句子大写 (Sentence case)</button>
+      <button class="btn btn-primary" onclick="convertToToggleCase()">切换大小写 (tOGGLE cASE)</button>
+      <button class="btn btn-primary" onclick="convertToSnakeCase()">下划线格式 (snake_case)</button>
+      <button class="btn btn-primary" onclick="convertToKebabCase()">连字符格式 (kebab-case)</button>
+      <button class="btn btn-primary" onclick="convertToCamelCase()">驼峰格式 (camelCase)</button>
+    </div>
+
+    <div class="editor-card">
+      <h2>转换结果</h2>
+      <textarea id="textOutput" placeholder="转换后的结果将显示在这里..." readonly></textarea>
+    </div>
+
+    <div class="action-row">
+      <button class="btn btn-primary" onclick="copyResult()">复制结果</button>
+      <button class="btn btn-primary" onclick="applyResult()">应用到输入</button>
+      <button class="btn btn-secondary" onclick="swapText()">交换输入输出</button>
+      <button class="btn btn-secondary" onclick="clearAll()">清空全部</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-value" id="charCount">0</span>
+        <span class="stat-label">字符数</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="wordCount">0</span>
+        <span class="stat-label">单词数</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="upperCount">0</span>
+        <span class="stat-label">大写字母</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="lowerCount">0</span>
+        <span class="stat-label">小写字母</span>
+      </div>
+    </div>
+
+    <div style="text-align: center;">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    const textInput = document.getElementById('textInput');
+    const textOutput = document.getElementById('textOutput');
+    const toast = document.getElementById('toast');
+
+    textInput.addEventListener('input', updateStats);
+    textOutput.addEventListener('input', updateStats);
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function updateStats() {
+      const text = textInput.value;
+      const charCount = text.length;
+      const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const upperCount = (text.match(/[A-Z]/g) || []).length;
+      const lowerCount = (text.match(/[a-z]/g) || []).length;
+
+      document.getElementById('charCount').textContent = charCount;
+      document.getElementById('wordCount').textContent = wordCount;
+      document.getElementById('upperCount').textContent = upperCount;
+      document.getElementById('lowerCount').textContent = lowerCount;
+    }
+
+    function convertToUpperCase() {
+      textOutput.value = textInput.value.toUpperCase();
+      updateStats();
+    }
+
+    function convertToLowerCase() {
+      textOutput.value = textInput.value.toLowerCase();
+      updateStats();
+    }
+
+    function convertToTitleCase() {
+      const text = textInput.value.toLowerCase();
+      textOutput.value = text.replace(/\b\w/g, char => char.toUpperCase());
+      updateStats();
+    }
+
+    function convertToSentenceCase() {
+      const text = textInput.value.toLowerCase().trim();
+      if (!text) {
+        textOutput.value = '';
+        updateStats();
+        return;
+      }
+      textOutput.value = text.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
+      updateStats();
+    }
+
+    function convertToToggleCase() {
+      textOutput.value = textInput.value.replace(/[a-zA-Z]/g, char =>
+        char === char.toUpperCase() ? char.toLowerCase() : char.toUpperCase()
+      );
+      updateStats();
+    }
+
+    function convertToSnakeCase() {
+      let text = textInput.value.trim();
+      text = text.replace(/([a-z])([A-Z])/g, '$1_$2');
+      text = text.replace(/[\s\-]+/g, '_');
+      text = text.replace(/[^a-zA-Z0-9_]/g, '');
+      textOutput.value = text.toLowerCase();
+      updateStats();
+    }
+
+    function convertToKebabCase() {
+      let text = textInput.value.trim();
+      text = text.replace(/([a-z])([A-Z])/g, '$1-$2');
+      text = text.replace(/[\s_]+/g, '-');
+      text = text.replace(/[^a-zA-Z0-9-]/g, '');
+      textOutput.value = text.toLowerCase();
+      updateStats();
+    }
+
+    function convertToCamelCase() {
+      let text = textInput.value.trim();
+      text = text.replace(/[\s_\-]+(.)?/g, (_, c) => c ? c.toUpperCase() : '');
+      text = text.replace(/[^a-zA-Z0-9]/g, '');
+      textOutput.value = text.charAt(0).toLowerCase() + text.slice(1);
+      updateStats();
+    }
+
+    function copyResult() {
+      if (!textOutput.value) {
+        showToast('没有可复制的内容');
+        return;
+      }
+      navigator.clipboard.writeText(textOutput.value).then(() => {
+        showToast('已复制到剪贴板');
+      }).catch(() => {
+        textOutput.select();
+        document.execCommand('copy');
+        showToast('已复制到剪贴板');
+      });
+    }
+
+    function applyResult() {
+      textInput.value = textOutput.value;
+      updateStats();
+    }
+
+    function swapText() {
+      const temp = textInput.value;
+      textInput.value = textOutput.value;
+      textOutput.value = temp;
+      updateStats();
+    }
+
+    function clearAll() {
+      textInput.value = '';
+      textOutput.value = '';
+      updateStats();
+    }
+
+    updateStats();
+  </script>
+</body>
+
+</html>

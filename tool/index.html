@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>开发者工具列表</title>
+  <title>工具集合</title>
   <style>
     :root {
       --bg-color: #ffffff;
@@ -53,6 +53,7 @@
     .category-section {
       margin-top: 40px;
       margin-bottom: 40px;
+      scroll-margin-top: 120px;
     }
 
     .category-title {
@@ -62,6 +63,7 @@
       margin-bottom: 20px;
       padding-bottom: 10px;
       border-bottom: 2px solid var(--button-bg);
+      scroll-margin-top: 120px;
     }
 
     .tool-list {
@@ -111,6 +113,79 @@
       background: var(--button-hover);
     }
 
+    /* 搜索与索引导航 */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg-color);
+      padding: 16px 0;
+      margin-bottom: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-box {
+      width: 100%;
+      max-width: 560px;
+      box-sizing: border-box;
+      padding: 12px 18px;
+      font-size: 1.05em;
+      color: var(--text-color);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 25px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search-box:focus {
+      border-color: var(--button-bg);
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+    }
+
+    .index-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .index-nav a {
+      padding: 6px 14px;
+      font-size: 0.9em;
+      color: var(--text-color);
+      text-decoration: none;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
+    }
+
+    .index-nav a:hover {
+      border-color: var(--button-bg);
+    }
+
+    .index-nav a.hidden {
+      display: none;
+    }
+
+    .empty-tip {
+      display: none;
+      font-size: 1.1em;
+      color: var(--text-secondary);
+      margin: 40px 0;
+    }
+
+    .tool-card.hidden {
+      display: none;
+    }
+
+    .category-section.hidden {
+      display: none;
+    }
+
     @media (max-width: 600px) {
       .tool-card {
         width: 100%;
@@ -120,11 +195,17 @@
 </head>
 
 <body>
-  <h1>开发者工具列表</h1>
-  <p>以下是我们的开发者工具集合，助力iOS开发和其他任务。更多工具即将推出！</p>
+  <h1>工具集合</h1>
+
+  <div class="toolbar">
+    <input type="text" id="searchInput" class="search-box" placeholder="搜索工具名称或功能描述…" autocomplete="off">
+    <nav class="index-nav" id="indexNav"></nav>
+  </div>
+
+  <div class="empty-tip" id="emptyTip">没有找到匹配的工具，换个关键词试试吧。</div>
 
   <!-- 编码转换类 -->
-  <div class="category-section">
+  <div class="category-section" id="cat-encode">
     <h2 class="category-title">📝 编码转换</h2>
     <div class="tool-list">
       <div class="tool-card">
@@ -161,7 +242,7 @@
   </div>
 
   <!-- 文本处理类 -->
-  <div class="category-section">
+  <div class="category-section" id="cat-text">
     <h2 class="category-title">✏️ 文本处理</h2>
     <div class="tool-list">
       <div class="tool-card">
@@ -189,11 +270,26 @@
         <p>极简风格，打开网页后，拖放 md 文件到网页中即可阅读。</p>
         <a href="./md_reader/index.html">使用工具</a>
       </div>
+      <div class="tool-card">
+        <h2>数字转中文大写</h2>
+        <p>将阿拉伯数字转换为中文大写，支持金额大写（元角分）和普通数字两种模式，适用于发票、合同等场景，支持暗黑模式。</p>
+        <a href="./number-to-chinese.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>摩斯电码工具</h2>
+        <p>文本与摩斯电码双向实时转换，支持声音播放、速度（WPM）和音调调节，附完整摩斯电码对照表，支持暗黑模式。</p>
+        <a href="./morse-code.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>英文大小写转换</h2>
+        <p>支持多种英文大小写转换模式：全部大写、全部小写、首字母大写、句子大写、切换大小写、下划线格式、连字符格式、驼峰格式，支持暗黑模式。</p>
+        <a href="./text-case-converter.html">使用工具</a>
+      </div>
     </div>
   </div>
 
   <!-- 日期时间类 -->
-  <div class="category-section">
+  <div class="category-section" id="cat-date">
     <h2 class="category-title">⏰ 日期时间</h2>
     <div class="tool-list">
       <div class="tool-card">
@@ -220,7 +316,7 @@
   </div>
 
   <!-- 生成器类 -->
-  <div class="category-section">
+  <div class="category-section" id="cat-generator">
     <h2 class="category-title">🎲 生成器</h2>
     <div class="tool-list">
       <div class="tool-card">
@@ -233,16 +329,11 @@
         <p>将文本、网址等内容生成二维码，支持自定义尺寸和容错率，可下载PNG图片。</p>
         <a href="./qrcode-generator.html">使用工具</a>
       </div>
-      <div class="tool-card">
-        <h2>iOS App Icon 生成器</h2>
-        <p>上传一张512x512或更大的图片（建议正方形、无透明背景），生成Xcode所需的App Icon和Contents.json，支持iPhone和iPad（包括Notification图标）。</p>
-        <a href="./ios-app-icon-generator.html">使用工具</a>
-      </div>
     </div>
   </div>
 
   <!-- 趣味挑战类 -->
-  <div class="category-section">
+  <div class="category-section" id="cat-fun">
     <h2 class="category-title">🧠 趣味挑战</h2>
     <div class="tool-list">
       <div class="tool-card">
@@ -263,19 +354,74 @@
     </div>
   </div>
 
-  <!-- 其他工具类 -->
-  <div class="category-section">
-    <h2 class="category-title">🛠️ 其他工具</h2>
+  <!-- 小游戏类 -->
+  <div class="category-section" id="cat-game">
+    <h2 class="category-title">🎮 小游戏</h2>
     <div class="tool-list">
+      <div class="tool-card">
+        <h2>2048</h2>
+        <p>经典数字合并小游戏：方向键/WASD/滑动即可操作，支持撤销、最高分记录与暗黑模式；内置摸鱼小窗模式（M 键）和老板键（` 键一键假装写代码），适合上班摸鱼。</p>
+        <a href="./2048.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>扫雷</h2>
+        <p>经典排雷小游戏：三档难度（9×9 / 16×16 / 16×30），首点安全、数字连锁翻开、右键/长按插旗、计时并记录各难度最快通关；内置摸鱼小窗模式（M 键）和老板键（` 键一键假装写代码），适合上班摸鱼。</p>
+        <a href="./minesweeper.html">使用工具</a>
+      </div>
+      <!-- 未来游戏可在此添加 -->
+    </div>
+  </div>
+
+  <!-- 图片工具类 -->
+  <div class="category-section" id="cat-image">
+    <h2 class="category-title">🖼️ 图片工具</h2>
+    <div class="tool-list">
+      <div class="tool-card">
+        <h2>图片压缩工具</h2>
+        <p>浏览器本地压缩，图片不上传服务器；支持 JPG / PNG / WebP 批量压缩，可调节质量与尺寸限制，实时对比节省率并批量下载，支持暗黑模式。</p>
+        <a href="./image-compressor.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>占位图与渐变图生成器</h2>
+        <p>生成占位图（自定义尺寸/颜色/文字/边框）、渐变图（线性/径向/锥形，内置16组精美预设）、图案纹理（圆点/网格/斜纹/棋盘/条纹/波浪），支持 PNG/JPEG/WebP/SVG 导出与 CSS 代码复制。</p>
+        <a href="./placeholder-generator.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>调色板提取工具</h2>
+        <p>基于中位切分算法从图片中提取主色，支持 4–24 色、可调精度；展示 HEX / RGB / HSL 与占比，一键复制，可导出 CSS 变量、SCSS、Tailwind、JSON、JS Array、Android XML 等代码，支持暗黑模式。</p>
+        <a href="./color-palette-extractor.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>iOS App Icon 生成器</h2>
+        <p>上传一张512x512或更大的图片（建议正方形、无透明背景），生成Xcode所需的App Icon和Contents.json，支持iPhone和iPad（包括Notification图标）。</p>
+        <a href="./ios-app-icon-generator.html">使用工具</a>
+      </div>
       <div class="tool-card">
         <h2>图片尺寸计算器</h2>
         <p>计算图片按比例缩放后的显示尺寸，支持已知宽度求高度或已知高度求宽度，自动计算缩放比例。</p>
         <a href="./image-size-calculator.html">使用工具</a>
       </div>
       <div class="tool-card">
+        <h2>批量图片处理</h2>
+        <p>输入尺寸批量修改图片</p>
+        <a href="./resized_images/index.html">使用工具</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 其他工具类 -->
+  <div class="category-section" id="cat-other">
+    <h2 class="category-title">🛠️ 其他工具</h2>
+    <div class="tool-list">
+      <div class="tool-card">
         <h2>简单计算器</h2>
         <p>支持基本四则运算和数学函数的实时计算器，左侧输入表达式，右侧显示结果，支持暗黑模式。</p>
         <a href="./calculator.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>单位换算工具</h2>
+        <p>长度、面积、体积、质量、温度、速度、时间、存储、网速带宽(Mbps)共13类单位实时互换，支持算式输入、一键交换、全部单位对照表和单行复制，支持暗黑模式。</p>
+        <a href="./unit-converter.html">使用工具</a>
       </div>
       <div class="tool-card">
         <h2>RSS阅读器</h2>
@@ -283,14 +429,67 @@
         <a href="./rss/index.html">使用工具</a>
       </div>
       <div class="tool-card">
-        <h2>批量图片处理</h2>
-        <p>输入尺寸批量修改图片</p>
-        <a href="./resized_images/index.html">使用工具</a>
+        <h2>全国车牌查询表</h2>
+        <p>全国各地车牌代号对照表，覆盖31个省/自治区/直辖市，支持按省份、城市、字母代号搜索和地区分类筛选，点击复制完整代号，支持暗黑模式。</p>
+        <a href="./license-plate.html">使用工具</a>
+      </div>
+      <div class="tool-card">
+        <h2>文本朗读工具</h2>
+        <p>输入文本调用浏览器语音合成（SpeechSynthesis）朗读，支持中英文等多种语音，可实时调节语速、音调和音量，支持暂停/继续/停止。</p>
+        <a href="./text-to-speech.html">使用工具</a>
       </div>
       <!-- 未来工具可在此添加 -->
     </div>
   </div>
-  </div>
+
+  <script>
+    (function () {
+      var input = document.getElementById('searchInput');
+      var emptyTip = document.getElementById('emptyTip');
+      var nav = document.getElementById('indexNav');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('.category-section'));
+
+      // 构建分类索引导航
+      sections.forEach(function (section) {
+        var titleEl = section.querySelector('.category-title');
+        if (!titleEl) return;
+        var link = document.createElement('a');
+        link.textContent = titleEl.textContent.trim();
+        link.href = '#' + section.id;
+        link.dataset.target = section.id;
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          var top = section.getBoundingClientRect().top + window.pageYOffset - 120;
+          window.scrollTo({ top: top, behavior: 'smooth' });
+        });
+        nav.appendChild(link);
+      });
+
+      function filter() {
+        var keyword = input.value.trim().toLowerCase();
+        var anyVisible = false;
+
+        sections.forEach(function (section) {
+          var cards = section.querySelectorAll('.tool-card');
+          var sectionVisible = false;
+
+          cards.forEach(function (card) {
+            var text = card.textContent.toLowerCase();
+            var match = keyword === '' || text.indexOf(keyword) !== -1;
+            card.classList.toggle('hidden', !match);
+            if (match) sectionVisible = true;
+          });
+
+          section.classList.toggle('hidden', !sectionVisible);
+          if (sectionVisible) anyVisible = true;
+        });
+
+        emptyTip.style.display = (keyword !== '' && !anyVisible) ? 'block' : 'none';
+      }
+
+      input.addEventListener('input', filter);
+    })();
+  </script>
 </body>
 
 </html>

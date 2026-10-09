@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>摩斯电码工具</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --input-bg: #ffffff;
+      --input-border: #cccccc;
+      --input-focus: #28a745;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary-bg: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --error-color: #dc3545;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --input-focus: #34ce57;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary-bg: #6c757d;
+        --button-secondary-hover: #7a8288;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --error-color: #ff6b6b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    .converter-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      font-size: 1.1em;
+    }
+
+    .input-group textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      border: 2px solid var(--input-border);
+      border-radius: 5px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease, background-color 0.3s ease;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--input-focus);
+    }
+
+    .input-group .hint {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .input-group .error {
+      font-size: 0.9em;
+      color: var(--error-color);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .convert-arrow {
+      text-align: center;
+      font-size: 1.8em;
+      color: var(--button-bg);
+      margin: 5px 0 15px;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+      padding: 15px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .speed-control label {
+      font-weight: bold;
+      white-space: nowrap;
+      color: var(--text-color);
+    }
+
+    .speed-control input[type="range"] {
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .speed-value {
+      min-width: 90px;
+      text-align: right;
+      color: var(--text-secondary);
+      font-family: 'Courier New', monospace;
+    }
+
+    .option-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .option-group label {
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button.action-btn {
+      flex: 1;
+      min-width: 110px;
+      padding: 12px 20px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button.action-btn:hover {
+      background: var(--button-hover);
+    }
+
+    button.action-btn:active {
+      transform: scale(0.98);
+    }
+
+    button.action-btn.secondary {
+      background: var(--button-secondary-bg);
+    }
+
+    button.action-btn.secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    button.action-btn.play {
+      background: #007bff;
+    }
+
+    button.action-btn.play:hover {
+      background: #0069d9;
+    }
+
+    button.action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--button-bg);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .info-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .info-section h3 {
+      margin-top: 0;
+      color: var(--text-color);
+    }
+
+    .info-section ul {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .morse-table {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .morse-table .cell {
+      padding: 8px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: var(--input-bg);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .morse-table .cell .char {
+      font-weight: bold;
+      font-size: 1.1em;
+      color: var(--text-color);
+    }
+
+    .morse-table .cell .code {
+      font-family: 'Courier New', monospace;
+      color: var(--button-bg);
+      font-size: 1em;
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .converter-container {
+        padding: 20px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button.action-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>摩斯电码工具</h1>
+  <p class="subtitle">文本与摩斯电码双向转换，支持声音播放和速度调节</p>
+
+  <div class="converter-container">
+    <div class="input-group">
+      <label for="text-input">文本（英文字母、数字、标点）</label>
+      <textarea id="text-input" placeholder="输入文本，例如：HELLO WORLD"></textarea>
+      <div class="hint">支持英文字母、数字和常用标点，不区分大小写</div>
+      <div class="error" id="text-error"></div>
+    </div>
+
+    <div class="convert-arrow">⇅</div>
+
+    <div class="input-group">
+      <label for="morse-input">摩斯电码</label>
+      <textarea id="morse-input" placeholder="输入摩斯电码，例如：.... . .-.. .-.. --- / .-- --- .-. .-.. -.."></textarea>
+      <div class="hint">点用 <strong>.</strong> 或 <strong>·</strong>，划用 <strong>-</strong>；字符间用空格或 <strong>/</strong>，单词间用 <strong>/</strong>（前后带空格）</div>
+      <div class="error" id="morse-error"></div>
+    </div>
+
+    <div class="control-panel">
+      <div class="speed-control">
+        <label for="speed">速度</label>
+        <input type="range" id="speed" min="5" max="40" value="15" step="1">
+        <span class="speed-value" id="speed-value">15 WPM</span>
+      </div>
+      <div class="option-group">
+        <label for="pitch-toggle">音调</label>
+        <input type="range" id="pitch" min="300" max="1000" value="600" step="50">
+        <span class="speed-value" id="pitch-value">600 Hz</span>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="action-btn play" id="play-btn" onclick="togglePlay()">播放声音</button>
+      <button class="action-btn" onclick="copyMorse()">复制电码</button>
+      <button class="action-btn secondary" onclick="clearAll()">清空</button>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h3>使用说明</h3>
+    <ul>
+      <li>在<strong>文本框</strong>输入英文/数字/标点，自动生成摩斯电码</li>
+      <li>在<strong>摩斯电码框</strong>输入电码，自动解码为文本（双向实时转换）</li>
+      <li>摩斯电码中字符间用空格或 <code>/</code> 分隔，单词间用 <code>/</code>（前后带空格）分隔</li>
+      <li><strong>播放声音</strong>：用蜂鸣音播放电码，可调节速度（WPM）和音调（Hz）</li>
+      <li>WPM（Words Per Minute）为国际标准速度单位，按 PARIS 标准计算</li>
+      <li>不支持的字符（如中文）在编码时会被忽略</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3>摩斯电码对照表</h3>
+    <div class="morse-table" id="morse-table"></div>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="./index.html" class="back-link">返回工具列表</a>
+  </div>
+
+  <div class="toast" id="toast">已复制到剪贴板</div>
+
+  <script>
+    // 摩斯电码表
+    const morseMap = {
+      'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.',
+      'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---',
+      'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---',
+      'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
+      'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--',
+      'Z': '--..',
+      '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+      '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
+      '.': '.-.-.-', ',': '--..--', '?': '..--..', "'": '.----.',
+      '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-',
+      '&': '.-...', ':': '---...', ';': '-.-.-.', '=': '-...-',
+      '+': '.-.-.', '-': '-....-', '_': '..--.-', '"': '.-..-.',
+      '$': '...-..-', '@': '.--.-.', ' ': '/'
+    };
+
+    // 反向映射
+    const reverseMorseMap = {};
+    for (const key in morseMap) {
+      reverseMorseMap[morseMap[key]] = key;
+    }
+
+    const textInput = document.getElementById('text-input');
+    const morseInput = document.getElementById('morse-input');
+    const textError = document.getElementById('text-error');
+    const morseError = document.getElementById('morse-error');
+    const speedSlider = document.getElementById('speed');
+    const speedValue = document.getElementById('speed-value');
+    const pitchSlider = document.getElementById('pitch');
+    const pitchValue = document.getElementById('pitch-value');
+    const playBtn = document.getElementById('play-btn');
+
+    let isUpdating = false;
+
+    // 文本转摩斯电码
+    function textToMorse(text) {
+      const upper = text.toUpperCase();
+      let result = [];
+      let unsupported = [];
+
+      for (let i = 0; i < upper.length; i++) {
+        const ch = upper[i];
+        if (morseMap[ch] !== undefined) {
+          result.push(morseMap[ch]);
+        } else if (ch === '\n') {
+          result.push('/');
+        } else {
+          unsupported.push(ch);
+        }
+      }
+
+      return {
+        morse: result.join(' '),
+        unsupported: unsupported
+      };
+    }
+
+    // 摩斯电码转文本
+    function morseToText(morse) {
+      // 统一点划符号：将 · 转为 .，— 转为 -
+      let normalized = morse.replace(/·/g, '.').replace(/—/g, '-');
+
+      // 分隔符处理：
+      // 1. " / "（前后带空格的斜杠）表示单词分隔，用特殊标记保留
+      // 2. 其余直接连接的 "/" 表示字符分隔，等同于空格
+      normalized = normalized.replace(/\s+\/\s+/g, ' \u0001 ');
+      normalized = normalized.replace(/\//g, ' ');
+
+      const tokens = normalized.split(/\s+/);
+      let result = '';
+      let invalid = [];
+
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        if (token === '') continue;
+        if (token === '\u0001') {
+          result += ' ';
+        } else if (reverseMorseMap[token] !== undefined) {
+          result += reverseMorseMap[token];
+        } else {
+          invalid.push(token);
+        }
+      }
+
+      return {
+        text: result,
+        invalid: invalid
+      };
+    }
+
+    // 文本输入变化
+    textInput.addEventListener('input', () => {
+      if (isUpdating) return;
+      textError.style.display = 'none';
+      const value = textInput.value;
+      if (!value.trim()) {
+        isUpdating = true;
+        morseInput.value = '';
+        isUpdating = false;
+        return;
+      }
+      const { morse, unsupported } = textToMorse(value);
+      isUpdating = true;
+      morseInput.value = morse;
+      isUpdating = false;
+      if (unsupported.length > 0) {
+        textError.textContent = '以下字符无法转换已被忽略：' + [...new Set(unsupported)].join(' ');
+        textError.style.display = 'block';
+      }
+    });
+
+    // 摩斯电码输入变化
+    morseInput.addEventListener('input', () => {
+      if (isUpdating) return;
+      morseError.style.display = 'none';
+      const value = morseInput.value;
+      if (!value.trim()) {
+        isUpdating = true;
+        textInput.value = '';
+        isUpdating = false;
+        return;
+      }
+      const { text, invalid } = morseToText(value);
+      isUpdating = true;
+      textInput.value = text;
+      isUpdating = false;
+      if (invalid.length > 0) {
+        morseError.textContent = '以下电码无法识别：' + invalid.join(' ');
+        morseError.style.display = 'block';
+      }
+    });
+
+    // 速度调节
+    speedSlider.addEventListener('input', () => {
+      speedValue.textContent = speedSlider.value + ' WPM';
+    });
+
+    pitchSlider.addEventListener('input', () => {
+      pitchValue.textContent = pitchSlider.value + ' Hz';
+    });
+
+    // ============ 声音播放 ============
+    let audioCtx = null;
+    let isPlaying = false;
+    let playTimeouts = [];
+
+    // 根据 WPM 计算点长度（毫秒），按 PARIS 标准
+    function getDotDuration(wpm) {
+      return 1200 / wpm;
+    }
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // 播放一个音（点或划）
+    function playTone(duration, frequency, startTime) {
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+
+      // 包络避免爆音
+      gainNode.gain.setValueAtTime(0, startTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.005);
+      gainNode.gain.setValueAtTime(0.3, startTime + duration / 1000 - 0.005);
+      gainNode.gain.linearRampToValueAtTime(0, startTime + duration / 1000);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration / 1000);
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        stopPlay();
+      } else {
+        startPlay();
+      }
+    }
+
+    function startPlay() {
+      const morse = morseInput.value.trim();
+      if (!morse) {
+        showToast('请先输入摩斯电码');
+        return;
+      }
+
+      initAudio();
+      isPlaying = true;
+      playBtn.textContent = '停止播放';
+      playBtn.classList.add('secondary');
+
+      const wpm = parseInt(speedSlider.value);
+      const pitch = parseInt(pitchSlider.value);
+      const dot = getDotDuration(wpm);
+      const dash = dot * 3;
+      const symbolGap = dot;      // 同一字符内符号间隔
+      const charGap = dot * 3;    // 字符间隔
+      const wordGap = dot * 7;    // 单词间隔
+
+      // 规范化摩斯电码
+      let normalized = morse.replace(/·/g, '.').replace(/—/g, '-');
+      const tokens = normalized.split(/\s+/);
+
+      let currentTime = audioCtx.currentTime;
+      const totalDurationMs = 0;
+
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        if (token === '') continue;
+
+        if (token === '/') {
+          // 单词间隔
+          currentTime += wordGap / 1000;
+          continue;
+        }
+
+        // 播放字符的每个符号
+        for (let j = 0; j < token.length; j++) {
+          const symbol = token[j];
+          const duration = symbol === '.' ? dot : dash;
+          playTone(duration, pitch, currentTime);
+          currentTime += duration / 1000;
+          // 符号间隔（最后一个符号不加）
+          if (j < token.length - 1) {
+            currentTime += symbolGap / 1000;
+          }
+        }
+
+        // 字符间隔
+        currentTime += charGap / 1000;
+      }
+
+      // 播放结束后恢复按钮状态
+      const totalMs = (currentTime - audioCtx.currentTime) * 1000;
+      const timeoutId = setTimeout(() => {
+        stopPlay();
+      }, totalMs + 100);
+      playTimeouts.push(timeoutId);
+    }
+
+    function stopPlay() {
+      isPlaying = false;
+      playBtn.textContent = '播放声音';
+      playBtn.classList.remove('secondary');
+      playTimeouts.forEach(id => clearTimeout(id));
+      playTimeouts = [];
+      if (audioCtx) {
+        // 通过关闭并重建来停止所有声音
+        audioCtx.close();
+        audioCtx = null;
+      }
+    }
+
+    // 复制摩斯电码
+    function copyMorse() {
+      const morse = morseInput.value;
+      if (!morse.trim()) {
+        showToast('暂无电码可复制');
+        return;
+      }
+      const textarea = document.createElement('textarea');
+      textarea.value = morse;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('已复制到剪贴板');
+      } catch (e) {
+        showToast('复制失败，请手动复制');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // 清空
+    function clearAll() {
+      textInput.value = '';
+      morseInput.value = '';
+      textError.style.display = 'none';
+      morseError.style.display = 'none';
+      if (isPlaying) stopPlay();
+      textInput.focus();
+    }
+
+    // Toast 提示
+    let toastTimer = null;
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // 生成摩斯电码对照表
+    function generateMorseTable() {
+      const table = document.getElementById('morse-table');
+      const displayOrder = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?!\'/()&:;=+-_"$@';
+      let html = '';
+      for (const ch of displayOrder) {
+        html += `<div class="cell"><div class="char">${ch}</div><div class="code">${morseMap[ch]}</div></div>`;
+      }
+      table.innerHTML = html;
+    }
+
+    generateMorseTable();
+  </script>
+</body>
+
+</html>

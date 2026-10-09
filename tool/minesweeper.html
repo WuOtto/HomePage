@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>扫雷 - 经典益智小游戏</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #1a1a1a;
+      --text-secondary: #6b7280;
+      --card-bg: #ffffff;
+      --card-border: #e5e7eb;
+      --chip-bg: #f3f4f6;
+      --primary: #28a745;
+      --primary-hover: #218838;
+      --danger: #dc3545;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --shadow-lg: rgba(0, 0, 0, 0.22);
+
+      /* 扫雷棋盘 */
+      --cell: 36px;
+      --gap: 3px;
+      --ms-bg: #c4cad3;
+      --ms-hid-top: #f4f6f9;
+      --ms-hid-bot: #d7dde4;
+      --ms-hid-b: #b4bcc8;
+      --ms-rev: #cfd6de;
+      --ms-rev-in: #bfc7d1;
+      --ms-boombg: #e03131;
+      --led-bg: #15181d;
+      --led: #3ddc68;
+      /* 数字颜色 */
+      --n1: #1565c0; --n2: #2e7d32; --n3: #c62828; --n4: #283593;
+      --n5: #ad1457; --n6: #00695c; --n7: #212121; --n8: #757575;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #0f172a;
+        --text-color: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --card-bg: #1e293b;
+        --card-border: #334155;
+        --chip-bg: #273449;
+        --primary: #34ce57;
+        --primary-hover: #2eb951;
+        --danger: #f87171;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --shadow-lg: rgba(0, 0, 0, 0.55);
+        --ms-bg: #0e131c;
+        --ms-hid-top: #3a4350;
+        --ms-hid-bot: #262e3a;
+        --ms-hid-b: #1d232e;
+        --ms-rev: #1a2230;
+        --ms-rev-in: #121a26;
+        --ms-boombg: #e5484d;
+        --led-bg: #04070b;
+        --led: #4ff06f;
+        --n1: #4dabf7; --n2: #69db7c; --n3: #ff8787; --n4: #b197fc;
+        --n5: #ffb066; --n6: #5cd6cf; --n7: #f1f3f5; --n8: #868e96;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ========== 主布局 ========== */
+    /* 专家级 30 列需要更宽的容器 */
+    .page { max-width: 1080px; margin: 0 auto; }
+
+    #stage { width: fit-content; margin: 0 auto; }
+
+    /* 小窗模式：整页变为可拖动悬浮窗 */
+    .mini-mode #stage {
+      position: fixed;
+      z-index: 9998;
+      margin: 0;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      box-shadow: 0 18px 50px var(--shadow-lg);
+      overflow: hidden;
+    }
+    body.mini-mode { overflow: hidden; }
+    /* 伪装界面打开时隐藏一切游戏元素 */
+    .disguised #stage,
+    .disguised .modal { visibility: hidden; }
+
+    /* ========== 隐身档：小窗强制暗色灰阶 ========== */
+    body.mini-mode {
+      --card-bg: #181b1f;
+      --card-border: #262a2f;
+      --chip-bg: #1d2125;
+      --text-color: #d7dbe0;
+      --text-secondary: #868d94;
+      --shadow-lg: rgba(0, 0, 0, 0);
+      --ms-bg: #12161c;
+      --ms-hid-top: #2b313b;
+      --ms-hid-bot: #1e242d;
+      --ms-hid-b: #191f27;
+      --ms-rev: #1a2130;
+      --ms-rev-in: #141b27;
+    }
+    body.mini-mode #stage {
+      border-color: #2a2f35;
+      box-shadow: none;
+      opacity: 0.64;
+      transition: opacity 0.28s ease;
+    }
+    body.mini-mode #stage:hover,
+    body.mini-mode #stage:active { opacity: 1; }
+    /* 小窗只留棋盘与状态行：隐藏标题区与操作区，界面整体灰阶化 */
+    body.mini-mode .head,
+    body.mini-mode .ctrl { display: none; }
+    body.mini-mode .board-box { filter: grayscale(1); }
+    body.mini-mode .guide { display: none; }
+
+    /* ========== 小窗拖拽条 ========== */
+    .mini-bar { display: none; }
+    .mini-mode .mini-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      cursor: grab;
+      background: var(--chip-bg);
+      border-bottom: 1px solid var(--card-border);
+      touch-action: none;
+      font-size: 0.78em;
+      font-weight: 600;
+    }
+    .mini-mode .mini-bar:active { cursor: grabbing; }
+    .mini-grip { color: var(--text-secondary); font-size: 0.9em; letter-spacing: 1px; }
+    .mini-title { flex: 1; white-space: nowrap; }
+    .mini-bar button {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-size: 0.74em;
+      cursor: pointer;
+      line-height: 1.6;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .mini-bar button:hover { border-color: var(--primary); color: var(--primary); }
+    .mini-bar .fake-btn { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .mini-bar .fake-btn:hover { opacity: 0.88; color: #fff; }
+    /* 伪装成终端灰字 */
+    body.mini-mode .mini-bar { background: transparent; border-bottom-color: #21252a; padding-bottom: 3px; }
+    body.mini-mode .mini-grip,
+    body.mini-mode .mini-title {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #565d64;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    body.mini-mode .mini-grip { font-size: 0.72em; }
+    body.mini-mode .mini-title { font-size: 0.66em; }
+    body.mini-mode .mini-bar button {
+      background: transparent;
+      border-color: #2a2f35;
+      color: #848b93;
+    }
+    body.mini-mode .mini-bar button:hover { border-color: #3a4149; color: #aeb6bd; }
+    body.mini-mode .mini-bar .fake-btn,
+    body.mini-mode .mini-bar .fake-btn:hover { background: transparent; color: #848b93; }
+
+    /* ========== 卡片 ========== */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 20px 20px;
+      box-shadow: 0 6px 24px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .mini-mode .card { border: none; box-shadow: none; border-radius: 0; padding: 6px 8px 8px; }
+
+    .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .head h1 { font-size: 2em; font-weight: 800; line-height: 1.1; }
+    .tagline { color: var(--text-secondary); font-size: 0.86em; margin-top: 3px; }
+    .mini-mode .tagline,
+    .mini-mode .ctrl { display: none; }
+
+    .scorebox { display: flex; gap: 8px; }
+    .chip {
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 5px 12px;
+      text-align: center;
+      min-width: 62px;
+    }
+    .chip-label { display: block; font-size: 0.7em; color: var(--text-secondary); letter-spacing: 1px; }
+    .chip-value { font-size: 1.25em; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+    .ctrl { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+    .ctrl button,
+    .diffs button {
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.88em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .ctrl button:hover,
+    .diffs button:hover { border-color: var(--primary); color: var(--primary); }
+    .ctrl button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .ctrl button.primary:hover { background: var(--primary-hover); color: #fff; }
+    .ctrl button.slack { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .ctrl button.slack:hover { background: #b02a37; color: #fff; }
+    .diffs { display: flex; gap: 6px; }
+    .diffs button.on {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .diffs button.on:hover { background: var(--primary-hover); color: #fff; }
+
+    /* 摸鱼小窗入口只在电脑端展示 */
+    @media (pointer: coarse) { .ctrl .slack { display: none; } }
+
+    /* ========== 扫雷棋盘 ========== */
+    .board-box { margin-top: 14px; touch-action: pan-y; }
+    .mini-mode .board-box { margin-top: 6px; }
+
+    .statbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 5px 8px;
+      margin-bottom: 8px;
+    }
+    .led {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: var(--led-bg);
+      color: var(--led);
+      border-radius: 6px;
+      padding: 1px 8px;
+      font-size: 1.05em;
+      font-weight: 700;
+      letter-spacing: 1px;
+      min-width: 4ch;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .led.neg { color: #ff6b6b; }
+    .face {
+      border: none;
+      background: transparent;
+      font-size: 1.45em;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 6px;
+      border-radius: 8px;
+      transition: background-color 0.12s ease, transform 0.08s ease;
+    }
+    .face:hover { background: var(--card-border); }
+    .face:active { transform: scale(0.9); }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(9, var(--cell));
+      grid-auto-rows: var(--cell);
+      gap: var(--gap);
+      background: var(--ms-bg);
+      border-radius: 10px;
+      padding: var(--gap);
+      width: fit-content;
+      margin: 0 auto;
+      transition: background-color 0.3s ease;
+    }
+    .cell {
+      width: var(--cell);
+      height: var(--cell);
+      border: none;
+      padding: 0;
+      font-size: calc(var(--cell) * 0.56);
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 4px;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .cell:focus { outline: none; }
+    .cell:active { transform: scale(0.92); }
+
+    /* 未揭开：凸起质感 */
+    .cell.hid {
+      background: linear-gradient(180deg, var(--ms-hid-top), var(--ms-hid-bot));
+      border: 1px solid var(--ms-hid-b);
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.14);
+    }
+    /* 已揭开：凹陷平底 */
+    .cell.rev {
+      background: var(--ms-rev);
+      box-shadow: inset 0 2px 3px var(--ms-rev-in);
+      cursor: default;
+    }
+    .cell.num { font-weight: 800; }
+    .num.n1 { color: var(--n1); }
+    .num.n2 { color: var(--n2); }
+    .num.n3 { color: var(--n3); }
+    .num.n4 { color: var(--n4); }
+    .num.n5 { color: var(--n5); }
+    .num.n6 { color: var(--n6); }
+    .num.n7 { color: var(--n7); }
+    .num.n8 { color: var(--n8); }
+
+    .cell.boom {
+      background: var(--ms-boombg);
+      color: #fff;
+      font-size: calc(var(--cell) * 0.66);
+    }
+    .cell.mine { background: var(--ms-rev); font-size: calc(var(--cell) * 0.62); }
+    .cell.wrong {
+      background: var(--ms-boombg);
+      color: #fff;
+      font-size: calc(var(--cell) * 0.6);
+    }
+    .cell.flag { font-size: calc(var(--cell) * 0.58); }
+    .cell.just { animation: rv 0.16s ease; }
+    body.mini-mode .cell.just { animation: none; }
+    @keyframes rv { 40% { transform: scale(1.14); } }
+
+    .hint { text-align: center; color: var(--text-secondary); font-size: 0.8em; margin-top: 12px; }
+    .mini-mode .hint { display: none; }
+
+    /* ========== 说明区 ========== */
+    .page-extra { margin-top: 22px; }
+    .guide {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .guide summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.95em;
+      list-style: none;
+      position: relative;
+    }
+    .guide summary::before { content: '▸'; position: absolute; left: -16px; top: 0; color: var(--primary); transition: transform 0.2s; }
+    .guide[open] summary::before { transform: rotate(90deg); }
+    .guide ul { margin: 10px 0 0 18px; color: var(--text-secondary); font-size: 0.88em; line-height: 1.9; }
+    .guide b { color: var(--text-color); }
+    .guide kbd {
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .footer-tip { text-align: center; color: var(--text-secondary); font-size: 0.82em; margin-top: 16px; line-height: 1.6; }
+    .back-link { text-align: center; margin-top: 18px; }
+    .back-link a {
+      display: inline-block;
+      padding: 9px 18px;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92em;
+      transition: background-color 0.2s ease;
+    }
+    .back-link a:hover { background: var(--primary-hover); }
+
+    .mini-mode .page-extra { display: none; }
+
+    /* ========== 弹窗 ========== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30000;
+      padding: 20px;
+    }
+    .modal.show { display: flex; }
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 26px 28px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    .modal-card h2 { font-size: 1.5em; margin-bottom: 8px; }
+    .modal-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 16px; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; }
+    .modal-btns button {
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .modal-btns button:hover { border-color: var(--primary); color: var(--primary); }
+    .modal-btns button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .modal-btns button.primary:hover { background: var(--primary-hover); color: #fff; }
+
+    /* ========== 老板键：假装写代码 ========== */
+    .fake {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      display: none;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    .fake.show { display: flex; }
+
+    .fake-top {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: #181825;
+      border-bottom: 1px solid #313244;
+      gap: 10px;
+      font-size: 0.8em;
+      color: #a6adc8;
+    }
+    .fake-dots { display: flex; gap: 6px; }
+    .fake-dots span { width: 11px; height: 11px; border-radius: 50%; }
+    .fake-dots .r { background: #f38ba8; }
+    .fake-dots .y { background: #f9e2af; }
+    .fake-dots .g { background: #a6e3a1; }
+    .fake-tab {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 3px 14px;
+      border-radius: 6px 6px 0 0;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.95em;
+    }
+    .fake-top .spacer { flex: 1; }
+    .fake-top .running { color: #a6adc8; font-size: 0.85em; }
+
+    .fake-body { flex: 1; display: flex; min-height: 0; }
+    .fake-side {
+      width: 170px;
+      background: #181825;
+      border-right: 1px solid #313244;
+      padding: 10px 0;
+      font-size: 0.8em;
+      color: #a6adc8;
+      overflow: hidden;
+      line-height: 1.9;
+    }
+    .fake-side .tree { padding: 0 12px; }
+    .fake-side .tree div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fake-side .tree .dir { color: #89b4fa; }
+    .fake-side .tree .file { padding-left: 16px; }
+    .fake-side .tree .sel {
+      background: #313244;
+      color: #cdd6f4;
+      border-radius: 4px;
+      padding-left: 8px;
+    }
+
+    .fake-editor { flex: 1; display: flex; min-width: 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.55; overflow: auto; padding-bottom: 40px; }
+    .fake-gutter { width: 46px; flex-shrink: 0; text-align: right; color: #585b70; padding: 12px 8px 0 0; user-select: none; }
+    .fake-code { flex: 1; padding: 12px 16px 0 8px; white-space: pre; min-width: 520px; }
+    .fake-code .cm { color: #6c7086; font-style: italic; }
+    .fake-code .kw { color: #cba6f7; }
+    .fake-code .tp { color: #89dceb; }
+    .fake-code .fn { color: #89b4fa; }
+    .fake-code .st { color: #a6e3a1; }
+    .fake-code .nm { color: #f9e2af; }
+    .fake-code .cur { background: rgba(137, 180, 250, 0.18); }
+    .fake-code .cur::after {
+      content: '';
+      display: inline-block;
+      width: 2px;
+      height: 13px;
+      background: #f38ba8;
+      vertical-align: text-bottom;
+      animation: blink 1s steps(1) infinite;
+      margin-left: 1px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .fake-status {
+      display: flex;
+      gap: 18px;
+      padding: 4px 14px;
+      background: #181825;
+      border-top: 1px solid #313244;
+      color: #a6adc8;
+      font-size: 0.75em;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+    .fake-status .ok { color: #a6e3a1; }
+    .fake-status .err { color: #f38ba8; }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <!-- 可切换为悬浮小窗的舞台 -->
+    <div id="stage">
+
+      <!-- 小窗拖拽条 -->
+      <div class="mini-bar" id="miniBar">
+        <span class="mini-grip">⠿</span>
+        <span class="mini-title">扫雷 · 小窗</span>
+        <button type="button" id="miniNew" title="新游戏 (N)">重开</button>
+        <button type="button" class="fake-btn" id="miniFake" title="老板来了！假装写代码 (`)">伪装</button>
+        <button type="button" id="miniExit" title="退出小窗模式 (M)">✕</button>
+      </div>
+
+      <div class="card">
+        <div class="head">
+          <div class="titles">
+            <h1>扫雷</h1>
+            <p class="tagline">揭开所有非雷格子，别踩到地雷</p>
+          </div>
+          <div class="scorebox">
+            <div class="chip"><span class="chip-label">最佳</span><span class="chip-value" id="bestVal">—</span></div>
+          </div>
+        </div>
+
+        <div class="ctrl">
+          <div class="diffs" id="diffs">
+            <button type="button" data-diff="easy" class="on">初级 9×9</button>
+            <button type="button" data-diff="medium">中级 16×16</button>
+            <button type="button" data-diff="expert">专家 16×30</button>
+          </div>
+          <button type="button" class="primary" id="newBtn">重开</button>
+          <button type="button" class="slack" id="slackBtn">🐟 摸鱼小窗 (M)</button>
+        </div>
+
+        <div class="board-box">
+          <div class="statbar">
+            <div class="led" id="ledMines">10</div>
+            <button type="button" class="face" id="faceBtn" title="重新开始">😀</button>
+            <div class="led" id="ledTime">000</div>
+          </div>
+          <div class="board" id="board"></div>
+        </div>
+
+        <p class="hint">左键揭开 · 右键/长按插旗 · 点数字且旗数匹配时自动翻开周围</p>
+      </div>
+    </div>
+
+    <div class="page-extra">
+      <details class="guide" id="guide" open>
+        <summary>玩法与摸鱼说明</summary>
+        <ul>
+          <li><b>基本规则</b>：揭开格子，数字 = 周围 8 格的地雷数；把地雷都插上旗、排清所有安全格即获胜</li>
+          <li><b>操作</b>：桌面<b>左键</b>揭开、<b>右键</b>插旗/拔旗；手机<b>点按</b>揭开、<b>长按</b>插旗；<b>点击已揭开且旗数匹配的数字</b>可一键翻开周围</li>
+          <li><b>首点保护</b>：第一次点击绝不会踩雷，会为你开辟一块安全区；右键连按可在“旗 ↔ 无标记”间切换</li>
+          <li><b>摸鱼小窗</b>：按 <kbd>M</kbd> 或点「摸鱼小窗」，页面变成可拖动的小窗口，拖到屏幕角落继续玩</li>
+          <li><b>老板键</b>：按 <kbd>`</kbd>（Esc 键下方）一键切换到「假装写代码」界面，再按 <kbd>`</kbd> 或 <kbd>Esc</kbd> 回来</li>
+          <li>每档难度的最快通关时间会自动保存在本地</li>
+        </ul>
+      </details>
+      <div class="footer-tip">💡 提示：初级 10 雷、中级 40 雷、专家 99 雷，从初级开始上手最快；高手都靠“数字 + 旗数”连锁翻开。</div>
+      <div class="back-link"><a href="./index.html">返回工具列表</a></div>
+    </div>
+  </main>
+
+  <!-- 结算弹窗 -->
+  <div class="modal" id="endModal">
+    <div class="modal-card">
+      <h2 id="endTitle">🎉 胜利！</h2>
+      <p id="endText">你排清了所有地雷。</p>
+      <div class="modal-btns">
+        <button type="button" class="primary" id="endBtn">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 老板键：假装在写代码 -->
+  <div class="fake" id="fake">
+    <div class="fake-top">
+      <div class="fake-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+      <span class="fake-tab">MainViewController.swift</span>
+      <span class="spacer"></span>
+      <span class="running">● Build Succeeded · iPhone 15 Pro</span>
+    </div>
+    <div class="fake-body">
+      <div class="fake-side">
+        <div class="tree">
+          <div class="dir">▼ HMPlayer</div>
+          <div class="file sel">MainViewController.swift</div>
+          <div class="file">PlayerView.swift</div>
+          <div class="file">RecordSession.swift</div>
+          <div class="file">SpeedPlaybackController.swift</div>
+          <div class="dir">▼ Models</div>
+          <div class="file">VideoTrack.swift</div>
+          <div class="file">CaptureConfig.swift</div>
+          <div class="dir">▼ Resources</div>
+          <div class="file">Localizable.strings</div>
+          <div class="dir">▼ Frameworks</div>
+          <div class="file">HM_Viewer.framework</div>
+        </div>
+      </div>
+      <div class="fake-editor">
+        <div class="fake-gutter" id="fakeGutter"></div>
+        <div class="fake-code" id="fakeCode"></div>
+      </div>
+    </div>
+    <div class="fake-status">
+      <span>MainViewController.swift</span>
+      <span class="ok">● Ready</span>
+      <span>行 <span id="fakeLine">28</span>，列 4</span>
+      <span>空格: 4</span>
+      <span>Swift 5.9</span>
+      <span class="err">0 错误</span>
+      <span id="fakeClock"></span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ================= 核心逻辑（纯状态、无 DOM，可单测） ================= */
+
+      var S = null;
+
+      function newState(conf) {
+        var st = {
+          conf: conf,
+          R: conf.r, C: conf.c, M: conf.m,
+          total: conf.r * conf.c,
+          grid: new Array(conf.r * conf.c).fill(0),  // -1=雷, 0..8=数字
+          flag: new Array(conf.r * conf.c).fill(0),
+          open: new Array(conf.r * conf.c).fill(0),
+          placed: false,        // 是否已布雷（首点后）
+          over: false,
+          won: false,
+          boomIdx: -1,
+          revealed: 0
+        };
+        st.nb = buildNb(st);
+        return st;
+      }
+
+      function buildNb(st) {
+        var nb = new Array(st.total);
+        for (var i = 0; i < st.total; i++) {
+          var r = Math.floor(i / st.C), c = i % st.C, arr = [];
+          for (var dr = -1; dr <= 1; dr++) {
+            for (var dc = -1; dc <= 1; dc++) {
+              if (!dr && !dc) continue;
+              var rr = r + dr, cc = c + dc;
+              if (rr < 0 || rr >= st.R || cc < 0 || cc >= st.C) continue;
+              arr.push(rr * st.C + cc);
+            }
+          }
+          nb[i] = arr;
+        }
+        return nb;
+      }
+
+      // 首点安全布雷：first 及其 8 邻域绝无雷
+      function placeMinesAt(st, first) {
+        var banned = [first];
+        var nbs = st.nb[first];
+        for (var k = 0; k < nbs.length; k++) banned.push(nbs[k]);
+        var bannedMap = {};
+        for (var b = 0; b < banned.length; b++) bannedMap[banned[b]] = true;
+
+        var pool = [];
+        for (var i = 0; i < st.total; i++) if (!bannedMap[i]) pool.push(i);
+        // Fisher–Yates
+        for (var p = pool.length - 1; p > 0; p--) {
+          var q = Math.floor(Math.random() * (p + 1));
+          var t = pool[p]; pool[p] = pool[q]; pool[q] = t;
+        }
+        for (var m = 0; m < st.M; m++) st.grid[pool[m]] = -1;
+        computeNumbers(st);
+        st.placed = true;
+      }
+
+      function computeNumbers(st) {
+        for (var i = 0; i < st.total; i++) {
+          if (st.grid[i] === -1) continue;
+          var cnt = 0, nbs = st.nb[i];
+          for (var k = 0; k < nbs.length; k++) if (st.grid[nbs[k]] === -1) cnt++;
+          st.grid[i] = cnt;
+        }
+      }
+
+      // 测试用：固定雷位直接铺盘
+      function seedMines(st, mineList) {
+        st.grid = new Array(st.total).fill(0);
+        st.flag = new Array(st.total).fill(0);
+        st.open = new Array(st.total).fill(0);
+        st.over = false; st.won = false; st.boomIdx = -1; st.revealed = 0;
+        for (var k = 0; k < mineList.length; k++) st.grid[mineList[k]] = -1;
+        computeNumbers(st);
+        st.placed = true;
+      }
+
+      function flagsAround(st, i) {
+        var nbs = st.nb[i], cnt = 0;
+        for (var k = 0; k < nbs.length; k++) if (st.flag[nbs[k]]) cnt++;
+        return cnt;
+      }
+
+      function boomAt(st, i) {
+        st.over = true;
+        st.boomIdx = i;
+      }
+
+      function checkWin(st) {
+        if (st.over) return;
+        if (st.revealed === st.total - st.M) {
+          st.over = true;
+          st.won = true;
+          // 自动为剩余地雷插旗
+          for (var i = 0; i < st.total; i++) if (st.grid[i] === -1) st.flag[i] = 1;
+        }
+      }
+
+      // 揭开一格；0 格自动洪泛展开。返回 {skip|boom}
+      function reveal(st, i) {
+        if (st.over || st.open[i] || st.flag[i]) return { skip: true };
+        if (!st.placed) placeMinesAt(st, i);
+        if (st.grid[i] === -1) { boomAt(st, i); return { boom: true }; }
+
+        var q = [i];
+        st.open[i] = 1;
+        st.revealed++;
+        while (q.length) {
+          var c = q.pop();
+          if (st.grid[c] !== 0) continue;
+          var ns = st.nb[c];
+          for (var k = 0; k < ns.length; k++) {
+            var j = ns[k];
+            if (st.open[j] || st.flag[j] || st.grid[j] === -1) continue;
+            st.open[j] = 1;
+            st.revealed++;
+            if (st.grid[j] === 0) q.push(j);
+          }
+        }
+        checkWin(st);
+        return { boom: false };
+      }
+
+      // 连锁翻开：已揭开数字格，周围旗数 == 数字时，翻开其余未标记格
+      function chordAt(st, i) {
+        if (st.over || !st.open[i] || st.grid[i] <= 0) return { skip: true };
+        if (flagsAround(st, i) !== st.grid[i]) return { skip: true };
+        var ns = st.nb[i];
+        // 若有未标记的雷在周围 → 视为点中该雷
+        for (var k = 0; k < ns.length; k++) {
+          var j = ns[k];
+          if (!st.open[j] && !st.flag[j] && st.grid[j] === -1) {
+            boomAt(st, j);
+            return { boom: true };
+          }
+        }
+        for (var k2 = 0; k2 < ns.length; k2++) {
+          var j2 = ns[k2];
+          if (!st.open[j2] && !st.flag[j2]) reveal(st, j2);
+        }
+        return { boom: false };
+      }
+
+      function toggleFlag(st, i) {
+        if (st.over || st.open[i]) return false;
+        st.flag[i] = st.flag[i] ? 0 : 1;
+        return st.flag[i] === 1;
+      }
+
+      /* ================= UI 与事件 ================= */
+
+      var CONF = {
+        easy:   { r: 9,  c: 9,  m: 10, key: 'easy' },
+        medium: { r: 16, c: 16, m: 40, key: 'medium' },
+        expert: { r: 16, c: 30, m: 99, key: 'expert' }
+      };
+      var BEST_KEY = 'tool-mine-best-';
+      var DIFF_NAME = { easy: '初级', medium: '中级', expert: '专家' };
+
+      var boardEl = document.getElementById('board');
+      var ledMines = document.getElementById('ledMines');
+      var ledTime = document.getElementById('ledTime');
+      var faceBtn = document.getElementById('faceBtn');
+      var bestVal = document.getElementById('bestVal');
+      var stage = document.getElementById('stage');
+      var endModal = document.getElementById('endModal');
+      var endTitle = document.getElementById('endTitle');
+      var endText = document.getElementById('endText');
+      var diffBtns = document.querySelectorAll('.diffs button');
+
+      var curKey = 'easy';
+      var timerId = null;
+      var sec = 0;
+      var ticking = false;
+
+      function bestFor(key) {
+        return parseInt(localStorage.getItem(BEST_KEY + key) || '0', 10);
+      }
+      function pad3(n) {
+        if (n < 0) return '-' + pad3(-n).slice(1);
+        return (n < 10 ? '00' : n < 100 ? '0' : '') + n;
+      }
+
+      /* ---------- 计时 ---------- */
+      function tick() {
+        sec++;
+        if (sec > 999) { sec = 999; }
+        ledTime.textContent = pad3(sec);
+      }
+      function startTimer() {
+        if (ticking) return;
+        ticking = true;
+        tick();
+        timerId = window.setInterval(tick, 1000);
+      }
+      function stopTimer() {
+        ticking = false;
+        if (timerId) { window.clearInterval(timerId); timerId = null; }
+      }
+
+      /* ---------- 渲染 ---------- */
+      function cellContent(i) {
+        var mine = S.grid[i] === -1;
+        if (S.flag[i]) {
+          // 游戏结束后：插在非雷上的错旗打叉
+          if (S.over && !S.won && !mine && i !== S.boomIdx) return 'cls-wrong';
+          return 'cls-flag';
+        }
+        if (S.over && mine) return i === S.boomIdx ? 'cls-boom' : 'cls-mine';
+        if (S.open[i]) {
+          return S.grid[i] > 0 ? 'n' + S.grid[i] : 'rev-empty';
+        }
+        return 'hid';
+      }
+
+      function renderAll(justIdx) {
+        boardEl.style.gridTemplateColumns = 'repeat(' + S.C + ', var(--cell))';
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < S.total; i++) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.dataset.i = i;
+          var kind = cellContent(i);
+          if (kind === 'hid') {
+            b.className = 'cell hid';
+          } else if (kind === 'cls-flag') {
+            b.className = 'cell hid flag';
+            b.textContent = '🚩';
+          } else if (kind === 'cls-wrong') {
+            b.className = 'cell rev wrong';
+            b.textContent = '❌';
+          } else if (kind === 'cls-boom') {
+            b.className = 'cell rev boom';
+            b.textContent = '💥';
+          } else if (kind === 'cls-mine') {
+            b.className = 'cell rev mine';
+            b.textContent = '💣';
+          } else if (kind === 'rev-empty') {
+            b.className = 'cell rev';
+          } else {
+            b.className = 'cell rev num ' + kind;
+            b.textContent = kind.slice(1);
+          }
+          if (justIdx === i) b.classList.add('just');
+          frag.appendChild(b);
+        }
+        boardEl.innerHTML = '';
+        boardEl.appendChild(frag);
+
+        // 状态栏
+        var flags = 0;
+        for (var f = 0; f < S.total; f++) if (S.flag[f]) flags++;
+        var left = S.M - flags;
+        ledMines.textContent = left < 0 ? '-' + pad3(-left) : pad3(left);
+        ledMines.classList.toggle('neg', left < 0);
+        faceBtn.textContent = S.over ? (S.won ? '😎' : '😵') : '😀';
+      }
+
+      /* ---------- 新局 / 换难度 ---------- */
+      function newGame() {
+        stopTimer();
+        sec = 0;
+        ticking = false;
+        ledTime.textContent = '000';
+        endModal.classList.remove('show');
+        S = newState(CONF[curKey]);
+        renderAll(-1);
+      }
+
+      function switchDiff(key) {
+        curKey = key;
+        for (var i = 0; i < diffBtns.length; i++) {
+          diffBtns[i].classList.toggle('on', diffBtns[i].dataset.diff === key);
+        }
+        showBest();
+        newGame();
+        fitBoard();
+      }
+
+      function showBest() {
+        var b = bestFor(curKey);
+        bestVal.textContent = b ? b + 's' : '—';
+      }
+
+      function finishGame() {
+        stopTimer();
+        if (S.won) {
+          var b = bestFor(curKey);
+          var record = false;
+          if (sec < b || b === 0) {
+            localStorage.setItem(BEST_KEY + curKey, String(sec));
+            record = true;
+            showBest();
+          }
+          endTitle.textContent = record ? '🏆 新纪录！' : '🎉 胜利！';
+          endText.textContent = '用时 ' + sec + ' 秒，排清了' + DIFF_NAME[curKey] + '的所有地雷' + (record ? '，刷新了最快纪录！' : '。');
+        } else {
+          endTitle.textContent = '💥 踩到地雷了';
+          endText.textContent = '坚持了 ' + sec + ' 秒。地雷都已标出，错旗打了叉，再试一次吧！';
+        }
+        renderAll(-1);
+        window.setTimeout(function () { endModal.classList.add('show'); }, 420);
+      }
+
+      /* ---------- 交互动作（统一入口） ---------- */
+      function act(i, longFlag) {
+        if (S.over) return;
+        var firstEver = !S.placed;
+        if (longFlag) {
+          if (!S.open[i]) { toggleFlag(S, i); renderAll(i); }
+          return;
+        }
+        if (!S.open[i] && !S.flag[i]) {
+          var r = reveal(S, i);
+          if (firstEver && !r.skip && !S.over) startTimer();
+          renderAll(i);
+        } else if (S.open[i] && S.grid[i] > 0) {
+          // 数字格：周围旗数 == 数字才触发连锁
+          var cd = chordAt(S, i);
+          if (!cd.skip) renderAll(i);
+        } else {
+          renderAll(-1);
+        }
+        if (S.over) finishGame();
+      }
+
+      /* ---------- 棋盘尺寸自适应 ---------- */
+      function fitBoard() {
+        var mini = document.body.classList.contains('mini-mode');
+        var availW = mini ? window.innerWidth - 88 : Math.min(window.innerWidth - 56, 1004);
+        var gap = S.C > 20 ? 2 : 3;
+        var cap = mini ? 30 : 42;
+        var cs = Math.max(14, Math.min(cap, Math.floor((availW - (S.C - 1) * gap) / S.C)));
+        if (mini) {
+          var maxByH = Math.floor((window.innerHeight - 150) / S.R);
+          cs = Math.max(14, Math.min(cs, maxByH));
+        }
+        boardEl.style.setProperty('--cell', cs + 'px');
+        boardEl.style.setProperty('--gap', gap + 'px');
+      }
+
+      /* ---------- 摸鱼小窗 / 老板键 ---------- */
+      var dragState = null;
+
+      function toggleMini() {
+        var on = document.body.classList.toggle('mini-mode');
+        var miniTitle = document.querySelector('.mini-title');
+        if (on) {
+          var r = stage.getBoundingClientRect();
+          var left = Math.max(8, window.innerWidth - r.width - 14);
+          var top = Math.max(8, window.innerHeight - r.height - 14);
+          stage.style.left = left + 'px';
+          stage.style.top = top + 'px';
+          if (miniTitle) miniTitle.textContent = 'node · dev --watch';
+        } else {
+          stage.style.left = '';
+          stage.style.top = '';
+          if (miniTitle) miniTitle.textContent = '扫雷 · 小窗';
+          exitFake();
+        }
+        fitBoard();
+      }
+
+      function enterFake() {
+        document.body.classList.add('disguised');
+        document.getElementById('fake').classList.add('show');
+        updateFakeClock();
+        document.title = 'MainViewController.swift — 编辑中';
+      }
+
+      function exitFake() {
+        document.body.classList.remove('disguised');
+        document.getElementById('fake').classList.remove('show');
+        document.title = document.title.replace(/ — 编辑中$/, '');
+      }
+
+      function updateFakeClock() {
+        var now = new Date();
+        function p2(n) { return n < 10 ? '0' + n : '' + n; }
+        var el = document.getElementById('fakeClock');
+        if (el) el.textContent = now.getMonth() + 1 + '-' + p2(now.getDate()) + ' ' + p2(now.getHours()) + ':' + p2(now.getMinutes());
+      }
+
+      /* ---------- 键盘 ---------- */
+      document.addEventListener('keydown', function (e) {
+        var code = e.code;
+        if (code === 'Backquote') {
+          e.preventDefault();
+          if (!e.repeat) {
+            var fakeOn = document.getElementById('fake').classList.contains('show');
+            if (fakeOn) exitFake(); else enterFake();
+          }
+          return;
+        }
+        if (e.key === 'Escape') {
+          if (document.getElementById('fake').classList.contains('show')) {
+            exitFake();
+            e.preventDefault();
+          }
+          return;
+        }
+        if (document.body.classList.contains('disguised')) return;
+        if (e.repeat) return;
+        var k = e.key.toLowerCase();
+        if (k === 'n') { newGame(); e.preventDefault(); }
+        else if (k === 'm') { toggleMini(); e.preventDefault(); }
+      });
+
+      /* ---------- 棋盘点击（指针事件统一处理） ---------- */
+      var down = null;       // {i, id, x, y, type, moved, longHandled}
+      var longTimer = null;
+
+      function clearLong() {
+        if (longTimer) { window.clearTimeout(longTimer); longTimer = null; }
+      }
+
+      function startLong(d) {
+        // 仅触屏长按 = 插旗/拔旗
+        if (d.type !== 'touch') return;
+        clearLong();
+        longTimer = window.setTimeout(function () {
+          longTimer = null;
+          if (!down || down.i !== d.i || down.moved || S.over) return;
+          if (d.longHandled) return;   // contextmenu 已抢先完成插旗
+          d.longHandled = true;
+          act(d.i, true);
+        }, 480);
+      }
+
+      boardEl.addEventListener('pointerdown', function (e) {
+        var cell = e.target.closest('.cell');
+        if (!cell || e.button !== 0) return;
+        var i = parseInt(cell.dataset.i, 10);
+        down = { i: i, id: e.pointerId, x: e.clientX, y: e.clientY, type: e.pointerType, moved: false, longHandled: false };
+        startLong(down);
+      });
+
+      document.addEventListener('pointermove', function (e) {
+        if (!down || e.pointerId !== down.id) return;
+        var dx = e.clientX - down.x, dy = e.clientY - down.y;
+        if (dx * dx + dy * dy > 120) { down.moved = true; clearLong(); }
+      });
+
+      function endPointer(e) {
+        if (!down || e.pointerId !== down.id) return;
+        clearLong();
+        if (e.button === 2) { down = null; return; }  // 右键交给 contextmenu
+        var d = down;
+        down = null;
+        if (d.moved || d.longHandled || d.type === 'touch' && !e.isPrimary) return;
+        act(d.i, false);
+      }
+
+      document.addEventListener('pointerup', endPointer);
+      document.addEventListener('pointercancel', function (e) {
+        if (down && e.pointerId === down.id) { clearLong(); down = null; }
+      });
+
+      // 右键 / 触屏长按弹出的系统菜单统一拦截为插旗
+      boardEl.addEventListener('contextmenu', function (e) {
+        var cell = e.target.closest('.cell');
+        if (!cell) return;
+        e.preventDefault();
+        if (S.over) return;
+        var i = parseInt(cell.dataset.i, 10);
+        if (S.open[i]) return;
+        // 触屏长按的 contextmenu 与 timer 只执行一次（去重），防止双触发把旗取消
+        if (down && down.type === 'touch' && down.i === i && !down.moved) {
+          clearLong();
+          if (!down.longHandled) {
+            down.longHandled = true;
+            toggleFlag(S, i);
+            renderAll(i);
+          }
+          return;
+        }
+        // 桌面右键
+        toggleFlag(S, i);
+        renderAll(i);
+      });
+
+      /* ---------- 按钮 ---------- */
+      var miniBar = document.getElementById('miniBar');
+      var faceEl = faceBtn;
+
+      function btn(sel, fn) { document.querySelector(sel).addEventListener('click', fn); }
+      btn('#newBtn', newGame);
+      btn('#miniNew', newGame);
+      btn('#slackBtn', toggleMini);
+      btn('#miniExit', toggleMini);
+      btn('#miniFake', enterFake);
+      btn('#endBtn', function () { endModal.classList.remove('show'); newGame(); });
+
+      faceEl.addEventListener('click', newGame);
+
+      for (var di = 0; di < diffBtns.length; di++) {
+        (function (b) {
+          b.addEventListener('click', function () { switchDiff(b.dataset.diff); });
+        })(diffBtns[di]);
+      }
+
+      // 小窗拖动
+      miniBar.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('button')) return;
+        var r = stage.getBoundingClientRect();
+        dragState = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId };
+        miniBar.setPointerCapture(e.pointerId);
+      });
+      miniBar.addEventListener('pointermove', function (e) {
+        if (!dragState || e.pointerId !== dragState.id) return;
+        var r = stage.getBoundingClientRect();
+        var w = Math.min(r.width, window.innerWidth - 16);
+        var h = Math.min(r.height, window.innerHeight - 16);
+        var left = e.clientX - dragState.dx;
+        var top = e.clientY - dragState.dy;
+        left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+        top = Math.max(8, Math.min(top, window.innerHeight - h - 8));
+        stage.style.left = left + 'px';
+        stage.style.top = top + 'px';
+      });
+      miniBar.addEventListener('pointerup', function () { dragState = null; });
+      miniBar.addEventListener('pointercancel', function () { dragState = null; });
+
+      // 窗口尺寸变化时自适应（含小窗边界收敛）
+      window.addEventListener('resize', function () {
+        fitBoard();
+        if (document.body.classList.contains('mini-mode')) {
+          var r = stage.getBoundingClientRect();
+          var left = Math.max(8, Math.min(parseFloat(stage.style.left) || 8, window.innerWidth - r.width - 8));
+          var top = Math.max(8, Math.min(parseFloat(stage.style.top) || 8, window.innerHeight - r.height - 8));
+          stage.style.left = left + 'px';
+          stage.style.top = top + 'px';
+        }
+      });
+
+      /* ---------- 伪代码编辑器 ---------- */
+      var fakeCode = [
+        ['import UIKit', 'kw'],
+        ['import AVFoundation', 'kw'],
+        [''],
+        ['final class ', 'kw'], ['MainViewController', 'tp'], [': UIViewController {', ''],
+        [''],
+        ['    private let session = AVCaptureSession()'],
+        ['    private let queue = DispatchQueue(label: ', ''], ['"capture.video"', 'st'], [')'],
+        [''],
+        ['    @IBOutlet private weak var previewView: UIView!'],
+        ['    @IBOutlet private weak var recordButton: UIButton!'],
+        [''],
+        ['    private var isRecording = false'],
+        [''],
+        ['    override func viewDidLoad() {'],
+        ['        super.viewDidLoad()'],
+        ['        configureSession()'],
+        ['        ', ''], ['// TODO: 检查麦克风权限', 'cm'],
+        ['    }'],
+        [''],
+        ['    private func configureSession() {'],
+        ['        session.beginConfiguration()'],
+        ['        session.sessionPreset = ', ''], ['"high"', 'st'], [''],
+        ['        guard let camera = AVCaptureDevice.default(for: ', ''], ['"video"', 'st'], [') else { return }'],
+        ['        do {'],
+        ['            let input = try AVCaptureDeviceInput(device: camera)'],
+        ['            if session.canAddInput(input) { session.addInput(input) }'],
+        ['        } catch {'],
+        ['            ', ''], ['// 相机初始化失败', 'cm'],
+        ['            return'],
+        ['        }'],
+        ['        session.commitConfiguration()'],
+        ['    }'],
+        [''],
+        ['    @IBAction private func toggleRecord(_ sender: UIButton) {'],
+        ['        isRecording.toggle()'],
+        ['        guard isRecording else {'],
+        ['            session.stopRunning()'],
+        ['            return'],
+        ['        }'],
+        ['        queue.async { [weak self] in'],
+        ['            self?.session.startRunning()'],
+        ['            ', ''], ['// 写入录制回调，补充落盘逻辑', 'cm'],
+        ['        }'],
+        ['    }'],
+        ['}']
+      ];
+
+      function buildFakeCode() {
+        var gutter = document.getElementById('fakeGutter');
+        var code = document.getElementById('fakeCode');
+        var ghtml = '';
+        var chtml = '';
+        for (var i = 0; i < fakeCode.length; i++) {
+          ghtml += (i + 1) + '\n';
+          var line = fakeCode[i];
+          chtml += line.map(function (seg) {
+            var text = seg[0];
+            var cls = seg[1];
+            if (cls) return '<span class="' + cls + '">' + escapeHtml(text) + '</span>';
+            return escapeHtml(text);
+          }).join('') + '\n';
+        }
+        gutter.textContent = ghtml;
+        code.innerHTML = chtml + '<span class="cur"></span>';
+      }
+
+      function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      /* ---------- 启动 ---------- */
+      buildFakeCode();
+      showBest();
+      newGame();
+      fitBoard();
+    })();
+  </script>
+</body>
+
+</html>

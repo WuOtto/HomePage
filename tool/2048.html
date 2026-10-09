@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>2048 - 合并数字小游戏</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #1a1a1a;
+      --text-secondary: #6b7280;
+      --card-bg: #ffffff;
+      --card-border: #e5e7eb;
+      --chip-bg: #f3f4f6;
+      --primary: #28a745;
+      --primary-hover: #218838;
+      --danger: #dc3545;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --shadow-lg: rgba(0, 0, 0, 0.22);
+
+      /* 棋盘尺寸（可被小窗/媒体查询覆盖） */
+      --c: 100px;
+      --g: 12px;
+      --pad: 12px;
+      --board-bg: #bbada0;
+      --cell-bg: rgba(238, 228, 218, 0.5);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #0f172a;
+        --text-color: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --card-bg: #1e293b;
+        --card-border: #334155;
+        --chip-bg: #273449;
+        --primary: #34ce57;
+        --primary-hover: #2eb951;
+        --danger: #f87171;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --shadow-lg: rgba(0, 0, 0, 0.55);
+        --board-bg: #3a3f47;
+        --cell-bg: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    /* 平板/小屏收窄格子 */
+    @media (max-width: 560px) {
+      :root { --c: 82px; --g: 9px; --pad: 9px; }
+    }
+    @media (max-width: 400px) {
+      :root { --c: 66px; --g: 8px; --pad: 8px; }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ========== 主布局 ========== */
+    .page { max-width: 560px; margin: 0 auto; }
+
+    #stage { width: fit-content; margin: 0 auto; }
+
+    /* 小窗模式：整页变为可拖动悬浮窗 */
+    .mini-mode #stage {
+      position: fixed;
+      z-index: 9998;
+      margin: 0;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      box-shadow: 0 18px 50px var(--shadow-lg);
+      overflow: hidden;
+    }
+    /* 小窗模式收窄棋盘尺寸，窗口更小巧 */
+    body.mini-mode { overflow: hidden; --c: 56px; --g: 6px; --pad: 6px; }
+    @media (max-width: 400px) {
+      body.mini-mode { --c: 46px; --g: 5px; --pad: 5px; }
+    }
+    /* 伪装界面打开时隐藏一切游戏元素 */
+    .disguised #stage,
+    .disguised .modal { visibility: hidden; }
+
+    /* ========== 小窗拖拽条 ========== */
+    .mini-bar { display: none; }
+
+    .mini-mode .mini-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      cursor: grab;
+      background: var(--chip-bg);
+      border-bottom: 1px solid var(--card-border);
+      touch-action: none;
+      font-size: 0.78em;
+      font-weight: 600;
+    }
+    .mini-mode .mini-bar:active { cursor: grabbing; }
+    .mini-grip { color: var(--text-secondary); font-size: 0.9em; letter-spacing: 1px; }
+    .mini-title { flex: 1; white-space: nowrap; }
+    .mini-bar button {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-size: 0.74em;
+      cursor: pointer;
+      line-height: 1.6;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .mini-bar button:hover { border-color: var(--primary); color: var(--primary); }
+    .mini-bar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .mini-bar button:disabled:hover { border-color: var(--card-border); color: var(--text-color); }
+    .mini-bar .fake-btn { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .mini-bar .fake-btn:hover { opacity: 0.88; color: #fff; }
+
+    /* ========== 卡片 ========== */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 20px 20px;
+      box-shadow: 0 6px 24px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .mini-mode .card { border: none; box-shadow: none; border-radius: 0; padding: 6px 7px 8px; }
+    /* 小窗模式：头部与计分更紧凑 */
+    .mini-mode .head { gap: 6px; }
+    .mini-mode .head h1 { font-size: 1.12em; }
+    .mini-mode .scorebox { gap: 5px; }
+    .mini-mode .chip { min-width: 42px; padding: 3px 8px; border-radius: 8px; }
+    .mini-mode .chip-label { font-size: 0.6em; }
+    .mini-mode .chip-value { font-size: 1em; }
+    .mini-mode .board { margin-top: 8px; border-radius: 10px; }
+    .mini-mode .bg-cell { border-radius: 6px; }
+
+    /* ========== 隐身档：小窗强制暗色灰阶，压低远距离辨识度 ========== */
+    /* 不随系统主题，小窗固定为深灰底，融入深色桌面 */
+    body.mini-mode {
+      --card-bg: #181b1f;
+      --card-border: #262a2f;
+      --chip-bg: #1d2125;
+      --text-color: #d7dbe0;
+      --text-secondary: #868d94;
+      --board-bg: #14171a;
+      --cell-bg: rgba(255, 255, 255, 0.05);
+      --shadow-lg: rgba(0, 0, 0, 0);
+    }
+    /* 去高亮描边与阴影，常态半透明，鼠标进入才变清晰 */
+    body.mini-mode #stage {
+      border-color: #2a2f35;
+      box-shadow: none;
+      opacity: 0.64;
+      transition: opacity 0.28s ease;
+    }
+    body.mini-mode #stage:hover,
+    body.mini-mode #stage:active { opacity: 1; }
+    /* 隐藏大标题区，得分压成右侧一行灰色小数字 */
+    body.mini-mode .head .titles { display: none; }
+    body.mini-mode .head { justify-content: flex-end; }
+    body.mini-mode .chip {
+      min-width: 0;
+      padding: 1px 0 1px 2px;
+      background: transparent;
+      border-color: transparent;
+    }
+    body.mini-mode .chip-label { display: none; }
+    body.mini-mode .chip-value {
+      font-size: 0.76em;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    /* 拖拽条伪装成一行终端灰字 */
+    body.mini-mode .mini-bar {
+      background: transparent;
+      border-bottom-color: #21252a;
+      padding-bottom: 3px;
+    }
+    body.mini-mode .mini-grip,
+    body.mini-mode .mini-title {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #565d64;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    body.mini-mode .mini-grip { font-size: 0.72em; }
+    body.mini-mode .mini-title { font-size: 0.66em; }
+    body.mini-mode .mini-bar button {
+      background: transparent;
+      border-color: #2a2f35;
+      color: #848b93;
+    }
+    body.mini-mode .mini-bar button:hover { border-color: #3a4149; color: #aeb6bd; }
+    body.mini-mode .mini-bar .fake-btn,
+    body.mini-mode .mini-bar .fake-btn:hover { background: transparent; color: #848b93; }
+    /* 动效收敛：合并不再弹跳、出生改纯淡入、得分不闪绿 */
+    body.mini-mode .tile i.pop { animation: none; }
+    body.mini-mode .tile i.spawn { animation: miniSpawn 0.16s ease; }
+    body.mini-mode .chip.bump .chip-value { animation: none; }
+    @keyframes miniSpawn { from { opacity: 0.1; } }
+
+    .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .head h1 { font-size: 2em; font-weight: 800; line-height: 1.1; }
+    .tagline { color: var(--text-secondary); font-size: 0.86em; margin-top: 3px; }
+    .mini-mode .tagline,
+    .mini-mode .ctrl { display: none; }
+
+    .scorebox { display: flex; gap: 8px; }
+    .chip {
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 5px 12px;
+      text-align: center;
+      min-width: 62px;
+    }
+    .chip-label { display: block; font-size: 0.7em; color: var(--text-secondary); letter-spacing: 1px; }
+    .chip-value { font-size: 1.25em; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .chip.bump .chip-value { animation: bump 0.3s ease; }
+
+    @keyframes bump { 30% { transform: scale(1.25); color: var(--primary); } }
+
+    .ctrl { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .ctrl button {
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.88em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .ctrl button:hover { border-color: var(--primary); color: var(--primary); }
+    .ctrl button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .ctrl button.primary:hover { background: var(--primary-hover); color: #fff; }
+    .ctrl button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ctrl button.slack { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .ctrl button.slack:hover { background: #b02a37; color: #fff; }
+
+    /* ========== 棋盘 ========== */
+    .board {
+      position: relative;
+      width: calc(var(--pad) * 2 + var(--c) * 4 + var(--g) * 3);
+      height: calc(var(--pad) * 2 + var(--c) * 4 + var(--g) * 3);
+      background: var(--board-bg);
+      border-radius: 12px;
+      margin: 14px auto 0;
+      touch-action: none;
+    }
+    .cells, .tiles { position: absolute; inset: 0; padding: var(--pad); }
+    .cells { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: var(--g); }
+    .bg-cell { background: var(--cell-bg); border-radius: 8px; }
+
+    .tile {
+      position: absolute;
+      width: var(--c);
+      height: var(--c);
+      will-change: transform;
+      transition: transform 0.12s ease-in-out;
+      pointer-events: none;
+    }
+    .tile i {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-weight: 800;
+      background: #eee4da;
+      color: #776e65;
+    }
+    .tile i.pop { animation: pop 0.22s ease; }
+    .tile i.spawn { animation: spawn 0.18s ease; }
+    @keyframes pop { 40% { transform: scale(1.12); } }
+    @keyframes spawn { from { transform: scale(0.3); opacity: 0.4; } }
+
+    /* 摸鱼小窗入口只在电脑端展示 */
+    @media (pointer: coarse) { .ctrl .slack { display: none; } }
+
+    .hint { text-align: center; color: var(--text-secondary); font-size: 0.8em; margin-top: 12px; }
+    .mini-mode .hint { display: none; }
+
+    /* ========== 说明区 ========== */
+    .page-extra { margin-top: 22px; }
+    .guide {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .guide summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.95em;
+      list-style: none;
+      position: relative;
+    }
+    .guide summary::before { content: '▸'; position: absolute; left: -16px; top: 0; color: var(--primary); transition: transform 0.2s; }
+    .guide[open] summary::before { transform: rotate(90deg); }
+    .guide ul { margin: 10px 0 0 18px; color: var(--text-secondary); font-size: 0.88em; line-height: 1.9; }
+    .guide kbd {
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .footer-tip { text-align: center; color: var(--text-secondary); font-size: 0.82em; margin-top: 16px; line-height: 1.6; }
+    .back-link { text-align: center; margin-top: 18px; }
+    .back-link a {
+      display: inline-block;
+      padding: 9px 18px;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92em;
+      transition: background-color 0.2s ease;
+    }
+    .back-link a:hover { background: var(--primary-hover); }
+
+    .mini-mode .page-extra { display: none; }
+
+    /* ========== 弹窗 ========== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30000;
+      padding: 20px;
+    }
+    .modal.show { display: flex; }
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 26px 28px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    .modal-card h2 { font-size: 1.5em; margin-bottom: 8px; }
+    .modal-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 16px; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; }
+    .modal-btns button {
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .modal-btns button:hover { border-color: var(--primary); color: var(--primary); }
+    .modal-btns button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .modal-btns button.primary:hover { background: var(--primary-hover); color: #fff; }
+
+    /* ========== 老板键：假装写代码 ========== */
+    .fake {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      display: none;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    .fake.show { display: flex; }
+
+    .fake-top {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: #181825;
+      border-bottom: 1px solid #313244;
+      gap: 10px;
+      font-size: 0.8em;
+      color: #a6adc8;
+    }
+    .fake-dots { display: flex; gap: 6px; }
+    .fake-dots span { width: 11px; height: 11px; border-radius: 50%; }
+    .fake-dots .r { background: #f38ba8; }
+    .fake-dots .y { background: #f9e2af; }
+    .fake-dots .g { background: #a6e3a1; }
+    .fake-tab {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 3px 14px;
+      border-radius: 6px 6px 0 0;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.95em;
+    }
+    .fake-top .spacer { flex: 1; }
+    .fake-top .running { color: #a6adc8; font-size: 0.85em; }
+
+    .fake-body { flex: 1; display: flex; min-height: 0; }
+    .fake-side {
+      width: 170px;
+      background: #181825;
+      border-right: 1px solid #313244;
+      padding: 10px 0;
+      font-size: 0.8em;
+      color: #a6adc8;
+      overflow: hidden;
+      line-height: 1.9;
+    }
+    .fake-side .tree { padding: 0 12px; }
+    .fake-side .tree div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fake-side .tree .dir { color: #89b4fa; }
+    .fake-side .tree .file { padding-left: 16px; }
+    .fake-side .tree .sel {
+      background: #313244;
+      color: #cdd6f4;
+      border-radius: 4px;
+      padding-left: 8px;
+    }
+
+    .fake-editor { flex: 1; display: flex; min-width: 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.55; overflow: auto; padding-bottom: 40px; }
+    .fake-gutter { width: 46px; flex-shrink: 0; text-align: right; color: #585b70; padding: 12px 8px 0 0; user-select: none; }
+    .fake-code { flex: 1; padding: 12px 16px 0 8px; white-space: pre; min-width: 520px; }
+    .fake-code .cm { color: #6c7086; font-style: italic; }
+    .fake-code .kw { color: #cba6f7; }
+    .fake-code .tp { color: #89dceb; }
+    .fake-code .fn { color: #89b4fa; }
+    .fake-code .st { color: #a6e3a1; }
+    .fake-code .nm { color: #f9e2af; }
+    .fake-code .cur { background: rgba(137, 180, 250, 0.18); }
+    .fake-code .cur::after {
+      content: '';
+      display: inline-block;
+      width: 2px;
+      height: 13px;
+      background: #f38ba8;
+      vertical-align: text-bottom;
+      animation: blink 1s steps(1) infinite;
+      margin-left: 1px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .fake-status {
+      display: flex;
+      gap: 18px;
+      padding: 4px 14px;
+      background: #181825;
+      border-top: 1px solid #313244;
+      color: #a6adc8;
+      font-size: 0.75em;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+    .fake-status .ok { color: #a6e3a1; }
+    .fake-status .err { color: #f38ba8; }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <!-- 可切换为悬浮小窗的舞台 -->
+    <div id="stage">
+
+      <!-- 小窗拖拽条 -->
+      <div class="mini-bar" id="miniBar">
+        <span class="mini-grip">⠿</span>
+        <span class="mini-title">2048 · 小窗</span>
+        <button type="button" id="miniUndo" title="撤销 (U)">撤销</button>
+        <button type="button" id="miniNew" title="新游戏 (N)">重开</button>
+        <button type="button" class="fake-btn" id="miniFake" title="老板来了！假装写代码 (`)">伪装</button>
+        <button type="button" id="miniExit" title="退出小窗模式 (M)">✕</button>
+      </div>
+
+      <div class="card">
+        <div class="head">
+          <div class="titles">
+            <h1>2048</h1>
+            <p class="tagline">合并相同数字，挑战 2048 方块</p>
+          </div>
+          <div class="scorebox">
+            <div class="chip" id="scoreChip"><span class="chip-label">得分</span><span class="chip-value" id="score">0</span></div>
+            <div class="chip"><span class="chip-label">最佳</span><span class="chip-value" id="best">0</span></div>
+          </div>
+        </div>
+
+        <div class="ctrl">
+          <button type="button" id="undoBtn" disabled>↶ 撤销</button>
+          <button type="button" class="primary" id="newBtn">新游戏</button>
+          <button type="button" class="slack" id="slackBtn">🐟 摸鱼小窗 (M)</button>
+        </div>
+
+        <div class="board" id="board">
+          <div class="cells" id="cells"></div>
+          <div class="tiles" id="tiles"></div>
+        </div>
+
+        <p class="hint">方向键 / WASD 移动 · 手机：在棋盘上滑动</p>
+      </div>
+    </div>
+
+    <div class="page-extra">
+      <details class="guide" id="guide" open>
+        <summary>摸鱼使用说明</summary>
+        <ul>
+          <li><b>摸鱼小窗</b>：按 <kbd>M</kbd> 或点「摸鱼小窗」，页面变成可拖动的小窗口，拖到屏幕角落继续玩</li>
+          <li><b>隐身配色</b>：小窗默认灰阶暗色 + 半透明，远处不易察觉；鼠标移到窗口上会变清晰，移开恢复低调</li>
+          <li><b>老板键</b>：按 <kbd>`</kbd>（Esc 键下方）一键切换到「假装写代码」界面，再按 <kbd>`</kbd> 或 <kbd>Esc</kbd> 回来</li>
+          <li><b>游戏操作</b>：<kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动 · <kbd>U</kbd> 撤销 · <kbd>N</kbd> 新游戏</li>
+          <li>相同数字方块碰撞会合并成它们的和，最高分自动保存在本地</li>
+        </ul>
+      </details>
+      <div class="footer-tip">💡 提示：在网页上玩的 2048 不会污染你的工作窗口，小窗拖到角落，老板键一按，谁也看不出来。</div>
+      <div class="back-link"><a href="./index.html">返回工具列表</a></div>
+    </div>
+  </main>
+
+  <!-- 胜利弹窗 -->
+  <div class="modal" id="winModal">
+    <div class="modal-card">
+      <h2>🎉 达成 2048！</h2>
+      <p id="winText">你已经合并出了 2048，太强了！</p>
+      <div class="modal-btns">
+        <button type="button" id="winContinue">继续挑战</button>
+        <button type="button" class="primary" id="winNew">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 游戏结束弹窗 -->
+  <div class="modal" id="overModal">
+    <div class="modal-card">
+      <h2>😅 游戏结束</h2>
+      <p id="overText">没有可移动的方块了，本局得分：0</p>
+      <div class="modal-btns">
+        <button type="button" id="overNew">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 老板键：假装在写代码 -->
+  <div class="fake" id="fake">
+    <div class="fake-top">
+      <div class="fake-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+      <span class="fake-tab">MainViewController.swift</span>
+      <span class="spacer"></span>
+      <span class="running">● Build Succeeded · iPhone 15 Pro</span>
+    </div>
+    <div class="fake-body">
+      <div class="fake-side">
+        <div class="tree">
+          <div class="dir">▼ HMPlayer</div>
+          <div class="file sel">MainViewController.swift</div>
+          <div class="file">PlayerView.swift</div>
+          <div class="file">RecordSession.swift</div>
+          <div class="file">SpeedPlaybackController.swift</div>
+          <div class="dir">▼ Models</div>
+          <div class="file">VideoTrack.swift</div>
+          <div class="file">CaptureConfig.swift</div>
+          <div class="dir">▼ Resources</div>
+          <div class="file">Localizable.strings</div>
+          <div class="dir">▼ Frameworks</div>
+          <div class="file">HM_Viewer.framework</div>
+        </div>
+      </div>
+      <div class="fake-editor">
+        <div class="fake-gutter" id="fakeGutter"></div>
+        <div class="fake-code" id="fakeCode"></div>
+      </div>
+    </div>
+    <div class="fake-status">
+      <span>MainViewController.swift</span>
+      <span class="ok">● Ready</span>
+      <span>行 <span id="fakeLine">28</span>，列 4</span>
+      <span>空格: 4</span>
+      <span>Swift 5.9</span>
+      <span class="err">0 错误</span>
+      <span id="fakeClock"></span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ================= DOM ================= */
+      var boardEl = document.getElementById('board');
+      var tilesEl = document.getElementById('tiles');
+      var cellsEl = document.getElementById('cells');
+      var scoreEl = document.getElementById('score');
+      var bestEl = document.getElementById('best');
+      var scoreChip = document.getElementById('scoreChip');
+      var undoBtn = document.getElementById('undoBtn');
+      var newBtn = document.getElementById('newBtn');
+      var slackBtn = document.getElementById('slackBtn');
+      var stage = document.getElementById('stage');
+      var winModal = document.getElementById('winModal');
+      var overModal = document.getElementById('overModal');
+      var overText = document.getElementById('overText');
+
+      var SIZE = 4;
+      var TOTAL = SIZE * SIZE;
+      var WIN_VALUE = 2048;
+      var BEST_KEY = 'tool-2048-best';
+
+      var grid = new Array(TOTAL).fill(0);   // 16 个格子的数值
+      var score = 0;
+      var best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+      var wonSeen = false;
+      var locked = false;                    // 动画期间锁输入
+      var undoStack = [];
+      var undoScore = [];
+
+      /* ================= 尺寸工具 ================= */
+      function metrics() {
+        var cs = getComputedStyle(boardEl);
+        var c = parseFloat(cs.getPropertyValue('--c')) || 100;
+        var g = parseFloat(cs.getPropertyValue('--g')) || 12;
+        return { c: c, g: g };
+      }
+
+      function posFor(idx) {
+        var m = metrics();
+        var row = Math.floor(idx / SIZE);
+        var col = idx % SIZE;
+        return 'translate(' + (col * (m.c + m.g)) + 'px,' + (row * (m.c + m.g)) + 'px)';
+      }
+
+      function tileColors(v) {
+        // 隐身档（摸鱼小窗）：灰阶低饱和，仅按数值分级微亮，方便贴近时读数字
+        if (document.body.classList.contains('mini-mode')) {
+          if (v >= 512) return ['#3d434a', '#c2c8cf'];
+          if (v >= 128) return ['#383e45', '#b2bac2'];
+          if (v >= 16) return ['#33383f', '#a4acb4'];
+          if (v >= 8) return ['#2f343a', '#9aa2aa'];
+          return ['#2a2e34', '#8f979f'];
+        }
+        if (v === 2) return ['#eee4da', '#776e65'];
+        if (v === 4) return ['#ede0c8', '#776e65'];
+        if (v === 8) return ['#f2b179', '#f9f6f2'];
+        if (v === 16) return ['#f59563', '#f9f6f2'];
+        if (v === 32) return ['#f67c5f', '#f9f6f2'];
+        if (v === 64) return ['#f65e3b', '#f9f6f2'];
+        if (v === 128) return ['#edcf72', '#f9f6f2'];
+        if (v === 256) return ['#edcc61', '#f9f6f2'];
+        if (v === 512) return ['#edc850', '#f9f6f2'];
+        if (v === 1024) return ['#edc53f', '#f9f6f2'];
+        if (v === 2048) return ['#edc22e', '#f9f6f2'];
+        return ['#3c3a32', '#f9f6f2'];
+      }
+
+      function fontSizeFor(v, c) {
+        if (v >= 1024) return c * 0.28;
+        if (v >= 128) return c * 0.34;
+        if (v >= 16) return c * 0.42;
+        return c * 0.46;
+      }
+
+      function paintTile(tile, v) {
+        var inner = tile.querySelector('i');
+        var colors = tileColors(v);
+        var c = metrics().c;
+        inner.style.background = colors[0];
+        inner.style.color = colors[1];
+        inner.style.fontSize = fontSizeFor(v, c) + 'px';
+        inner.textContent = v;
+        tile.dataset.v = v;
+      }
+
+      /* ================= 渲染 ================= */
+      function buildBg() {
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < TOTAL; i++) {
+          var d = document.createElement('div');
+          d.className = 'bg-cell';
+          frag.appendChild(d);
+        }
+        cellsEl.appendChild(frag);
+      }
+
+      // 依据 grid 重建所有方块。anim: 可选 {merge:[idx], spawn:idx}
+      function render(anim) {
+        tilesEl.innerHTML = '';
+        for (var i = 0; i < TOTAL; i++) {
+          var v = grid[i];
+          if (v === 0) continue;
+          var t = document.createElement('div');
+          t.className = 'tile';
+          t.dataset.idx = i;
+          t.innerHTML = '<i></i>';
+          paintTile(t, v);
+          t.style.transform = posFor(i);     // 插入前定位，避免首帧闪动
+          tilesEl.appendChild(t);
+        }
+        if (anim) {
+          var kids = tilesEl.children;
+          for (var k = 0; k < kids.length; k++) {
+            var el = kids[k];
+            var idx = parseInt(el.dataset.idx, 10);
+            if (anim.spawn === idx) {
+              var s = el.querySelector('i');
+              s.classList.add('spawn');
+            } else if (anim.merge && anim.merge.indexOf(idx) !== -1) {
+              var p = el.querySelector('i');
+              p.classList.add('pop');
+            }
+          }
+        }
+      }
+
+      // 布局变化（小窗切换/窗口缩放）后，重算所有方块位置与字号
+      function relayout() {
+        var kids = tilesEl.children;
+        for (var k = 0; k < kids.length; k++) {
+          var el = kids[k];
+          el.style.transform = posFor(parseInt(el.dataset.idx, 10));
+          var inner = el.querySelector('i');
+          var c = metrics().c;
+          inner.style.fontSize = fontSizeFor(parseInt(el.dataset.v, 10), c) + 'px';
+        }
+      }
+
+      /* ================= 移动算法 ================= */
+      // 每条“线”上从靠近目标边到远离目标边的格子索引
+      function linesFor(dir) {
+        var lines = [];
+        var i, j;
+        if (dir === 'left') {
+          for (i = 0; i < SIZE; i++) { var l = []; for (j = 0; j < SIZE; j++) l.push(i * SIZE + j); lines.push(l); }
+        } else if (dir === 'right') {
+          for (i = 0; i < SIZE; i++) { var r = []; for (j = SIZE - 1; j >= 0; j--) r.push(i * SIZE + j); lines.push(r); }
+        } else if (dir === 'up') {
+          for (i = 0; i < SIZE; i++) { var u = []; for (j = 0; j < SIZE; j++) u.push(j * SIZE + i); lines.push(u); }
+        } else {
+          for (i = 0; i < SIZE; i++) { var d = []; for (j = SIZE - 1; j >= 0; j--) d.push(j * SIZE + i); lines.push(d); }
+        }
+        return lines;
+      }
+
+      // 核心：计算一次方向移动。返回 null 表示该方向无效。
+      // next: 移动后的数值数组；moves: 动画 {from,to}（含被合并的“受害者”滑向目标格）；
+      // mergeCells: 发生合并的目标格；gain: 本步得分。
+      function computeMove(dir) {
+        var next = new Array(TOTAL).fill(0);
+        var owners = new Array(TOTAL).fill(-1);
+        var moves = [];
+        var mergeCells = [];
+        var gain = 0;
+        var moved = false;
+        var lines = linesFor(dir);
+
+        for (var li = 0; li < lines.length; li++) {
+          var line = lines[li];
+          var vals = [], own = [];
+          for (var p = 0; p < line.length; p++) {
+            var idx = line[p];
+            if (grid[idx] !== 0) { vals.push(grid[idx]); own.push(idx); }
+          }
+
+          // 沿“靠近目标边优先”的顺序就地合并，记录每段输出是否由合并产生
+          var outV = [], outO = [], outMerge = [];
+          var pairs = [];   // 合并对 {sur, vic}，顺序与 outMerge 中的 true 一一对应
+          var i2 = 0;
+          while (i2 < vals.length) {
+            if (i2 + 1 < vals.length && vals[i2] === vals[i2 + 1]) {
+              outV.push(vals[i2] * 2);
+              outO.push(own[i2]);
+              outMerge.push(true);
+              pairs.push({ sur: own[i2], vic: own[i2 + 1] });
+              gain += vals[i2] * 2;
+              i2 += 2;
+            } else {
+              outV.push(vals[i2]);
+              outO.push(own[i2]);
+              outMerge.push(false);
+              i2 += 1;
+            }
+          }
+
+          // 分配到该线的目标格（靠近目标边优先）
+          var pairIdx = 0;
+          for (var s = 0; s < line.length; s++) {
+            var target = line[s];
+            if (s < outV.length) {
+              next[target] = outV[s];
+              owners[target] = outO[s];
+              if (outMerge[s]) {
+                // 合并产生的格子：幸存者与受害者都滑到 target
+                mergeCells.push(target);
+                moves.push({ from: pairs[pairIdx].sur, to: target });
+                moves.push({ from: pairs[pairIdx].vic, to: target });
+                pairIdx++;
+              } else if (outO[s] !== target) {
+                moves.push({ from: outO[s], to: target });
+                moved = true;
+              }
+            } else {
+              next[target] = 0;
+              owners[target] = -1;
+            }
+          }
+        }
+
+        // 没有任何数值变化也没有滑动，说明方向无效
+        var anyDiff = false;
+        for (var ci = 0; ci < TOTAL; ci++) {
+          if (next[ci] !== grid[ci]) { anyDiff = true; break; }
+        }
+        if (!anyDiff && !moved && mergeCells.length === 0) return null;
+
+        return { next: next, moves: moves, mergeCells: mergeCells, gain: gain };
+      }
+
+      /* ================= 游戏控制 ================= */
+      function hasEmpty() {
+        for (var i = 0; i < TOTAL; i++) if (grid[i] === 0) return true;
+        return false;
+      }
+
+      function canMergeAny() {
+        for (var i = 0; i < TOTAL; i++) {
+          var v = grid[i];
+          if (v === 0) continue;
+          var r = Math.floor(i / SIZE), c = i % SIZE;
+          if (c + 1 < SIZE && grid[i + 1] === v) return true;
+          if (r + 1 < SIZE && grid[i + SIZE] === v) return true;
+        }
+        return false;
+      }
+
+      function spawnTile() {
+        var empties = [];
+        for (var i = 0; i < TOTAL; i++) if (grid[i] === 0) empties.push(i);
+        if (empties.length === 0) return -1;
+        var idx = empties[Math.floor(Math.random() * empties.length)];
+        grid[idx] = Math.random() < 0.9 ? 2 : 4;
+        return idx;
+      }
+
+      function updateScoreUI() {
+        scoreEl.textContent = score;
+        if (score > best) {
+          best = score;
+          localStorage.setItem(BEST_KEY, String(best));
+        }
+        bestEl.textContent = best;
+        undoBtn.disabled = undoStack.length === 0;
+        var mb = document.getElementById('miniUndo');
+        if (mb) mb.disabled = undoStack.length === 0;
+      }
+
+      function bumpScore() {
+        scoreChip.classList.remove('bump');
+        void scoreChip.offsetWidth;
+        scoreChip.classList.add('bump');
+      }
+
+      function hideModals() {
+        winModal.classList.remove('show');
+        overModal.classList.remove('show');
+      }
+
+      function endCheck() {
+        if (!hasEmpty() && !canMergeAny()) {
+          overText.textContent = '没有可移动的方块了，本局得分：' + score;
+          overModal.classList.add('show');
+          return;
+        }
+        if (!wonSeen) {
+          for (var i = 0; i < TOTAL; i++) {
+            if (grid[i] >= WIN_VALUE) {
+              wonSeen = true;
+              winModal.classList.add('show');
+              break;
+            }
+          }
+        }
+      }
+
+      function move(dir) {
+        if (locked) return;
+        if (winModal.classList.contains('show') || overModal.classList.contains('show')) return;
+        var plan = computeMove(dir);
+        if (!plan) return;
+
+        // 快照供撤销
+        undoStack.push(grid.slice());
+        undoScore.push(score);
+        if (undoStack.length > 64) { undoStack.shift(); undoScore.shift(); }
+
+        // 动画阶段：旧方块按 moves 滑动
+        var byIdx = {};
+        var kids = tilesEl.children;
+        for (var k = 0; k < kids.length; k++) {
+          byIdx[parseInt(kids[k].dataset.idx, 10)] = kids[k];
+        }
+        locked = true;
+        var seen = {};
+        for (var m = 0; m < plan.moves.length; m++) {
+          var mv = plan.moves[m];
+          var el = byIdx[mv.from];
+          if (!el) continue;
+          el.style.transform = posFor(mv.to);
+          seen[mv.from] = true;
+        }
+
+        window.setTimeout(function () {
+          grid = plan.next;
+          score += plan.gain;
+          var spawnIdx = spawnTile();
+          render({ merge: plan.mergeCells, spawn: spawnIdx });
+          updateScoreUI();
+          if (plan.gain > 0) bumpScore();
+          hideModals();
+          endCheck();
+          locked = false;
+        }, 125);
+      }
+
+      function undo() {
+        if (locked) return;
+        if (undoStack.length === 0) return;
+        grid = undoStack.pop();
+        score = undoScore.pop();
+        wonSeen = false;
+        hideModals();
+        render(null);
+        updateScoreUI();
+        if (!hasEmpty() && !canMergeAny()) endCheck();
+      }
+
+      function newGame() {
+        grid = new Array(TOTAL).fill(0);
+        score = 0;
+        wonSeen = false;
+        undoStack = [];
+        undoScore = [];
+        hideModals();
+        var a = spawnTile();
+        var b = spawnTile();
+        render(null);
+        updateScoreUI();
+        if (a !== -1 || b !== -1) { /* 已渲染 */ }
+      }
+
+      /* ================= 小窗/老板键 ================= */
+      var dragState = null;
+
+      function toggleMini() {
+        var on = document.body.classList.toggle('mini-mode');
+        var miniTitle = document.querySelector('.mini-title');
+        if (on) {
+          var r = stage.getBoundingClientRect();
+          var left = Math.max(8, window.innerWidth - r.width - 14);
+          var top = Math.max(8, window.innerHeight - r.height - 14);
+          stage.style.left = left + 'px';
+          stage.style.top = top + 'px';
+          if (miniTitle) miniTitle.textContent = 'node · dev --watch';
+        } else {
+          stage.style.left = '';
+          stage.style.top = '';
+          if (miniTitle) miniTitle.textContent = '2048 · 小窗';
+          exitFake();
+        }
+        render(null);   // 小窗切换隐身档后按灰阶重绘方块
+        window.setTimeout(relayout, 0);
+      }
+
+      function enterFake() {
+        document.body.classList.add('disguised');
+        document.getElementById('fake').classList.add('show');
+        updateFakeClock();
+        document.title = 'MainViewController.swift — 编辑中';
+      }
+
+      function exitFake() {
+        document.body.classList.remove('disguised');
+        document.getElementById('fake').classList.remove('show');
+        document.title = document.title.replace(/ — 编辑中$/, '');
+      }
+
+      function updateFakeClock() {
+        var now = new Date();
+        function p2(n) { return n < 10 ? '0' + n : '' + n; }
+        var el = document.getElementById('fakeClock');
+        if (el) el.textContent = now.getMonth() + 1 + '-' + p2(now.getDate()) + ' ' + p2(now.getHours()) + ':' + p2(now.getMinutes());
+      }
+
+      /* ================= 事件 ================= */
+      function dirFromKey(key) {
+        key = key.toLowerCase();
+        if (key === 'arrowup' || key === 'w') return 'up';
+        if (key === 'arrowdown' || key === 's') return 'down';
+        if (key === 'arrowleft' || key === 'a') return 'left';
+        if (key === 'arrowright' || key === 'd') return 'right';
+        return null;
+      }
+
+      document.addEventListener('keydown', function (e) {
+        var dir = dirFromKey(e.key);
+        if (dir) {
+          e.preventDefault();
+          if (!document.body.classList.contains('disguised')) move(dir);
+          return;
+        }
+        var code = e.code;
+        if (code === 'Backquote') {
+          e.preventDefault();
+          if (!e.repeat) {
+            var fakeOn = document.getElementById('fake').classList.contains('show');
+            if (fakeOn) exitFake(); else enterFake();
+          }
+          return;
+        }
+        if (e.key === 'Escape') {
+          if (document.getElementById('fake').classList.contains('show')) {
+            exitFake();
+            e.preventDefault();
+          }
+          return;
+        }
+        if (document.body.classList.contains('disguised')) return;
+        if (e.repeat) return;
+        var k = e.key.toLowerCase();
+        if (k === 'u') { undo(); e.preventDefault(); }
+        else if (k === 'n') { newGame(); e.preventDefault(); }
+        else if (k === 'm') { toggleMini(); e.preventDefault(); }
+      });
+
+      // 触屏滑动
+      var touchStart = null;
+      boardEl.addEventListener('touchstart', function (e) {
+        if (e.touches.length === 1) {
+          touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+      }, { passive: true });
+      boardEl.addEventListener('touchend', function (e) {
+        if (!touchStart) return;
+        var dx = e.changedTouches[0].clientX - touchStart.x;
+        var dy = e.changedTouches[0].clientY - touchStart.y;
+        touchStart = null;
+        var ax = Math.abs(dx), ay = Math.abs(dy);
+        if (Math.max(ax, ay) < 18) return;
+        var dir = ax > ay ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+        move(dir);
+      }, { passive: true });
+
+      // 顶栏按钮
+      undoBtn.addEventListener('click', undo);
+      newBtn.addEventListener('click', newGame);
+      slackBtn.addEventListener('click', toggleMini);
+      document.getElementById('miniUndo').addEventListener('click', undo);
+      document.getElementById('miniNew').addEventListener('click', newGame);
+      document.getElementById('miniExit').addEventListener('click', toggleMini);
+      document.getElementById('miniFake').addEventListener('click', enterFake);
+
+      // 弹窗按钮
+      document.getElementById('winContinue').addEventListener('click', function () { winModal.classList.remove('show'); });
+      document.getElementById('winNew').addEventListener('click', function () { winModal.classList.remove('show'); newGame(); });
+      document.getElementById('overNew').addEventListener('click', function () { overModal.classList.remove('show'); newGame(); });
+
+      // 小窗拖动
+      var miniBar = document.getElementById('miniBar');
+      miniBar.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('button')) return;
+        var r = stage.getBoundingClientRect();
+        dragState = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId };
+        miniBar.setPointerCapture(e.pointerId);
+      });
+      miniBar.addEventListener('pointermove', function (e) {
+        if (!dragState || e.pointerId !== dragState.id) return;
+        var r = stage.getBoundingClientRect();
+        var w = Math.min(r.width, window.innerWidth - 16);
+        var h = Math.min(r.height, window.innerHeight - 16);
+        var left = e.clientX - dragState.dx;
+        var top = e.clientY - dragState.dy;
+        left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+        top = Math.max(8, Math.min(top, window.innerHeight - h - 8));
+        stage.style.left = left + 'px';
+        stage.style.top = top + 'px';
+      });
+      miniBar.addEventListener('pointerup', function () { dragState = null; });
+      miniBar.addEventListener('pointercancel', function () { dragState = null; });
+
+      // 伪代码编辑器：行号 + 代码
+      var fakeCode = [
+        ['import UIKit', 'kw'],
+        ['import AVFoundation', 'kw'],
+        [''],
+        ['final class ', 'kw'], ['MainViewController', 'tp'], [': UIViewController {', ''],
+        [''],
+        ['    private let session = AVCaptureSession()'],
+        ['    private let queue = DispatchQueue(label: ', ''], ['"capture.video"', 'st'], [')'],
+        [''],
+        ['    @IBOutlet private weak var previewView: UIView!'],
+        ['    @IBOutlet private weak var recordButton: UIButton!'],
+        [''],
+        ['    private var isRecording = false'],
+        [''],
+        ['    override func viewDidLoad() {'],
+        ['        super.viewDidLoad()'],
+        ['        configureSession()'],
+        ['        ', ''], ['// TODO: 检查麦克风权限', 'cm'],
+        ['    }'],
+        [''],
+        ['    private func configureSession() {'],
+        ['        session.beginConfiguration()'],
+        ['        session.sessionPreset = ', ''], ['"high"', 'st'], [''],
+        ['        guard let camera = AVCaptureDevice.default(for: ', ''], ['"video"', 'st'], [') else { return }'],
+        ['        do {'],
+        ['            let input = try AVCaptureDeviceInput(device: camera)'],
+        ['            if session.canAddInput(input) { session.addInput(input) }'],
+        ['        } catch {'],
+        ['            ', ''], ['// 相机初始化失败', 'cm'],
+        ['            return'],
+        ['        }'],
+        ['        session.commitConfiguration()'],
+        ['    }'],
+        [''],
+        ['    @IBAction private func toggleRecord(_ sender: UIButton) {'],
+        ['        isRecording.toggle()'],
+        ['        guard isRecording else {'],
+        ['            session.stopRunning()'],
+        ['            return'],
+        ['        }'],
+        ['        queue.async { [weak self] in'],
+        ['            self?.session.startRunning()'],
+        ['            ', ''], ['// 写入录制回调，补充落盘逻辑', 'cm'],
+        ['        }'],
+        ['    }'],
+        ['}']
+      ];
+
+      function buildFakeCode() {
+        var gutter = document.getElementById('fakeGutter');
+        var code = document.getElementById('fakeCode');
+        var ghtml = '';
+        var chtml = '';
+        for (var i = 0; i < fakeCode.length; i++) {
+          ghtml += (i + 1) + '\n';
+          var line = fakeCode[i];
+          var segments = line;
+          chtml += segments.map(function (seg) {
+            var text = seg[0];
+            var cls = seg[1];
+            if (cls) return '<span class="' + cls + '">' + escapeHtml(text) + '</span>';
+            return escapeHtml(text);
+          }).join('') + '\n';
+        }
+        gutter.textContent = ghtml;
+        code.innerHTML = chtml + '<span class="cur"></span>';
+      }
+
+      function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      // 窗口尺寸变化时重排（含小窗边界收敛）
+      window.addEventListener('resize', function () {
+        relayout();
+        if (document.body.classList.contains('mini-mode')) {
+          var r = stage.getBoundingClientRect();
+          var left = Math.max(8, Math.min(parseFloat(stage.style.left) || 8, window.innerWidth - r.width - 8));
+          var top = Math.max(8, Math.min(parseFloat(stage.style.top) || 8, window.innerHeight - r.height - 8));
+          stage.style.left = left + 'px';
+          stage.style.top = top + 'px';
+        }
+      });
+
+      /* ================= 启动 ================= */
+      bestEl.textContent = best;
+      buildBg();
+      buildFakeCode();
+      newGame();
+    })();
+  </script>
+</body>
+
+</html>

@@ -219,7 +219,7 @@
 <body>
   <div class="container">
     <h1>日期时间计算器</h1>
-    <p class="subtitle">计算日期间隔、日期加减、工作日计算</p>
+    <p class="subtitle">计算日期间隔、日期加减、工作日计算、秒数转时分秒</p>
 
     <!-- 日期间隔计算 -->
     <div class="calculator-card">
@@ -275,6 +275,24 @@
         总计 <span id="workdayTotal">0</span> 天，
         工作日 <span id="workdayCount">0</span> 天，
         周末 <span id="weekendCount">0</span> 天
+      </div>
+    </div>
+
+    <!-- 秒数转时分秒 -->
+    <div class="calculator-card">
+      <h2>秒数转时分秒</h2>
+      <div class="calc-row">
+        <input type="number" id="secondsInput" placeholder="输入秒数" min="0" style="flex: 1; min-width: 150px; width: auto;" />
+        <span class="separator">秒</span>
+        <button class="btn-calc" onclick="convertSeconds()">转换</button>
+      </div>
+      <div id="secondsResult" class="result-box">
+        <div><span id="hmsFormat">-</span></div>
+        <div class="result-detail">
+          小时：<span id="hoursOnly">0</span> 小时<br/>
+          分钟：<span id="minutesOnly">0</span> 分钟<br/>
+          秒数：<span id="secondsOnly">0</span> 秒
+        </div>
       </div>
     </div>
 
@@ -420,6 +438,31 @@
       document.getElementById('weekendCount').textContent = weekends;
 
       document.getElementById('workdayResult').classList.add('show');
+    }
+
+    // 秒数转时分秒
+    function convertSeconds() {
+      const totalSeconds = parseInt(document.getElementById('secondsInput').value);
+
+      if (isNaN(totalSeconds) || totalSeconds < 0) {
+        alert('请输入有效的秒数');
+        return;
+      }
+
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      const hmsStr = `${hours} 小时 ${minutes} 分 ${seconds} 秒`;
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const totalHours = (totalSeconds / 3600).toFixed(2);
+
+      document.getElementById('hmsFormat').textContent = hmsStr;
+      document.getElementById('hoursOnly').textContent = totalHours;
+      document.getElementById('minutesOnly').textContent = totalMinutes;
+      document.getElementById('secondsOnly').textContent = totalSeconds;
+
+      document.getElementById('secondsResult').classList.add('show');
     }
 
     // 页面加载时初始化

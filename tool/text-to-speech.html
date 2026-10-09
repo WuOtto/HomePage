@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文本朗读工具</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --input-bg: #ffffff;
+      --input-border: #cccccc;
+      --input-focus: #28a745;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary-bg: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --error-color: #dc3545;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --input-focus: #34ce57;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary-bg: #6c757d;
+        --button-secondary-hover: #7a8288;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --error-color: #ff6b6b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    .converter-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      font-size: 1.1em;
+    }
+
+    .input-group textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      line-height: 1.6;
+      border: 2px solid var(--input-border);
+      border-radius: 5px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease, background-color 0.3s ease;
+      resize: vertical;
+      min-height: 160px;
+    }
+
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--input-focus);
+    }
+
+    .char-count {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 18px;
+      margin: 20px 0;
+      padding: 18px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .control-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .control-item label {
+      font-weight: bold;
+      white-space: nowrap;
+      color: var(--text-color);
+    }
+
+    .control-item select {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 1em;
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      cursor: pointer;
+    }
+
+    .control-item select:focus {
+      outline: none;
+      border-color: var(--input-focus);
+    }
+
+    .set-default-btn {
+      flex: 0 0 auto;
+      min-width: auto;
+      padding: 8px 14px;
+      font-size: 0.9em;
+    }
+
+    .slider-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .slider-control label {
+      font-weight: bold;
+      white-space: nowrap;
+      color: var(--text-color);
+    }
+
+    .slider-control input[type="range"] {
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .slider-value {
+      min-width: 60px;
+      text-align: right;
+      color: var(--text-secondary);
+      font-family: 'Courier New', monospace;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button.action-btn {
+      flex: 1;
+      min-width: 110px;
+      padding: 12px 20px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button.action-btn:hover {
+      background: var(--button-hover);
+    }
+
+    button.action-btn:active {
+      transform: scale(0.98);
+    }
+
+    button.action-btn.secondary {
+      background: var(--button-secondary-bg);
+    }
+
+    button.action-btn.secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    button.action-btn.play {
+      background: #007bff;
+    }
+
+    button.action-btn.play:hover {
+      background: #0069d9;
+    }
+
+    button.action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status-bar {
+      margin-top: 15px;
+      padding: 10px 14px;
+      border-radius: 5px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-secondary);
+      font-size: 0.9em;
+      min-height: 20px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .status-bar.error {
+      color: var(--error-color);
+      border-color: var(--error-color);
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--button-bg);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .info-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .info-section h3 {
+      margin-top: 0;
+      color: var(--text-color);
+    }
+
+    .info-section ul {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .converter-container {
+        padding: 20px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button.action-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>文本朗读工具</h1>
+  <p class="subtitle">输入文本，调用浏览器语音合成（SpeechSynthesis）朗读出来</p>
+
+  <div class="converter-container">
+    <div class="input-group">
+      <label for="text-input">输入要朗读的文本</label>
+      <textarea id="text-input" placeholder="在此输入或粘贴文本，然后点击「开始朗读」…"></textarea>
+      <div class="char-count"><span id="char-count">0</span> 个字符</div>
+    </div>
+
+    <div class="control-panel">
+      <div class="control-item">
+        <label for="voice-select">语音</label>
+        <select id="voice-select"></select>
+        <button class="action-btn secondary set-default-btn" id="set-default-btn" onclick="setDefaultVoice()" title="将当前选中的语音设为默认音色">设为默认</button>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <div class="slider-control">
+        <label for="rate">语速</label>
+        <input type="range" id="rate" min="0.5" max="2" value="1" step="0.1">
+        <span class="slider-value" id="rate-value">1.0×</span>
+      </div>
+      <div class="slider-control">
+        <label for="pitch">音调</label>
+        <input type="range" id="pitch" min="0" max="2" value="1" step="0.1">
+        <span class="slider-value" id="pitch-value">1.0</span>
+      </div>
+      <div class="slider-control">
+        <label for="volume">音量</label>
+        <input type="range" id="volume" min="0" max="1" value="1" step="0.1">
+        <span class="slider-value" id="volume-value">100%</span>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="action-btn play" id="play-btn" onclick="toggleSpeak()">开始朗读</button>
+      <button class="action-btn secondary" id="pause-btn" onclick="togglePause()" disabled>暂停</button>
+      <button class="action-btn secondary" onclick="stopSpeak()">停止</button>
+    </div>
+
+    <div class="status-bar" id="status-bar">就绪</div>
+  </div>
+
+  <div class="info-section">
+    <h3>使用说明</h3>
+    <ul>
+      <li>在文本框中输入或粘贴任意文本，点击<strong>开始朗读</strong>即可听到朗读声音</li>
+      <li><strong>语音</strong>：选择不同的朗读声音（如中文、英文等），列表随浏览器可用语音自动加载</li>
+      <li><strong>设为默认</strong>：选中喜欢的语音后点击，会把它保存为默认音色；下次打开页面自动选中该音色（保存在浏览器本地）</li>
+      <li><strong>语速 / 音调 / 音量</strong>：实时调节朗读的速度、音高和声音大小</li>
+      <li><strong>暂停 / 继续</strong>：朗读过程中可暂停，再次点击继续；<strong>停止</strong>会结束本次朗读</li>
+      <li>朗读功能依赖浏览器的 <code>SpeechSynthesis</code> 接口，部分浏览器或设备可能不支持或有声库限制</li>
+      <li>首次朗读需在页面上点击按钮触发（浏览器要求用户交互后才能播放声音）</li>
+    </ul>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="./index.html" class="back-link">返回工具列表</a>
+  </div>
+
+  <div class="toast" id="toast">提示</div>
+
+  <script>
+    const textInput = document.getElementById('text-input');
+    const charCount = document.getElementById('char-count');
+    const voiceSelect = document.getElementById('voice-select');
+    const rateSlider = document.getElementById('rate');
+    const pitchSlider = document.getElementById('pitch');
+    const volumeSlider = document.getElementById('volume');
+    const rateValue = document.getElementById('rate-value');
+    const pitchValue = document.getElementById('pitch-value');
+    const volumeValue = document.getElementById('volume-value');
+    const playBtn = document.getElementById('play-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const statusBar = document.getElementById('status-bar');
+
+    const synth = window.speechSynthesis;
+    const DEFAULT_VOICE_KEY = 'tts-default-voice';
+    let voices = [];
+    let isSpeaking = false;
+    let isPaused = false;
+    let lastUtterance = null;
+
+    // 读取用户保存的默认音色标识（voice 的 name+lang）
+    function getDefaultVoiceId() {
+      try {
+        return localStorage.getItem(DEFAULT_VOICE_KEY);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // 根据保存的标识在 voices 中查找索引
+    function findVoiceIndexById(id) {
+      if (!id) return -1;
+      // 精确匹配存储的标识
+      let idx = voices.findIndex(v => (v.name + '|' + v.lang) === id);
+      if (idx >= 0) return idx;
+      // 退而求其次：仅按 name 匹配
+      idx = voices.findIndex(v => v.name === id.split('|')[0]);
+      return idx;
+    }
+
+    function setDefaultVoice() {
+      const index = parseInt(voiceSelect.value, 10);
+      if (isNaN(index) || !voices[index]) {
+        showToast('请先选择语音');
+        return;
+      }
+      const v = voices[index];
+      const id = v.name + '|' + v.lang;
+      try {
+        localStorage.setItem(DEFAULT_VOICE_KEY, id);
+        showToast('已将「' + v.name + '」设为默认音色');
+      } catch (e) {
+        showToast('保存失败，浏览器可能禁用了本地存储');
+      }
+    }
+
+    function supportsSpeech() {
+      return 'speechSynthesis' in window;
+    }
+
+    function showStatus(message, isError) {
+      statusBar.textContent = message;
+      statusBar.classList.toggle('error', !!isError);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function loadVoices() {
+      voices = synth.getVoices();
+      if (!voices.length) return;
+
+      const current = voiceSelect.value;
+      voiceSelect.innerHTML = '';
+
+      // 优先按语言分组，便于查找中文等语音
+      voices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        const label = voice.name + (voice.lang ? ' (' + voice.lang + ')' : '');
+        option.textContent = label;
+        option.value = index;
+        voiceSelect.appendChild(option);
+      });
+
+      // 默认选择顺序：1) 用户保存的默认音色  2) 中文语音  3) 保留当前选择
+      const savedId = getDefaultVoiceId();
+      const savedIndex = findVoiceIndexById(savedId);
+      if (savedIndex >= 0) {
+        voiceSelect.value = savedIndex;
+      } else {
+        const zhIndex = voices.findIndex(v => /zh|cmn|chinese/i.test(v.lang + v.name));
+        if (zhIndex >= 0) {
+          voiceSelect.value = zhIndex;
+        } else if (current) {
+          voiceSelect.value = current;
+        }
+      }
+    }
+
+    function buildUtterance() {
+      const text = textInput.value.trim();
+      const utter = new SpeechSynthesisUtterance(text);
+      const voiceIndex = parseInt(voiceSelect.value, 10);
+      if (!isNaN(voiceIndex) && voices[voiceIndex]) {
+        utter.voice = voices[voiceIndex];
+        utter.lang = voices[voiceIndex].lang;
+      }
+      utter.rate = parseFloat(rateSlider.value);
+      utter.pitch = parseFloat(pitchSlider.value);
+      utter.volume = parseFloat(volumeSlider.value);
+
+      utter.onstart = () => {
+        isSpeaking = true;
+        isPaused = false;
+        playBtn.textContent = '重新朗读';
+        playBtn.disabled = false;
+        pauseBtn.disabled = false;
+        pauseBtn.textContent = '暂停';
+        showStatus('正在朗读…');
+      };
+
+      utter.onpause = () => {
+        isPaused = true;
+        pauseBtn.textContent = '继续';
+        showStatus('已暂停');
+      };
+
+      utter.onresume = () => {
+        isPaused = false;
+        pauseBtn.textContent = '暂停';
+        showStatus('正在朗读…');
+      };
+
+      utter.onend = () => {
+        isSpeaking = false;
+        isPaused = false;
+        playBtn.textContent = '开始朗读';
+        pauseBtn.disabled = true;
+        pauseBtn.textContent = '暂停';
+        showStatus('朗读结束');
+        lastUtterance = null;
+      };
+
+      utter.onerror = (event) => {
+        // interrupted 通常是被新的朗读指令（重播/取消）或浏览器语音列表刷新打断，
+        // 属于正常操作流程，不当作错误提示
+        if (event.error === 'interrupted') {
+          isSpeaking = false;
+          isPaused = false;
+          pauseBtn.disabled = true;
+          return;
+        }
+        isSpeaking = false;
+        isPaused = false;
+        playBtn.textContent = '开始朗读';
+        pauseBtn.disabled = true;
+        showStatus('朗读出错：' + (event.error || '未知错误'), true);
+      };
+
+      return utter;
+    }
+
+    function toggleSpeak() {
+      if (!supportsSpeech()) {
+        showStatus('当前浏览器不支持语音合成（SpeechSynthesis）功能', true);
+        return;
+      }
+
+      const text = textInput.value.trim();
+      if (!text) {
+        showStatus('请先输入要朗读的文本', true);
+        textInput.focus();
+        return;
+      }
+
+      // 如果正在朗读，先停止再重新开始（即“重新朗读”）
+      synth.cancel();
+
+      const utter = buildUtterance();
+      lastUtterance = utter;
+      // 部分浏览器需要先 resume 才能正常播放
+      if (synth.paused) synth.resume();
+      synth.speak(utter);
+    }
+
+    function togglePause() {
+      if (!supportsSpeech()) return;
+      if (!isSpeaking) return;
+
+      if (isPaused) {
+        synth.resume();
+      } else {
+        synth.pause();
+      }
+    }
+
+    function stopSpeak() {
+      if (!supportsSpeech()) return;
+      synth.cancel();
+      isSpeaking = false;
+      isPaused = false;
+      playBtn.textContent = '开始朗读';
+      pauseBtn.disabled = true;
+      pauseBtn.textContent = '暂停';
+      showStatus('已停止');
+      lastUtterance = null;
+    }
+
+    // 事件绑定
+    textInput.addEventListener('input', () => {
+      charCount.textContent = textInput.value.length;
+    });
+
+    rateSlider.addEventListener('input', () => {
+      rateValue.textContent = parseFloat(rateSlider.value).toFixed(1) + '×';
+      if (lastUtterance) lastUtterance.rate = parseFloat(rateSlider.value);
+    });
+
+    pitchSlider.addEventListener('input', () => {
+      pitchValue.textContent = parseFloat(pitchSlider.value).toFixed(1);
+      if (lastUtterance) lastUtterance.pitch = parseFloat(pitchSlider.value);
+    });
+
+    volumeSlider.addEventListener('input', () => {
+      volumeValue.textContent = Math.round(parseFloat(volumeSlider.value) * 100) + '%';
+      if (lastUtterance) lastUtterance.volume = parseFloat(volumeSlider.value);
+    });
+
+    // 初始化
+    if (!supportsSpeech()) {
+      showStatus('当前浏览器不支持语音合成（SpeechSynthesis）功能', true);
+      playBtn.disabled = true;
+    } else {
+      // 语音列表可能是异步加载的
+      if (typeof speechSynthesis.onvoiceschanged !== 'undefined') {
+        speechSynthesis.onvoiceschanged = loadVoices;
+      }
+      loadVoices();
+      showStatus('就绪');
+    }
+  </script>
+</body>
+
+</html>

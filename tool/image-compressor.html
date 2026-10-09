@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片压缩工具</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --button-danger: #dc3545;
+      --button-danger-hover: #c82333;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --input-bg: #ffffff;
+      --input-border: #dddddd;
+      --progress-bg: #e9ecef;
+      --progress-fill: #28a745;
+      --stat-bg: rgba(40, 167, 69, 0.15);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary: #6c757d;
+        --button-secondary-hover: #868e96;
+        --button-danger: #dc3545;
+        --button-danger-hover: #e04b5a;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --progress-bg: #555555;
+        --progress-fill: #34ce57;
+        --stat-bg: rgba(52, 206, 87, 0.15);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 15px 0;
+      font-size: 1.1em;
+      color: var(--text-color);
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .setting-item { display: flex; flex-direction: column; gap: 8px; }
+
+    .setting-item label {
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 0.95em;
+    }
+
+    .setting-item select,
+    .setting-item input[type="number"] {
+      padding: 10px 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      font-size: 0.95em;
+      font-family: inherit;
+    }
+
+    .setting-item select:focus,
+    .setting-item input:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .slider-row { display: flex; align-items: center; gap: 12px; }
+
+    .slider-row input[type="range"] { flex: 1; accent-color: var(--button-bg); }
+
+    .slider-value {
+      min-width: 48px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-color);
+      font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--input-border);
+      border-radius: 8px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      background-color: var(--input-bg);
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--button-bg);
+      background-color: var(--card-bg);
+    }
+
+    .upload-zone-icon { font-size: 3em; margin-bottom: 10px; }
+    .upload-zone-text { color: var(--text-secondary); font-size: 1em; }
+    .upload-zone-hint { color: var(--text-secondary); font-size: 0.85em; margin-top: 8px; }
+
+    .file-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .file-item {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 15px;
+      padding: 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      background-color: var(--input-bg);
+      align-items: center;
+    }
+
+    .file-thumb {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      background-color: var(--card-bg);
+    }
+
+    .file-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow: hidden;
+    }
+
+    .file-name {
+      font-weight: 600;
+      color: var(--text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-meta { font-size: 0.85em; color: var(--text-secondary); }
+
+    .file-compare {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .size-original { color: var(--text-secondary); text-decoration: line-through; }
+    .size-compressed { font-weight: 600; color: var(--button-bg); }
+
+    .size-saved {
+      padding: 2px 8px;
+      border-radius: 4px;
+      background-color: var(--stat-bg);
+      color: var(--button-bg);
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background-color: var(--progress-bg);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--progress-fill);
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 3px;
+    }
+
+    .file-actions { display: flex; gap: 8px; }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      color: white;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-primary { background: var(--button-bg); }
+    .btn-primary:hover:not(:disabled) { background: var(--button-hover); }
+    .btn-secondary { background: var(--button-secondary); }
+    .btn-secondary:hover:not(:disabled) { background: var(--button-secondary-hover); }
+    .btn-danger { background: var(--button-danger); }
+    .btn-danger:hover { background: var(--button-danger-hover); }
+    .btn-icon { padding: 8px 12px; }
+
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 15px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .summary-item { text-align: center; flex: 1; min-width: 120px; }
+
+    .summary-value {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .summary-label { font-size: 0.85em; color: var(--text-secondary); margin-top: 4px; }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--button-bg);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px var(--shadow);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover { background: var(--button-hover); }
+    .hidden { display: none; }
+
+    @media (max-width: 768px) {
+      body { padding: 15px; }
+      h1 { font-size: 2em; }
+      .file-item { grid-template-columns: 60px 1fr; }
+      .file-thumb { width: 60px; height: 60px; }
+      .file-actions { grid-column: 1 / -1; justify-content: flex-end; }
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toast" id="toast">操作成功</div>
+
+  <div class="container">
+    <h1>图片压缩工具</h1>
+    <p class="subtitle">浏览器本地压缩，图片不上传服务器，支持批量处理 JPG / PNG / WebP</p>
+
+    <div class="card">
+      <h2>压缩设置</h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label>输出格式</label>
+          <select id="outputFormat">
+            <option value="image/jpeg">JPEG (有损压缩)</option>
+            <option value="image/png">PNG (无损压缩)</option>
+            <option value="image/webp">WebP (推荐)</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label>压缩质量</label>
+          <div class="slider-row">
+            <input type="range" id="quality" min="10" max="100" value="80">
+            <span class="slider-value" id="qualityValue">80%</span>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>最大宽度 (px，0=不限制)</label>
+          <input type="number" id="maxWidth" min="0" max="10000" value="0" placeholder="例如 1920">
+        </div>
+        <div class="setting-item">
+          <label>最大高度 (px，0=不限制)</label>
+          <input type="number" id="maxHeight" min="0" max="10000" value="0" placeholder="例如 1080">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>选择图片</h2>
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-zone-icon">📁</div>
+        <div class="upload-zone-text">点击或拖拽图片到此处上传</div>
+        <div class="upload-zone-hint">支持 JPG / PNG / WebP，可多选批量上传</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple class="hidden">
+    </div>
+
+    <div class="card hidden" id="resultCard">
+      <div class="action-bar">
+        <button class="btn btn-primary" id="compressAllBtn" onclick="compressAll()">全部压缩</button>
+        <button class="btn btn-secondary" id="downloadAllBtn" onclick="downloadAll()" disabled>批量下载</button>
+        <button class="btn btn-danger" onclick="clearAll()">清空全部</button>
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-item">
+          <div class="summary-value" id="totalFiles">0</div>
+          <div class="summary-label">图片数量</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value" id="totalOriginal">0 KB</div>
+          <div class="summary-label">原始总大小</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value" id="totalCompressed">0 KB</div>
+          <div class="summary-label">压缩后总大小</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-value" id="totalSaved">0%</div>
+          <div class="summary-label">节省空间</div>
+        </div>
+      </div>
+
+      <div class="file-list" id="fileList"></div>
+    </div>
+
+    <div style="text-align: center;">
+      <a href="./index.html" class="back-link">返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const resultCard = document.getElementById('resultCard');
+    const qualitySlider = document.getElementById('quality');
+    const qualityValue = document.getElementById('qualityValue');
+    const toast = document.getElementById('toast');
+    const compressAllBtn = document.getElementById('compressAllBtn');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+
+    let files = [];
+
+    qualitySlider.addEventListener('input', function () {
+      qualityValue.textContent = qualitySlider.value + '%';
+    });
+
+    uploadZone.addEventListener('click', function () { fileInput.click(); });
+    uploadZone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', function () {
+      uploadZone.classList.remove('dragover');
+    });
+    uploadZone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', function (e) { handleFiles(e.target.files); });
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function () { toast.classList.remove('show'); }, 2000);
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function handleFiles(fileArray) {
+      const arr = Array.from(fileArray).filter(function (f) { return f.type.startsWith('image/'); });
+      arr.forEach(function (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            files.push({
+              id: Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+              file: file,
+              name: file.name,
+              originalSize: file.size,
+              originalWidth: img.width,
+              originalHeight: img.height,
+              thumbUrl: e.target.result,
+              compressedBlob: null,
+              compressedSize: null,
+              compressedUrl: null
+            });
+            renderFileList();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderFileList() {
+      if (files.length === 0) {
+        resultCard.classList.add('hidden');
+        return;
+      }
+      resultCard.classList.remove('hidden');
+      fileList.innerHTML = '';
+      let totalOrig = 0, totalComp = 0, compCount = 0;
+      files.forEach(function (item) {
+        totalOrig += item.originalSize;
+        if (item.compressedSize !== null) {
+          totalComp += item.compressedSize;
+          compCount++;
+        }
+        const saved = item.compressedSize !== null
+          ? Math.round((1 - item.compressedSize / item.originalSize) * 100)
+          : null;
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        let html = '';
+        html += '<img class="file-thumb" src="' + (item.compressedUrl || item.thumbUrl) + '" alt="">';
+        html += '<div class="file-info">';
+        html += '<div class="file-name">' + item.name + '</div>';
+        html += '<div class="file-meta">' + item.originalWidth + ' × ' + item.originalHeight + 'px</div>';
+        html += '<div class="file-compare">';
+        html += '<span class="size-original">' + formatSize(item.originalSize) + '</span>';
+        if (item.compressedSize !== null) {
+          html += '<span>→</span>';
+          html += '<span class="size-compressed">' + formatSize(item.compressedSize) + '</span>';
+          html += '<span class="size-saved">-'+saved+'%</span>';
+        } else {
+          html += '<span style="color:var(--text-secondary)">未压缩</span>';
+        }
+        html += '</div>';
+        html += '<div class="progress-bar"><div class="progress-fill" id="prog-'+item.id+'"></div></div>';
+        html += '</div>';
+        html += '<div class="file-actions">';
+        html += '<button class="btn btn-primary btn-icon" onclick="compressOne(\''+item.id+'\')">压缩</button>';
+        if (item.compressedBlob) {
+          html += '<button class="btn btn-secondary btn-icon" onclick="downloadOne(\''+item.id+'\')">下载</button>';
+        }
+        html += '<button class="btn btn-danger btn-icon" onclick="removeFile(\''+item.id+'\')">×</button>';
+        html += '</div>';
+        div.innerHTML = html;
+        fileList.appendChild(div);
+      });
+      document.getElementById('totalFiles').textContent = files.length;
+      document.getElementById('totalOriginal').textContent = formatSize(totalOrig);
+      document.getElementById('totalCompressed').textContent = compCount ? formatSize(totalComp) : '—';
+      document.getElementById('totalSaved').textContent = (compCount && totalOrig > 0)
+        ? (Math.round((1 - totalComp / totalOrig) * 100) + '%')
+        : '—';
+      downloadAllBtn.disabled = compCount === 0;
+    }
+
+    function compressOne(id) {
+      return new Promise(function (resolve) {
+        const item = files.find(function (f) { return f.id === id; });
+        if (!item) { resolve(); return; }
+        const prog = document.getElementById('prog-' + id);
+        if (prog) prog.style.width = '20%';
+        try {
+          const format = document.getElementById('outputFormat').value;
+          const quality = parseInt(qualitySlider.value, 10) / 100;
+          const maxW = parseInt(document.getElementById('maxWidth').value, 10) || 0;
+          const maxH = parseInt(document.getElementById('maxHeight').value, 10) || 0;
+          const img = new Image();
+          img.onload = function () {
+            let w = img.width, h = img.height;
+            if (maxW > 0 && w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+            if (maxH > 0 && h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            if (format === 'image/jpeg') {
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, w, h);
+            }
+            ctx.drawImage(img, 0, 0, w, h);
+            if (prog) prog.style.width = '60%';
+            canvas.toBlob(function (blob) {
+              if (!blob) { showToast('压缩失败'); resolve(); return; }
+              if (item.compressedUrl) { try { URL.revokeObjectURL(item.compressedUrl); } catch (e) {} }
+              item.compressedBlob = blob;
+              item.compressedSize = blob.size;
+              item.compressedUrl = URL.createObjectURL(blob);
+              if (prog) prog.style.width = '100%';
+              setTimeout(function () { renderFileList(); resolve(); }, 150);
+            }, format, quality);
+          };
+          img.onerror = function () { showToast('图片加载失败'); resolve(); };
+          img.src = item.thumbUrl;
+        } catch (err) {
+          showToast('压缩出错');
+          resolve();
+        }
+      });
+    }
+
+    async function compressAll() {
+      compressAllBtn.disabled = true;
+      for (let i = 0; i < files.length; i++) {
+        await compressOne(files[i].id);
+      }
+      compressAllBtn.disabled = false;
+      showToast('全部压缩完成');
+    }
+
+    function downloadOne(id) {
+      const item = files.find(function (f) { return f.id === id; });
+      if (!item || !item.compressedBlob) return;
+      const a = document.createElement('a');
+      a.href = item.compressedUrl;
+      const ext = item.compressedBlob.type.split('/')[1] || 'jpg';
+      const base = item.name.replace(/\.[^.]+$/, '');
+      a.download = base + '_compressed.' + ext;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    async function downloadAll() {
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].compressedBlob) {
+          downloadOne(files[i].id);
+          await new Promise(function (r) { setTimeout(r, 300); });
+        }
+      }
+    }
+
+    function removeFile(id) {
+      const idx = files.findIndex(function (f) { return f.id === id; });
+      if (idx === -1) return;
+      const f = files[idx];
+      if (f.compressedUrl) { try { URL.revokeObjectURL(f.compressedUrl); } catch (e) {} }
+      files.splice(idx, 1);
+      renderFileList();
+    }
+
+    function clearAll() {
+      files.forEach(function (f) {
+        if (f.compressedUrl) { try { URL.revokeObjectURL(f.compressedUrl); } catch (e) {} }
+      });
+      files = [];
+      fileInput.value = '';
+      renderFileList();
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>单位换算工具</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --input-bg: #ffffff;
+      --input-border: #cccccc;
+      --input-focus: #28a745;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --chip-bg: #ffffff;
+      --chip-active-bg: #28a745;
+      --chip-active-color: #ffffff;
+      --row-hover: #eef7f0;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --error-color: #dc3545;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --input-focus: #34ce57;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --chip-bg: #2d2d2d;
+        --chip-active-bg: #28a745;
+        --chip-active-color: #ffffff;
+        --row-hover: #383838;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --error-color: #ff6b6b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* 分类标签 */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      font-size: 0.95em;
+      color: var(--text-color);
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .tab:hover {
+      border-color: var(--button-bg);
+    }
+
+    .tab.active {
+      background: var(--chip-active-bg);
+      border-color: var(--chip-active-bg);
+      color: var(--chip-active-color);
+      font-weight: bold;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 4px var(--shadow);
+      margin-bottom: 24px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 0.9em;
+      font-weight: bold;
+      color: var(--text-secondary);
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      color: var(--text-color);
+      background-color: var(--input-bg);
+      border: 2px solid var(--input-border);
+      border-radius: 5px;
+      transition: border-color 0.2s ease, background-color 0.3s ease;
+      font-family: inherit;
+    }
+
+    input[type="text"] {
+      font-family: 'Courier New', monospace;
+      font-size: 1.05em;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--input-focus);
+    }
+
+    .convert-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: end;
+      margin-top: 16px;
+    }
+
+    .swap-btn {
+      flex: none;
+      width: auto;
+      min-width: 0;
+      height: 45px;
+      margin-bottom: 0;
+      padding: 0 14px;
+      font-size: 1.2em;
+      background: var(--input-bg);
+      color: var(--text-color);
+      border: 2px solid var(--input-border);
+    }
+
+    .swap-btn:hover {
+      background: var(--input-bg);
+      border-color: var(--button-bg);
+    }
+
+    .result-box {
+      margin-top: 20px;
+      padding: 20px;
+      text-align: center;
+      background: var(--bg-color);
+      border: 1px dashed var(--card-border);
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    .result-value {
+      font-size: 2.1em;
+      font-weight: bold;
+      line-height: 1.25;
+      color: var(--button-bg);
+      word-break: break-all;
+    }
+
+    .result-unit {
+      font-size: 0.55em;
+      font-weight: normal;
+      color: var(--text-secondary);
+      margin-left: 6px;
+    }
+
+    .result-sub {
+      margin-top: 10px;
+      font-size: 0.95em;
+      color: var(--text-secondary);
+      word-break: break-all;
+    }
+
+    .result-actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      font-family: inherit;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .ghost-btn {
+      background: transparent;
+      color: var(--text-color);
+      border: 1px solid var(--card-border);
+    }
+
+    .ghost-btn:hover {
+      background: transparent;
+      border-color: var(--button-bg);
+    }
+
+    .error {
+      display: none;
+      margin-top: 14px;
+      text-align: center;
+      font-size: 0.95em;
+      color: var(--error-color);
+    }
+
+    /* 全部单位表格 */
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .card-head h3 {
+      margin: 0;
+      font-size: 1.15em;
+    }
+
+    .precision {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .precision select {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 0.95em;
+      border-width: 1px;
+    }
+
+    .unit-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.98em;
+    }
+
+    .unit-table th {
+      text-align: left;
+      font-size: 0.85em;
+      font-weight: normal;
+      color: var(--text-secondary);
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--card-border);
+      white-space: nowrap;
+    }
+
+    .unit-table th:last-child,
+    .unit-table td:last-child {
+      text-align: right;
+    }
+
+    .unit-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--card-border);
+      vertical-align: middle;
+    }
+
+    .unit-table tbody tr {
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .unit-table tbody tr:hover {
+      background: var(--row-hover);
+    }
+
+    .unit-table tbody tr.is-target {
+      background: var(--row-hover);
+    }
+
+    .unit-name {
+      white-space: nowrap;
+    }
+
+    .unit-name span {
+      color: var(--text-secondary);
+      font-size: 0.88em;
+      margin-left: 4px;
+    }
+
+    .unit-value {
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+    }
+
+    .row-copy {
+      padding: 4px 10px;
+      font-size: 0.82em;
+      font-weight: normal;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--card-border);
+    }
+
+    .row-copy:hover {
+      background: transparent;
+      color: var(--button-bg);
+      border-color: var(--button-bg);
+    }
+
+    .info-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .info-section h3 {
+      margin-top: 0;
+      color: var(--text-color);
+    }
+
+    .info-section ul {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 32px;
+      transform: translate(-50%, 16px);
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: var(--button-bg);
+      color: #fff;
+      font-size: 0.95em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 99;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .convert-row {
+        grid-template-columns: 1fr;
+      }
+
+      .swap-btn {
+        width: 100%;
+        height: auto;
+        padding: 8px;
+        transform: rotate(90deg);
+      }
+
+      .result-value {
+        font-size: 1.7em;
+      }
+
+      .unit-table td,
+      .unit-table th {
+        padding: 8px 6px;
+        font-size: 0.92em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>单位换算工具</h1>
+  <p class="subtitle">长度、面积、体积、质量、温度、速度、时间、数据、网速带宽、角度、压力、能量、功率，共 13 类常用单位</p>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="card">
+    <div class="field">
+      <label for="valueInput">数值</label>
+      <input type="text" id="valueInput" value="1" autocomplete="off" spellcheck="false"
+        placeholder="输入数值，支持 1+2*3 这样的算式">
+    </div>
+
+    <div class="convert-row">
+      <div class="field">
+        <label for="fromUnit">从</label>
+        <select id="fromUnit"></select>
+      </div>
+      <button class="swap-btn" id="swapBtn" type="button" title="交换单位">⇄</button>
+      <div class="field">
+        <label for="toUnit">到</label>
+        <select id="toUnit"></select>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-value" id="resultValue">—</div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="result-actions">
+        <button id="copyBtn" type="button">复制结果</button>
+        <button class="ghost-btn" id="clearBtn" type="button">清空</button>
+      </div>
+    </div>
+
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h3>全部单位</h3>
+      <label class="precision">有效数字
+        <select id="precision">
+          <option value="auto" selected>自动</option>
+          <option value="3">3 位</option>
+          <option value="4">4 位</option>
+          <option value="6">6 位</option>
+          <option value="8">8 位</option>
+          <option value="10">10 位</option>
+          <option value="12">12 位</option>
+        </select>
+      </label>
+    </div>
+    <table class="unit-table">
+      <thead>
+        <tr>
+          <th>单位</th>
+          <th>数值</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="unitRows"></tbody>
+    </table>
+  </div>
+
+  <div class="info-section">
+    <h3>使用说明</h3>
+    <ul>
+      <li>输入数值后自动实时换算，无需点击按钮</li>
+      <li>数值框支持简单算式，例如输入 <code>12*2.54</code> 会先算出 30.48 再换算</li>
+      <li>点击下方「全部单位」中的任意一行，可把它设为换算目标单位</li>
+      <li>点击「复制结果」可复制当前换算结果，鼠标悬停表格行也可单行复制数值</li>
+      <li>数值过大或过小时自动切换为科学计数法，避免显示一长串 0</li>
+      <li>温度类采用公式换算（不是简单倍率），其余单位均为线性倍率换算</li>
+    </ul>
+    <h3 style="margin-top:20px;">常用换算</h3>
+    <ul id="notesList"></ul>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="./index.html" class="back-link">返回工具列表</a>
+  </div>
+
+  <div class="toast" id="toast">已复制</div>
+
+  <script>
+    (function () {
+      // ---------- 单位数据 ----------
+      // f: 相对基准单位的倍率；温度使用 to/from 函数
+      var CATEGORIES = [
+        {
+          id: 'length', name: '📏 长度', base: '米', def: ['m', 'ft'],
+          notes: [
+            '1 米 = 100 厘米 = 1000 毫米',
+            '1 英寸 = 2.54 厘米；1 英尺 = 12 英寸 = 30.48 厘米',
+            '1 英里 = 1.609344 公里；1 海里 = 1.852 公里',
+            '1 尺 = 1/3 米 ≈ 33.33 厘米；1 里 = 500 米'
+          ],
+          units: [
+            { name: '千米', symbol: 'km', f: 1000 },
+            { name: '米', symbol: 'm', f: 1 },
+            { name: '分米', symbol: 'dm', f: 0.1 },
+            { name: '厘米', symbol: 'cm', f: 0.01 },
+            { name: '毫米', symbol: 'mm', f: 0.001 },
+            { name: '微米', symbol: 'µm', f: 1e-6 },
+            { name: '纳米', symbol: 'nm', f: 1e-9 },
+            { name: '英里', symbol: 'mi', f: 1609.344 },
+            { name: '码', symbol: 'yd', f: 0.9144 },
+            { name: '英尺', symbol: 'ft', f: 0.3048 },
+            { name: '英寸', symbol: 'in', f: 0.0254 },
+            { name: '海里', symbol: 'nmi', f: 1852 },
+            { name: '里', symbol: '里', f: 500 },
+            { name: '丈', symbol: '丈', f: 10 / 3 },
+            { name: '尺', symbol: '尺', f: 1 / 3 },
+            { name: '寸', symbol: '寸', f: 1 / 30 },
+            { name: '天文单位', symbol: 'AU', f: 1.495978707e11 },
+            { name: '光年', symbol: 'ly', f: 9.4607304725808e15 }
+          ]
+        },
+        {
+          id: 'area', name: '🧱 面积', base: '平方米', def: ['m²', 'mu'],
+          notes: [
+            '1 公顷 = 15 亩 = 10000 平方米',
+            '1 亩 ≈ 666.67 平方米',
+            '1 英亩 ≈ 4046.86 平方米 ≈ 6.07 亩',
+            '1 平方英尺 ≈ 0.0929 平方米'
+          ],
+          units: [
+            { name: '平方千米', symbol: 'km²', f: 1e6 },
+            { name: '公顷', symbol: 'ha', f: 10000 },
+            { name: '公亩', symbol: 'a', f: 100 },
+            { name: '亩', symbol: 'mu', f: 2000 / 3 },
+            { name: '平方米', symbol: 'm²', f: 1 },
+            { name: '平方分米', symbol: 'dm²', f: 0.01 },
+            { name: '平方厘米', symbol: 'cm²', f: 1e-4 },
+            { name: '平方毫米', symbol: 'mm²', f: 1e-6 },
+            { name: '平方英里', symbol: 'mi²', f: 2589988.110336 },
+            { name: '英亩', symbol: 'ac', f: 4046.8564224 },
+            { name: '平方码', symbol: 'yd²', f: 0.83612736 },
+            { name: '平方英尺', symbol: 'ft²', f: 0.09290304 },
+            { name: '平方英寸', symbol: 'in²', f: 0.00064516 }
+          ]
+        },
+        {
+          id: 'volume', name: '🧪 体积', base: '升', def: ['L', 'gal(US)'],
+          notes: [
+            '1 立方米 = 1000 升；1 立方分米 = 1 升',
+            '1 加仑(美) ≈ 3.785 升；1 加仑(英) ≈ 4.546 升',
+            '1 液量盎司(美) ≈ 29.57 毫升',
+            '1 桶(石油) = 42 加仑(美) ≈ 158.99 升'
+          ],
+          units: [
+            { name: '立方米', symbol: 'm³', f: 1000 },
+            { name: '立方分米', symbol: 'dm³', f: 1 },
+            { name: '立方厘米', symbol: 'cm³', f: 0.001 },
+            { name: '升', symbol: 'L', f: 1 },
+            { name: '毫升', symbol: 'mL', f: 0.001 },
+            { name: '微升', symbol: 'µL', f: 1e-6 },
+            { name: '加仑(美)', symbol: 'gal(US)', f: 3.785411784 },
+            { name: '加仑(英)', symbol: 'gal(UK)', f: 4.54609 },
+            { name: '夸脱(美)', symbol: 'qt(US)', f: 0.946352946 },
+            { name: '品脱(美)', symbol: 'pt(US)', f: 0.473176473 },
+            { name: '液量盎司(美)', symbol: 'fl oz(US)', f: 0.0295735295625 },
+            { name: '立方英尺', symbol: 'ft³', f: 28.316846592 },
+            { name: '立方英寸', symbol: 'in³', f: 0.016387064 },
+            { name: '桶(石油)', symbol: 'bbl', f: 158.987294928 }
+          ]
+        },
+        {
+          id: 'mass', name: '⚖️ 质量', base: '千克', def: ['kg', 'lb'],
+          notes: [
+            '1 千克 = 1000 克 = 2 斤',
+            '1 斤 = 500 克；1 两 = 50 克；1 钱 = 5 克',
+            '1 磅 ≈ 453.59 克 ≈ 0.907 斤',
+            '1 盎司 ≈ 28.35 克；1 克拉 = 0.2 克'
+          ],
+          units: [
+            { name: '吨', symbol: 't', f: 1000 },
+            { name: '千克', symbol: 'kg', f: 1 },
+            { name: '克', symbol: 'g', f: 0.001 },
+            { name: '毫克', symbol: 'mg', f: 1e-6 },
+            { name: '微克', symbol: 'µg', f: 1e-9 },
+            { name: '担', symbol: '担', f: 50 },
+            { name: '斤', symbol: '斤', f: 0.5 },
+            { name: '两', symbol: '两', f: 0.05 },
+            { name: '钱', symbol: '钱', f: 0.005 },
+            { name: '磅', symbol: 'lb', f: 0.45359237 },
+            { name: '盎司', symbol: 'oz', f: 0.028349523125 },
+            { name: '英石', symbol: 'st', f: 6.35029318 },
+            { name: '克拉', symbol: 'ct', f: 0.0002 },
+            { name: '短吨(美)', symbol: 'ton(US)', f: 907.18474 },
+            { name: '长吨(英)', symbol: 'ton(UK)', f: 1016.0469088 }
+          ]
+        },
+        {
+          id: 'temperature', name: '🌡️ 温度', base: '摄氏度', def: ['°C', '°F'],
+          notes: [
+            '°F = °C × 9 / 5 + 32',
+            '°C = (°F − 32) × 5 / 9',
+            'K = °C + 273.15；°C = K − 273.15',
+            '0 °C = 32 °F = 273.15 K；100 °C = 212 °F'
+          ],
+          units: [
+            { name: '摄氏度', symbol: '°C', to: function (v) { return v; }, from: function (v) { return v; } },
+            { name: '华氏度', symbol: '°F', to: function (v) { return (v - 32) * 5 / 9; }, from: function (v) { return v * 9 / 5 + 32; } },
+            { name: '开尔文', symbol: 'K', to: function (v) { return v - 273.15; }, from: function (v) { return v + 273.15; } },
+            { name: '兰氏度', symbol: '°R', to: function (v) { return v * 5 / 9 - 273.15; }, from: function (v) { return (v + 273.15) * 9 / 5; } },
+            { name: '列氏度', symbol: '°Ré', to: function (v) { return v * 1.25; }, from: function (v) { return v * 0.8; } }
+          ]
+        },
+        {
+          id: 'speed', name: '🚀 速度', base: '米/秒', def: ['km/h', 'm/s'],
+          notes: [
+            '1 米/秒 = 3.6 千米/小时',
+            '1 节 = 1 海里/小时 = 1.852 千米/小时',
+            '1 英里/小时 ≈ 1.609 千米/小时',
+            '1 马赫 ≈ 340.3 米/秒（15℃ 海平面）'
+          ],
+          units: [
+            { name: '米/秒', symbol: 'm/s', f: 1 },
+            { name: '千米/小时', symbol: 'km/h', f: 1 / 3.6 },
+            { name: '英里/小时', symbol: 'mph', f: 0.44704 },
+            { name: '英尺/秒', symbol: 'ft/s', f: 0.3048 },
+            { name: '节', symbol: 'kn', f: 1852 / 3600 },
+            { name: '马赫', symbol: 'Mach', f: 340.3 },
+            { name: '光速', symbol: 'c', f: 299792458 }
+          ]
+        },
+        {
+          id: 'time', name: '⏱️ 时间', base: '秒', def: ['min', 's'],
+          notes: [
+            '1 小时 = 60 分钟 = 3600 秒',
+            '1 天 = 24 小时 = 1440 分钟',
+            '1 周 = 7 天 = 168 小时',
+            '本工具中 1 月按 30 天、1 年按 365 天计算'
+          ],
+          units: [
+            { name: '纳秒', symbol: 'ns', f: 1e-9 },
+            { name: '微秒', symbol: 'µs', f: 1e-6 },
+            { name: '毫秒', symbol: 'ms', f: 0.001 },
+            { name: '秒', symbol: 's', f: 1 },
+            { name: '分钟', symbol: 'min', f: 60 },
+            { name: '小时', symbol: 'h', f: 3600 },
+            { name: '天', symbol: 'd', f: 86400 },
+            { name: '周', symbol: 'wk', f: 604800 },
+            { name: '月(30天)', symbol: 'mo', f: 2592000 },
+            { name: '年(365天)', symbol: 'yr', f: 31536000 },
+            { name: '闰年(366天)', symbol: 'yr(leap)', f: 31622400 },
+            { name: '十年', symbol: 'decade', f: 315360000 },
+            { name: '世纪', symbol: 'century', f: 3153600000 }
+          ]
+        },
+        {
+          id: 'data', name: '💾 数据', base: '字节', def: ['MB', 'GB'],
+          notes: [
+            '1 字节(B) = 8 比特(bit)',
+            '按二进制计量：1 KB = 1024 B，1 MB = 1024 KB',
+            '1 GB = 1024 MB；1 TB = 1024 GB',
+            '「千字节/兆字节」为十进制计量，1 kB = 1000 B',
+            '网速/带宽单位（Mbps、MB/s 等）请看「📶 网速带宽」分类'
+          ],
+          units: [
+            { name: '比特', symbol: 'bit', f: 0.125 },
+            { name: '字节', symbol: 'B', f: 1 },
+            { name: '千字节(1000)', symbol: 'kB', f: 1000 },
+            { name: '兆字节(1000²)', symbol: 'MB(10³)', f: 1e6 },
+            { name: 'KB(1024)', symbol: 'KB', f: 1024 },
+            { name: 'MB(1024²)', symbol: 'MB', f: 1048576 },
+            { name: 'GB(1024³)', symbol: 'GB', f: 1073741824 },
+            { name: 'TB(1024⁴)', symbol: 'TB', f: 1099511627776 },
+            { name: 'PB(1024⁵)', symbol: 'PB', f: 1125899906842624 },
+            { name: 'KiB', symbol: 'KiB', f: 1024 },
+            { name: 'MiB', symbol: 'MiB', f: 1048576 },
+            { name: 'GiB', symbol: 'GiB', f: 1073741824 },
+            { name: 'TiB', symbol: 'TiB', f: 1099511627776 }
+          ]
+        },
+        {
+          id: 'bandwidth', name: '📶 网速带宽', base: '比特/秒', def: ['Mbps', 'MB/s'],
+          notes: [
+            '1 字节/秒(B/s) = 8 比特/秒(bps)，带宽与下载速度差 8 倍，最容易搞错的就是这里',
+            '1 MB/s = 8 Mbps = 1000 KB/s',
+            '100 Mbps 宽带理论下载速度约 12.5 MB/s；1000 Mbps(千兆) 约 125 MB/s',
+            '带宽按十进制换算：1 Mbps = 1000 Kbps = 1000000 bps'
+          ],
+          units: [
+            { name: '比特/秒', symbol: 'bps', f: 1 },
+            { name: '千比特/秒', symbol: 'Kbps', f: 1e3 },
+            { name: '兆比特/秒', symbol: 'Mbps', f: 1e6 },
+            { name: '吉比特/秒', symbol: 'Gbps', f: 1e9 },
+            { name: '太比特/秒', symbol: 'Tbps', f: 1e12 },
+            { name: '字节/秒', symbol: 'B/s', f: 8 },
+            { name: '千字节/秒', symbol: 'KB/s', f: 8e3 },
+            { name: '兆字节/秒', symbol: 'MB/s', f: 8e6 },
+            { name: '吉字节/秒', symbol: 'GB/s', f: 8e9 }
+          ]
+        },
+        {
+          id: 'angle', name: '📐 角度', base: '度', def: ['°', 'rad'],
+          notes: [
+            '180° = π 弧度；1 弧度 ≈ 57.2958°',
+            '1 圈 = 360° = 400 百分度',
+            '1 度 = 60 分 = 3600 秒',
+            '1 毫弧度 ≈ 0.0573°'
+          ],
+          units: [
+            { name: '度', symbol: '°', f: 1 },
+            { name: '弧度', symbol: 'rad', f: 57.29577951308232 },
+            { name: '毫弧度', symbol: 'mrad', f: 0.05729577951308232 },
+            { name: '百分度', symbol: 'grad', f: 0.9 },
+            { name: '圈', symbol: 'turn', f: 360 },
+            { name: '角分', symbol: '′', f: 1 / 60 },
+            { name: '角秒', symbol: '″', f: 1 / 3600 }
+          ]
+        },
+        {
+          id: 'pressure', name: '🎈 压力', base: '帕斯卡', def: ['kPa', 'psi'],
+          notes: [
+            '1 标准大气压 = 101325 Pa ≈ 101.3 kPa',
+            '1 bar = 100000 Pa；1 mbar = 100 Pa',
+            '1 psi ≈ 6894.76 Pa ≈ 6.895 kPa',
+            '1 毫米汞柱(mmHg) ≈ 133.32 Pa'
+          ],
+          units: [
+            { name: '帕斯卡', symbol: 'Pa', f: 1 },
+            { name: '百帕', symbol: 'hPa', f: 100 },
+            { name: '千帕', symbol: 'kPa', f: 1000 },
+            { name: '兆帕', symbol: 'MPa', f: 1e6 },
+            { name: '巴', symbol: 'bar', f: 100000 },
+            { name: '毫巴', symbol: 'mbar', f: 100 },
+            { name: '标准大气压', symbol: 'atm', f: 101325 },
+            { name: '磅力/平方英寸', symbol: 'psi', f: 6894.757293168 },
+            { name: '托', symbol: 'Torr', f: 133.32236842105263 },
+            { name: '毫米汞柱', symbol: 'mmHg', f: 133.322387415 },
+            { name: '千克力/平方厘米', symbol: 'kgf/cm²', f: 98066.5 }
+          ]
+        },
+        {
+          id: 'energy', name: '⚡ 能量', base: '焦耳', def: ['kcal', 'kJ'],
+          notes: [
+            '1 千卡(kcal) = 4.184 千焦 = 1000 卡',
+            '1 千瓦时(kWh) = 3.6 兆焦(MJ)',
+            '1 电子伏 ≈ 1.602×10⁻¹⁹ 焦耳',
+            '1 英热单位(BTU) ≈ 1055.06 焦耳'
+          ],
+          units: [
+            { name: '焦耳', symbol: 'J', f: 1 },
+            { name: '千焦', symbol: 'kJ', f: 1000 },
+            { name: '兆焦', symbol: 'MJ', f: 1e6 },
+            { name: '卡', symbol: 'cal', f: 4.184 },
+            { name: '千卡', symbol: 'kcal', f: 4184 },
+            { name: '瓦时', symbol: 'Wh', f: 3600 },
+            { name: '千瓦时', symbol: 'kWh', f: 3600000 },
+            { name: '电子伏', symbol: 'eV', f: 1.602176634e-19 },
+            { name: '英热单位', symbol: 'BTU', f: 1055.05585262 },
+            { name: '英尺磅', symbol: 'ft·lb', f: 1.3558179483314 }
+          ]
+        },
+        {
+          id: 'power', name: '🔌 功率', base: '瓦特', def: ['kW', 'PS'],
+          notes: [
+            '1 千瓦 = 1000 瓦',
+            '1 公制马力(PS) = 735.49875 瓦 ≈ 0.7355 千瓦',
+            '1 英制马力(hp) ≈ 745.7 瓦',
+            '1 瓦 = 1 焦耳/秒'
+          ],
+          units: [
+            { name: '瓦特', symbol: 'W', f: 1 },
+            { name: '千瓦', symbol: 'kW', f: 1000 },
+            { name: '兆瓦', symbol: 'MW', f: 1e6 },
+            { name: '公制马力', symbol: 'PS', f: 735.49875 },
+            { name: '英制马力', symbol: 'hp', f: 745.6998715822702 },
+            { name: '卡/秒', symbol: 'cal/s', f: 4.184 },
+            { name: '英热单位/小时', symbol: 'BTU/h', f: 0.29307107017222 }
+          ]
+        }
+      ];
+
+      // ---------- DOM ----------
+      var tabsEl = document.getElementById('tabs');
+      var valueInput = document.getElementById('valueInput');
+      var fromSelect = document.getElementById('fromUnit');
+      var toSelect = document.getElementById('toUnit');
+      var swapBtn = document.getElementById('swapBtn');
+      var resultValueEl = document.getElementById('resultValue');
+      var resultSubEl = document.getElementById('resultSub');
+      var copyBtn = document.getElementById('copyBtn');
+      var clearBtn = document.getElementById('clearBtn');
+      var errorEl = document.getElementById('errorMsg');
+      var precisionEl = document.getElementById('precision');
+      var unitRowsEl = document.getElementById('unitRows');
+      var notesListEl = document.getElementById('notesList');
+      var toastEl = document.getElementById('toast');
+
+      var current = CATEGORIES[0];
+      var lastResultText = '';
+      var unitMemory = {}; // 记住每个分类上次选中的单位
+
+      // 取单位相对基准的换算系数 / 函数
+      function toBase(unit, v) {
+        return unit.to ? unit.to(v) : v * unit.f;
+      }
+
+      function fromBase(unit, v) {
+        return unit.from ? unit.from(v) : v / unit.f;
+      }
+
+      // ---------- 数字解析与格式化 ----------
+      function parseInput(raw) {
+        var str = String(raw).trim().replace(/[,，\s]/g, '');
+        if (!str) return { empty: true };
+        if (!/^[0-9+\-*/().eE]+$/.test(str)) {
+          return { error: '只能输入数字和 + - * / ( ) 运算符' };
+        }
+        try {
+          var v = Function('"use strict";return (' + str + ')')();
+          if (typeof v !== 'number' || !isFinite(v)) {
+            return { error: '表达式无法计算，请检查输入' };
+          }
+          return { value: v };
+        } catch (e) {
+          return { error: '表达式格式有误，请检查输入' };
+        }
+      }
+
+      function trimNum(s) {
+        s = String(s);
+        if (s.indexOf('e') !== -1 || s.indexOf('E') !== -1) return s;
+        if (s.indexOf('.') !== -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+        return s;
+      }
+
+      function formatNumber(v) {
+        if (v === 0) return '0';
+        if (!isFinite(v)) return '—';
+
+        var mode = precisionEl.value;
+        var abs = Math.abs(v);
+
+        if (mode !== 'auto') {
+          var digits = parseInt(mode, 10);
+          if (abs >= 1e21 || abs < 1e-7) return trimNum(v.toExponential(digits - 1));
+          return trimNum(v.toPrecision(digits));
+        }
+
+        // 自动：过大或过小用科学计数法
+        if (abs >= 1e15 || abs < 1e-6) {
+          return trimNum(v.toExponential(6));
+        }
+        var s = trimNum(v.toPrecision(8));
+        // toPrecision 在整数位过多时会退回指数形式，这里再展开成普通数字
+        if (s.indexOf('e') !== -1) s = String(Number(s));
+        return s;
+      }
+
+      // ---------- 渲染 ----------
+      function renderTabs() {
+        tabsEl.innerHTML = '';
+        CATEGORIES.forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'tab' + (cat.id === current.id ? ' active' : '');
+          btn.textContent = cat.name;
+          btn.addEventListener('click', function () {
+            switchCategory(cat.id);
+          });
+          tabsEl.appendChild(btn);
+        });
+      }
+
+      function fillSelect(select, units, selectedSymbol) {
+        select.innerHTML = '';
+        units.forEach(function (u) {
+          var opt = document.createElement('option');
+          opt.value = u.symbol;
+          opt.textContent = u.name + ' (' + u.symbol + ')';
+          select.appendChild(opt);
+        });
+        if (selectedSymbol) {
+          var found = units.some(function (u) { return u.symbol === selectedSymbol; });
+          if (found) select.value = selectedSymbol;
+        }
+      }
+
+      function getUnit(symbol) {
+        var list = current.units;
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].symbol === symbol) return list[i];
+        }
+        return list[0];
+      }
+
+      function switchCategory(id) {
+        var cat = null;
+        for (var i = 0; i < CATEGORIES.length; i++) {
+          if (CATEGORIES[i].id === id) cat = CATEGORIES[i];
+        }
+        if (!cat) return;
+
+        // 记录上一个分类的选择
+        if (current && current.id !== id) {
+          unitMemory[current.id] = { from: fromSelect.value, to: toSelect.value };
+        }
+        current = cat;
+
+        Array.prototype.forEach.call(tabsEl.children, function (btn, idx) {
+          btn.classList.toggle('active', CATEGORIES[idx].id === id);
+        });
+
+        var remembered = unitMemory[cat.id];
+        fillSelect(fromSelect, cat.units, remembered ? remembered.from : cat.def[0]);
+        fillSelect(toSelect, cat.units, remembered ? remembered.to : cat.def[1]);
+
+        notesListEl.innerHTML = '';
+        cat.notes.forEach(function (note) {
+          var li = document.createElement('li');
+          li.textContent = note;
+          notesListEl.appendChild(li);
+        });
+
+        update();
+      }
+
+      function update() {
+        var parsed = parseInput(valueInput.value);
+
+        if (parsed.empty) {
+          resultValueEl.textContent = '—';
+          resultSubEl.textContent = '';
+          errorEl.style.display = 'none';
+          lastResultText = '';
+          buildRows(null);
+          return;
+        }
+
+        if (parsed.error) {
+          errorEl.textContent = parsed.error;
+          errorEl.style.display = 'block';
+          resultValueEl.textContent = '—';
+          resultSubEl.textContent = '';
+          lastResultText = '';
+          buildRows(null);
+          return;
+        }
+
+        errorEl.style.display = 'none';
+
+        var fromUnit = getUnit(fromSelect.value);
+        var toUnit = getUnit(toSelect.value);
+        var baseValue = toBase(fromUnit, parsed.value);
+        var result = fromBase(toUnit, baseValue);
+
+        var out = formatNumber(result);
+        resultValueEl.innerHTML = '';
+        resultValueEl.appendChild(document.createTextNode(out));
+        var unitSpan = document.createElement('span');
+        unitSpan.className = 'result-unit';
+        unitSpan.textContent = toUnit.symbol;
+        resultValueEl.appendChild(unitSpan);
+
+        // 换算关系行
+        var oneFrom = fromBase(toUnit, toBase(fromUnit, 1));
+        resultSubEl.textContent = '1 ' + fromUnit.symbol + ' = ' + formatNumber(oneFrom) +
+          ' ' + toUnit.symbol + '　·　输入值 ' + trimNum(formatNumber(parsed.value));
+
+        lastResultText = out + ' ' + toUnit.symbol;
+
+        buildRows({ base: baseValue, target: toUnit.symbol });
+      }
+
+      function buildRows(ctx) {
+        unitRowsEl.innerHTML = '';
+        current.units.forEach(function (u) {
+          var tr = document.createElement('tr');
+          if (ctx && u.symbol === ctx.target) tr.classList.add('is-target');
+
+          var tdName = document.createElement('td');
+          tdName.className = 'unit-name';
+          tdName.textContent = u.name;
+          var small = document.createElement('span');
+          small.textContent = u.symbol;
+          tdName.appendChild(small);
+
+          var tdValue = document.createElement('td');
+          tdValue.className = 'unit-value';
+          tdValue.textContent = ctx ? formatNumber(fromBase(u, ctx.base)) : '—';
+
+          var tdBtn = document.createElement('td');
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'row-copy';
+          btn.textContent = '复制';
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var text = tdValue.textContent;
+            if (text && text !== '—') copyText(text + ' ' + u.symbol);
+          });
+          tdBtn.appendChild(btn);
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdValue);
+          tr.appendChild(tdBtn);
+
+          tr.addEventListener('click', function () {
+            toSelect.value = u.symbol;
+            update();
+          });
+
+          unitRowsEl.appendChild(tr);
+        });
+      }
+
+      // ---------- 复制 ----------
+      function copyText(text) {
+        if (!text) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            showToast('已复制：' + text);
+          }, function () {
+            fallbackCopy(text);
+          });
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('已复制：' + text);
+        } catch (e) {
+          showToast('复制失败，请手动选择');
+        }
+        document.body.removeChild(ta);
+      }
+
+      var toastTimer = null;
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove('show');
+        }, 1600);
+      }
+
+      // ---------- 事件 ----------
+      valueInput.addEventListener('input', update);
+
+      fromSelect.addEventListener('change', update);
+      toSelect.addEventListener('change', update);
+      precisionEl.addEventListener('change', update);
+
+      swapBtn.addEventListener('click', function () {
+        var a = fromSelect.value;
+        fromSelect.value = toSelect.value;
+        toSelect.value = a;
+        update();
+      });
+
+      copyBtn.addEventListener('click', function () {
+        if (!lastResultText) {
+          showToast('暂无结果可复制');
+          return;
+        }
+        copyText(lastResultText);
+      });
+
+      clearBtn.addEventListener('click', function () {
+        valueInput.value = '';
+        valueInput.focus();
+        update();
+      });
+
+      // 输入框回车时全选，便于快速替换
+      valueInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          valueInput.select();
+        }
+      });
+
+      // ---------- 初始化 ----------
+      renderTabs();
+      switchCategory(current.id);
+    })();
+  </script>
+</body>
+
+</html>
