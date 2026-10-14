@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>三重镇 - 合成建造小游戏</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #1a1a1a;
+      --text-secondary: #6b7280;
+      --card-bg: #ffffff;
+      --card-border: #e5e7eb;
+      --chip-bg: #f3f4f6;
+      --primary: #28a745;
+      --primary-hover: #218838;
+      --danger: #dc3545;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --shadow-lg: rgba(0, 0, 0, 0.22);
+
+      /* 棋盘尺寸（可被小窗/媒体查询覆盖） */
+      --c: 72px;
+      --g: 8px;
+      --pad: 12px;
+      --board-bg: #c9b79a;
+      --cell-bg: rgba(255, 255, 255, 0.34);
+      --cell-hover: rgba(255, 255, 255, 0.66);
+      --empty-ring: rgba(0, 0, 0, 0.07);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #0f172a;
+        --text-color: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --card-bg: #1e293b;
+        --card-border: #334155;
+        --chip-bg: #273449;
+        --primary: #34ce57;
+        --primary-hover: #2eb951;
+        --danger: #f87171;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --shadow-lg: rgba(0, 0, 0, 0.55);
+        --board-bg: #3a3f47;
+        --cell-bg: rgba(255, 255, 255, 0.07);
+        --cell-hover: rgba(255, 255, 255, 0.16);
+        --empty-ring: rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    @media (max-width: 560px) { :root { --c: 56px; --g: 6px; --pad: 10px; } }
+    @media (max-width: 400px) { :root { --c: 44px; --g: 5px; --pad: 8px; } }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page { max-width: 560px; margin: 0 auto; }
+    #stage { width: fit-content; margin: 0 auto; }
+
+    /* ========== 小窗模式：整页变为可拖动悬浮窗 ========== */
+    .mini-mode #stage {
+      position: fixed;
+      z-index: 9998;
+      margin: 0;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      box-shadow: 0 18px 50px var(--shadow-lg);
+      overflow: hidden;
+    }
+    body.mini-mode { overflow: hidden; --c: 40px; --g: 5px; --pad: 6px; }
+    @media (max-width: 400px) { body.mini-mode { --c: 34px; --g: 4px; --pad: 5px; } }
+
+    .disguised #stage,
+    .disguised .modal { visibility: hidden; }
+
+    /* ========== 小窗拖拽条 ========== */
+    .mini-bar { display: none; }
+
+    .mini-mode .mini-bar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 7px;
+      cursor: grab;
+      background: var(--chip-bg);
+      border-bottom: 1px solid var(--card-border);
+      touch-action: none;
+      font-size: 0.74em;
+      font-weight: 600;
+    }
+    .mini-mode .mini-bar:active { cursor: grabbing; }
+    .mini-grip { color: var(--text-secondary); font-size: 0.9em; letter-spacing: 1px; }
+    .mini-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-bar button {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 6px;
+      padding: 1px 5px;
+      font-size: 0.92em;
+      cursor: pointer;
+      line-height: 1.6;
+      white-space: nowrap;
+      flex: none;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .mini-bar button:hover { border-color: var(--primary); color: var(--primary); }
+    .mini-bar button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .mini-bar button:disabled:hover { border-color: var(--card-border); color: var(--text-color); }
+    .mini-bar .fake-btn { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .mini-bar .fake-btn:hover { opacity: 0.88; color: #fff; }
+
+    /* ========== 卡片 ========== */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 20px 20px;
+      box-shadow: 0 6px 24px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .mini-mode .card { border: none; box-shadow: none; border-radius: 0; padding: 5px 6px 7px; }
+
+    .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .head h1 { font-size: 2em; font-weight: 800; line-height: 1.1; }
+    .tagline { color: var(--text-secondary); font-size: 0.86em; margin-top: 3px; }
+    .mini-mode .tagline, .mini-mode .ctrl { display: none; }
+
+    .scorebox { display: flex; gap: 8px; }
+    .chip {
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 5px 12px;
+      text-align: center;
+      min-width: 62px;
+    }
+    .chip-label { display: block; font-size: 0.7em; color: var(--text-secondary); letter-spacing: 1px; }
+    .chip-value { font-size: 1.25em; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .chip.bump .chip-value { animation: bump 0.3s ease; }
+    @keyframes bump { 30% { transform: scale(1.25); color: var(--primary); } }
+
+    .ctrl { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .ctrl button {
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.88em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .ctrl button:hover { border-color: var(--primary); color: var(--primary); }
+    .ctrl button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .ctrl button.primary:hover { background: var(--primary-hover); color: #fff; }
+    .ctrl button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ctrl button.slack { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .ctrl button.slack:hover { background: #b02a37; color: #fff; }
+
+    /* ========== 手牌托盘 ========== */
+    .tray { display: flex; gap: 10px; margin-top: 14px; }
+    .tray-box {
+      flex: 1;
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 7px 8px 9px;
+      text-align: center;
+      transition: border-color 0.15s ease;
+    }
+    .tray-label { display: block; font-size: 0.68em; color: var(--text-secondary); letter-spacing: 0.5px; margin-bottom: 5px; }
+    .tray-box.big .tray-label { color: var(--primary); font-weight: 700; }
+    .tray-box.clickable { cursor: pointer; }
+    .tray-box.clickable:hover { border-color: var(--primary); }
+    .mini-mode .tray { gap: 6px; margin-top: 7px; }
+    .mini-mode .tray-box { padding: 3px 4px 5px; border-radius: 8px; }
+    .mini-mode .tray-label { font-size: 0.58em; margin-bottom: 2px; }
+
+    .piece {
+      width: 46px;
+      height: 46px;
+      margin: 0 auto;
+      position: relative;
+      border-radius: 9px;
+      background: var(--empty-ring);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mini-mode .piece { width: 30px; height: 30px; border-radius: 6px; }
+    .piece i {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      font-size: 25px;
+      line-height: 1;
+      background: var(--tb, transparent);
+      color: var(--tf, transparent);
+    }
+    .mini-mode .piece i { font-size: 17px; border-radius: 6px; }
+    .piece.empty i { background: transparent; font-size: 13px; color: var(--text-secondary); }
+    .piece.empty i::after { content: '空'; }
+    .piece i .idx {
+      position: absolute;
+      right: 8%;
+      bottom: 4%;
+      font-size: 0.42em;
+      font-weight: 800;
+      opacity: 0.5;
+      font-variant-numeric: tabular-nums;
+    }
+    .mini-mode .piece i .idx { display: none; }
+    .piece.pulse { animation: pulse 0.34s ease; }
+    @keyframes pulse { 45% { transform: scale(1.14); } }
+
+    /* ========== 棋盘 ========== */
+    .board {
+      position: relative;
+      width: calc(var(--pad) * 2 + var(--c) * 6 + var(--g) * 5);
+      height: calc(var(--pad) * 2 + var(--c) * 6 + var(--g) * 5);
+      background: var(--board-bg);
+      border-radius: 12px;
+      margin: 12px auto 0;
+      touch-action: manipulation;
+    }
+    .cells, .tiles { position: absolute; inset: 0; padding: var(--pad); }
+    .cells { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); gap: var(--g); }
+    .bg-cell { background: var(--cell-bg); border-radius: 8px; transition: background-color 0.12s ease; }
+    @media (hover: hover) { .bg-cell:hover { background: var(--cell-hover); } }
+    /* 手上是机器人 / 钻石时，棋盘给一点提示（小窗里保持隐身，不加色） */
+    body.bot-mode .bg-cell { background: rgba(214, 90, 72, 0.07); }
+    body.bot-mode .tile:not(.empty) i { box-shadow: inset 0 0 0 2px rgba(214, 90, 72, 0.6); }
+    body.bot-mode .tile.empty i { opacity: 0.22; }
+    body.crystal-mode .bg-cell { background: rgba(55, 138, 221, 0.10); }
+    body.mini-mode.bot-mode .bg-cell,
+    body.mini-mode.crystal-mode .bg-cell { background: var(--cell-bg); }
+    body.mini-mode.bot-mode .tile:not(.empty) i { box-shadow: none; }
+    body.mini-mode.bot-mode .tile.empty i { opacity: 1; }
+    .mini-mode .board { margin-top: 6px; border-radius: 9px; }
+    .mini-mode .bg-cell { border-radius: 5px; }
+
+    .tile { position: absolute; width: var(--c); height: var(--c); will-change: transform; pointer-events: none; }
+    .tile i {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: calc(var(--c) * 0.5);
+      line-height: 1;
+      background: var(--tb, transparent);
+      color: var(--tf, #333);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .mini-mode .tile i { border-radius: 5px; }
+    .tile.empty i { background: transparent; }
+    .tile i .idx {
+      position: absolute;
+      right: 5%;
+      bottom: 2%;
+      font-size: 0.3em;
+      font-weight: 800;
+      opacity: 0.45;
+      font-variant-numeric: tabular-nums;
+    }
+    .mini-mode .tile i .idx { display: none; }
+
+    /* 稀有变体：金环 + 星标 */
+    .tile i.rare { box-shadow: inset 0 0 0 2px #e0a800, 0 0 8px rgba(224, 168, 0, 0.55); }
+    .tile i.rare::after {
+      content: '✦';
+      position: absolute;
+      left: 4%;
+      top: 0;
+      font-size: 0.3em;
+      color: #b8860b;
+    }
+
+    /* 棋子配色（棋子和托盘手牌共用，靠 --tb/--tf 传递） */
+    .t-m1 { --tb: #d9eec7; --tf: #2f5d24; }
+    .t-m2 { --tb: #c2e39c; --tf: #29521f; }
+    .t-m3 { --tb: #a2d76d; --tf: #234a19; }
+    .t-m4 { --tb: #efdcb0; --tf: #6b4a1e; }
+    .t-m5 { --tb: #e6c887; --tf: #66430f; }
+    .t-m6 { --tb: #dcb264; --tf: #5a3a0c; }
+    .t-m7 { --tb: #cbc4b8; --tf: #463f31; }
+    .t-m8 { --tb: #bcc8ea; --tf: #2e3c62; }
+    .t-b1 { --tb: #d2d5d9; --tf: #484d55; }
+    .t-b2 { --tb: #e8dff4; --tf: #4b3b64; }
+    .t-b3 { --tb: #d6c8ec; --tf: #3d2d5a; }
+    .t-b4 { --tb: #f4e2a6; --tf: #6a4f10; }
+    .t-b5 { --tb: #f2cf6c; --tf: #5a3e04; }
+    .t-bear { --tb: #c08f63; --tf: #3a2312; }
+    .t-rock { --tb: #d3d6da; --tf: #45484d; }
+    .t-mount { --tb: #bfb7a8; --tf: #3d372c; }
+    .t-crystal { --tb: #cfe6f7; --tf: #1c4a6e; }
+    .t-bot { --tb: #dde2e8; --tf: #39404a; }
+
+    @media (prefers-color-scheme: dark) {
+      .t-m1 { --tb: #2f4a28; --tf: #b8dd9f; }
+      .t-m2 { --tb: #37582c; --tf: #a8d88a; }
+      .t-m3 { --tb: #3d6630; --tf: #9ad47a; }
+      .t-m4 { --tb: #5a4526; --tf: #e6d0a4; }
+      .t-m5 { --tb: #66491f; --tf: #eccf98; }
+      .t-m6 { --tb: #73521d; --tf: #f0d49a; }
+      .t-m7 { --tb: #4a4b4e; --tf: #d8dade; }
+      .t-m8 { --tb: #33405e; --tf: #bcc9ec; }
+      .t-b1 { --tb: #3f4245; --tf: #c3c7cc; }
+      .t-b2 { --tb: #443a5c; --tf: #d9cdf0; }
+      .t-b3 { --tb: #4f4270; --tf: #cabdf0; }
+      .t-b4 { --tb: #5c4a18; --tf: #f0dda2; }
+      .t-b5 { --tb: #6b5313; --tf: #f7e08a; }
+      .t-bear { --tb: #54331d; --tf: #d8ae86; }
+      .t-rock { --tb: #42464a; --tf: #c6cace; }
+      .t-mount { --tb: #4c453a; --tf: #ded4c2; }
+      .t-crystal { --tb: #23455f; --tf: #b7ddf6; }
+      .t-bot { --tb: #3c434c; --tf: #cdd5dd; }
+    }
+
+    /* 隐身档：小窗强制灰阶低饱和，压低远距离辨识度 */
+    body.mini-mode {
+      --card-bg: #181b1f;
+      --card-border: #262a2f;
+      --chip-bg: #1d2125;
+      --text-color: #d7dbe0;
+      --text-secondary: #868d94;
+      --board-bg: #14171a;
+      --cell-bg: rgba(255, 255, 255, 0.05);
+      --cell-hover: rgba(255, 255, 255, 0.08);
+      --empty-ring: rgba(255, 255, 255, 0.05);
+      --shadow-lg: rgba(0, 0, 0, 0);
+    }
+    body.mini-mode #stage {
+      border-color: #2a2f35;
+      box-shadow: none;
+      opacity: 0.64;
+      transition: opacity 0.28s ease;
+    }
+    body.mini-mode #stage:hover,
+    body.mini-mode #stage:active { opacity: 1; }
+    body.mini-mode .head .titles { display: none; }
+    body.mini-mode .head { justify-content: flex-end; }
+    body.mini-mode .chip {
+      min-width: 0;
+      padding: 1px 0 1px 2px;
+      background: transparent;
+      border-color: transparent;
+    }
+    body.mini-mode .chip-label { display: none; }
+    body.mini-mode .chip-value { font-size: 0.76em; font-weight: 600; color: var(--text-secondary); }
+    body.mini-mode .mini-bar { background: transparent; border-bottom-color: #21252a; padding-bottom: 3px; }
+    body.mini-mode .mini-grip,
+    body.mini-mode .mini-title {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: #565d64;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    body.mini-mode .mini-grip { font-size: 0.72em; }
+    body.mini-mode .mini-title { font-size: 0.66em; }
+    body.mini-mode .mini-bar button { background: transparent; border-color: #2a2f35; color: #848b93; }
+    body.mini-mode .mini-bar button:hover { border-color: #3a4149; color: #aeb6bd; }
+    /* 托盘标签一律压成灰字，绿色高亮在小窗里太显眼 */
+    body.mini-mode .tray-box.big .tray-label { color: var(--text-secondary); font-weight: 400; }
+    body.mini-mode .tray-box.clickable:hover { border-color: var(--card-border); }
+    body.mini-mode .mini-bar .fake-btn,
+    body.mini-mode .mini-bar .fake-btn:hover { background: transparent; color: #848b93; }
+    /* emoji 去色，避免彩色图标在深色桌面上过于显眼 */
+    body.mini-mode .tile i,
+    body.mini-mode .piece i { filter: grayscale(1) contrast(0.86); }
+    body.mini-mode .t-m1,
+    body.mini-mode .t-m2,
+    body.mini-mode .t-m3,
+    body.mini-mode .t-b1 { --tb: #2a2e34; --tf: #8f979f; }
+    body.mini-mode .t-m4,
+    body.mini-mode .t-m5,
+    body.mini-mode .t-b2 { --tb: #2f343a; --tf: #9aa2aa; }
+    body.mini-mode .t-m6,
+    body.mini-mode .t-m7,
+    body.mini-mode .t-b3,
+    body.mini-mode .t-b4 { --tb: #33383f; --tf: #a4acb4; }
+    body.mini-mode .t-m8,
+    body.mini-mode .t-b5 { --tb: #383e45; --tf: #b2bac2; }
+    body.mini-mode .t-bear { --tb: #2c3036; --tf: #aeb6bd; }
+    body.mini-mode .t-rock,
+    body.mini-mode .t-mount { --tb: #2e3238; --tf: #959da5; }
+    body.mini-mode .t-crystal,
+    body.mini-mode .t-bot { --tb: #33383f; --tf: #a4acb4; }
+    body.mini-mode .tile i.rare { box-shadow: inset 0 0 0 1px #4a5158; }
+    body.mini-mode .tile i.rare::after { color: #6a727a; }
+    /* 动效收敛 */
+    body.mini-mode .tile i.pop,
+    body.mini-mode .tile i.hop { animation: none; }
+    body.mini-mode .tile i.spawn { animation: miniFade 0.16s ease; }
+    body.mini-mode .tile i.morph { animation: miniFade 0.16s ease; }
+    body.mini-mode .chip.bump .chip-value { animation: none; }
+    @keyframes miniFade { from { opacity: 0.1; } }
+
+    /* ========== 棋子动画 ========== */
+    .tile i.spawn { animation: spawn 0.2s ease; }
+    .tile i.pop { animation: pop 0.24s ease; }
+    .tile i.hop { animation: hop 0.2s ease; }
+    .tile i.vanish { animation: vanish 0.16s ease forwards; }
+    .tile i.tombIn { animation: tombIn 0.28s ease; }
+    .tile i.nope { animation: nope 0.22s ease; }
+    /* 钻石变形：给一个独立拍子，否则看不出这一格刚才发生了什么 */
+    .tile i.morph { animation: morph 0.4s ease; }
+    @keyframes spawn { from { transform: scale(0.3); opacity: 0.35; } }
+    @keyframes pop { 40% { transform: scale(1.18); } }
+    @keyframes hop { 50% { transform: translateY(-18%) scale(1.08); } }
+    @keyframes vanish { to { transform: scale(0.55); opacity: 0.2; } }
+    @keyframes tombIn { 40% { transform: scale(1.16) rotate(-6deg); } }
+    @keyframes nope { 25% { transform: translateX(-8%); } 75% { transform: translateX(8%); } }
+    @keyframes morph {
+      0% { transform: scale(0.5) rotate(-16deg); opacity: 0.3; }
+      55% { transform: scale(1.2) rotate(7deg); opacity: 1; }
+    }
+
+    /* 摸鱼小窗入口只在电脑端展示 */
+    @media (pointer: coarse) { .ctrl .slack { display: none; } }
+
+    .status { text-align: center; color: var(--text-secondary); font-size: 0.78em; margin-top: 10px; font-variant-numeric: tabular-nums; }
+    .mini-mode .status { display: none; }
+    .hint { text-align: center; color: var(--text-secondary); font-size: 0.8em; margin-top: 6px; }
+    .mini-mode .hint { display: none; }
+
+    /* ========== 说明区 ========== */
+    .page-extra { margin-top: 22px; }
+    .guide {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .guide summary { cursor: pointer; font-weight: 700; font-size: 0.95em; list-style: none; position: relative; }
+    .guide summary::before { content: '▸'; position: absolute; left: -16px; top: 0; color: var(--primary); transition: transform 0.2s; }
+    .guide[open] summary::before { transform: rotate(90deg); }
+    .guide ul { margin: 10px 0 0 18px; color: var(--text-secondary); font-size: 0.88em; line-height: 1.9; }
+    .guide kbd {
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 4px; margin-top: 10px; align-items: center; }
+    .legend .lg {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--chip-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2px 9px 2px 4px;
+      font-size: 0.78em;
+      color: var(--text-secondary);
+    }
+    .legend .lg b { font-size: 15px; line-height: 1; }
+    .legend .sep { color: var(--text-secondary); font-size: 0.8em; padding: 0 2px; }
+    .footer-tip { text-align: center; color: var(--text-secondary); font-size: 0.82em; margin-top: 16px; line-height: 1.6; }
+    .back-link { text-align: center; margin-top: 18px; }
+    .back-link a {
+      display: inline-block;
+      padding: 9px 18px;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92em;
+      transition: background-color 0.2s ease;
+    }
+    .back-link a:hover { background: var(--primary-hover); }
+    .mini-mode .page-extra { display: none; }
+
+    /* ========== 弹窗 ========== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30000;
+      padding: 20px;
+    }
+    .modal.show { display: flex; }
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 26px 28px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    .modal-card h2 { font-size: 1.5em; margin-bottom: 10px; }
+    .modal-card p { color: var(--text-secondary); font-size: 0.92em; margin-bottom: 8px; line-height: 1.7; }
+    .modal-card .big { font-size: 2em; font-weight: 800; color: var(--primary); margin: 4px 0 10px; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+    .modal-btns button {
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .modal-btns button:hover { border-color: var(--primary); color: var(--primary); }
+    .modal-btns button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .modal-btns button.primary:hover { background: var(--primary-hover); color: #fff; }
+
+    /* ========== 老板键：假装写代码 ========== */
+    .fake {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      display: none;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    .fake.show { display: flex; }
+
+    .fake-top {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: #181825;
+      border-bottom: 1px solid #313244;
+      gap: 10px;
+      font-size: 0.8em;
+      color: #a6adc8;
+    }
+    .fake-dots { display: flex; gap: 6px; }
+    .fake-dots span { width: 11px; height: 11px; border-radius: 50%; }
+    .fake-dots .r { background: #f38ba8; }
+    .fake-dots .y { background: #f9e2af; }
+    .fake-dots .g { background: #a6e3a1; }
+    .fake-tab {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 3px 14px;
+      border-radius: 6px 6px 0 0;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 0.95em;
+    }
+    .fake-top .spacer { flex: 1; }
+    .fake-top .running { color: #a6adc8; font-size: 0.85em; }
+
+    .fake-body { flex: 1; display: flex; min-height: 0; }
+    .fake-side {
+      width: 176px;
+      background: #181825;
+      border-right: 1px solid #313244;
+      padding: 10px 0;
+      font-size: 0.8em;
+      color: #a6adc8;
+      overflow: hidden;
+      line-height: 1.9;
+    }
+    .fake-side .tree { padding: 0 12px; }
+    .fake-side .tree div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fake-side .tree .dir { color: #89b4fa; }
+    .fake-side .tree .file { padding-left: 16px; }
+    .fake-side .tree .sel { background: #313244; color: #cdd6f4; border-radius: 4px; padding-left: 8px; }
+
+    .fake-editor {
+      flex: 1;
+      display: flex;
+      min-width: 0;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      font-size: 12.5px;
+      line-height: 1.55;
+      overflow: auto;
+      padding-bottom: 40px;
+    }
+    .fake-gutter { width: 46px; flex-shrink: 0; text-align: right; color: #585b70; padding: 12px 8px 0 0; user-select: none; }
+    .fake-code { flex: 1; padding: 12px 16px 0 8px; white-space: pre; min-width: 560px; }
+    .fake-code .cm { color: #6c7086; font-style: italic; }
+    .fake-code .kw { color: #cba6f7; }
+    .fake-code .tp { color: #89dceb; }
+    .fake-code .fn { color: #89b4fa; }
+    .fake-code .st { color: #a6e3a1; }
+    .fake-code .nm { color: #f9e2af; }
+    .fake-code .cur { background: rgba(137, 180, 250, 0.18); }
+    .fake-code .cur::after {
+      content: '';
+      display: inline-block;
+      width: 2px;
+      height: 13px;
+      background: #f38ba8;
+      vertical-align: text-bottom;
+      animation: blink 1s steps(1) infinite;
+      margin-left: 1px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .fake-status {
+      display: flex;
+      gap: 18px;
+      padding: 4px 14px;
+      background: #181825;
+      border-top: 1px solid #313244;
+      color: #a6adc8;
+      font-size: 0.75em;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+    .fake-status .ok { color: #a6e3a1; }
+    .fake-status .err { color: #f38ba8; }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <!-- 可切换为悬浮小窗的舞台 -->
+    <div id="stage">
+
+      <!-- 小窗拖拽条 -->
+      <div class="mini-bar" id="miniBar">
+        <span class="mini-grip">⠿</span>
+        <span class="mini-title">npm run dev</span>
+        <button type="button" id="miniUndo" title="撤销 (U)">撤销</button>
+        <button type="button" id="miniNew" title="新游戏 (N)">重开</button>
+        <button type="button" class="fake-btn" id="miniFake" title="老板来了！假装写代码 (`)">伪装</button>
+        <button type="button" id="miniExit" title="退出小窗模式 (M)">✕</button>
+      </div>
+
+      <div class="card">
+        <div class="head">
+          <div class="titles">
+            <h1>三重镇</h1>
+            <p class="tagline">三个相同物件相连即合体，在 6×6 里造出一座小镇</p>
+          </div>
+          <div class="scorebox">
+            <div class="chip" id="scoreChip"><span class="chip-label">得分</span><span class="chip-value" id="score">0</span></div>
+            <div class="chip"><span class="chip-label">最佳</span><span class="chip-value" id="best">0</span></div>
+          </div>
+        </div>
+
+        <div class="ctrl">
+          <button type="button" id="undoBtn" disabled>↶ 撤销</button>
+          <button type="button" id="soundBtn">🔊 音效</button>
+          <button type="button" class="primary" id="newBtn">新游戏</button>
+          <button type="button" class="slack" id="slackBtn">🐟 摸鱼小窗 (M)</button>
+        </div>
+
+        <div class="tray">
+          <div class="tray-box big">
+            <span class="tray-label">当前棋子</span>
+            <div class="piece" id="handPiece"><i></i></div>
+          </div>
+          <div class="tray-box clickable" id="storeBox" title="点击寄存当前棋子 / 取回仓库里的棋子">
+            <span class="tray-label">仓库</span>
+            <div class="piece" id="storePiece"><i></i></div>
+          </div>
+          <div class="tray-box">
+            <span class="tray-label">下一手</span>
+            <div class="piece" id="nextPiece"><i></i></div>
+          </div>
+        </div>
+
+        <div class="board" id="board">
+          <div class="cells" id="cells"></div>
+          <div class="tiles" id="tiles"></div>
+        </div>
+
+        <p class="status" id="status">回合 0 · 场上熊 0 只 · 最高建筑 —</p>
+        <p class="hint" id="hint">点空格落子 · 熊会自己走动，整群熊被堵到无路可走才变墓碑</p>
+      </div>
+    </div>
+
+    <div class="page-extra">
+      <details class="guide" open>
+        <summary>怎么玩（30 秒上手）</summary>
+        <ul>
+          <li><b>落子</b>：点棋盘上的空格放下「当前棋子」。放下就永久生效，不能移动。</li>
+          <li><b>合体</b>：横竖相邻的 <b>3 个及以上同种物件</b>会自动合成高一级。<b>落点 = 这群里最后放下的那一格</b>，所以怎么摆最关键。</li>
+          <li><b>熊</b>：熊也是发给你的手牌，必须找地方放下。每回合熊会自己走一格；<b>一整群熊都被堵到无路可走</b>时它们才会一起变成墓碑 —— 单只熊被同伴挡住不算死，它会等同伴让路。所以想刷教堂，要把整窝熊填满。</li>
+          <li><b>熊支链</b>：墓碑 ×3 → 教堂 ×3 → 大教堂 ×3 → 小宝箱 ×3 → 大宝箱。把熊圈进角落是刷高分的关键。</li>
+          <li><b>💎 钻石</b>：万能牌。放进空格后它会自动变成<b>能让这一格凑成 3 连</b>的那种物件（同时有多种可能时取等级最高的），一个都凑不出就白白变成一块石头。所以放之前先看四周。</li>
+          <li><b>🤖 机器人</b>：不能放到棋盘上，而是<b>点棋盘上任意一格拆掉它</b>：熊 → 墓碑、山 → 小宝箱、其余直接清空，并按被拆棋子的分值扣分。小宝箱和大宝箱拆不了。</li>
+          <li><b>石链</b>：石头 ×3 → 山 ×3 → 大宝箱。钻石放空了也不算血本无归。</li>
+          <li><b>4 连及以上</b>：合体会产出带金环的「稀有变体」，分数额外 +50%，结算时也额外加分。</li>
+          <li><b>仓库</b>：只有一格，可以把当前棋子寄存起来等时机；点击仓库可寄存/取回（免费，不消耗回合）。</li>
+          <li><b>结束</b>：棋盘没有空格可放时本局结束，刷新页面可以接着上一局继续。</li>
+          <li><b>快捷键</b>：<kbd>U</kbd> 撤销 · <kbd>N</kbd> 新游戏 · <kbd>M</kbd> 摸鱼小窗 · <kbd>`</kbd> 老板键</li>
+        </ul>
+        <div class="legend" id="legend"></div>
+      </details>
+      <details class="guide">
+        <summary>摸鱼使用说明</summary>
+        <ul>
+          <li><b>摸鱼小窗</b>：按 <kbd>M</kbd> 或点「摸鱼小窗」，页面变成可拖动的小窗口，拖到屏幕角落继续玩</li>
+          <li><b>隐身配色</b>：小窗默认灰阶暗色 + 半透明，emoji 也一起去色，远处不易察觉；鼠标移到窗口上会变清晰</li>
+          <li><b>老板键</b>：按 <kbd>`</kbd>（Esc 键下方）一键切到「假装写代码」界面，再按 <kbd>`</kbd> 或 <kbd>Esc</kbd> 回来</li>
+        </ul>
+      </details>
+      <div class="footer-tip">💡 提示：这局存档在本地浏览器里，关掉页面明天回来还能接着造城。</div>
+      <div class="back-link"><a href="./index.html">返回工具列表</a></div>
+    </div>
+  </main>
+
+  <!-- 结算弹窗 -->
+  <div class="modal" id="overModal">
+    <div class="modal-card">
+      <h2>棋盘满了</h2>
+      <div class="big" id="overScore">0</div>
+      <p id="overDetail">本局结束</p>
+      <div class="modal-btns">
+        <button type="button" id="overUndo">撤销一步</button>
+        <button type="button" class="primary" id="overNew">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 老板键：假装在写代码 -->
+  <div class="fake" id="fake">
+    <div class="fake-top">
+      <div class="fake-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+      <span class="fake-tab">dataset_builder.py</span>
+      <span class="spacer"></span>
+      <span class="running">● 正在运行 · Python 3.12</span>
+    </div>
+    <div class="fake-body">
+      <div class="fake-side">
+        <div class="tree">
+          <div class="dir">▼ etl</div>
+          <div class="file">__init__.py</div>
+          <div class="file sel">dataset_builder.py</div>
+          <div class="file">schema_validator.py</div>
+          <div class="file">shard_writer.py</div>
+          <div class="dir">▼ models</div>
+          <div class="file">feature_spec.py</div>
+          <div class="file">label_mapping.py</div>
+          <div class="dir">▼ configs</div>
+          <div class="file">base.yaml</div>
+          <div class="file">prod.yaml</div>
+          <div class="dir">▼ tests</div>
+          <div class="file">test_builder.py</div>
+        </div>
+      </div>
+      <div class="fake-editor">
+        <div class="fake-gutter" id="fakeGutter"></div>
+        <div class="fake-code" id="fakeCode"></div>
+      </div>
+    </div>
+    <div class="fake-status">
+      <span>dataset_builder.py</span>
+      <span class="ok">● 已连接</span>
+      <span>行 <span id="fakeLine">31</span>，列 9</span>
+      <span>空格: 4</span>
+      <span>Python 3.12</span>
+      <span class="err">0 个问题</span>
+      <span id="fakeClock"></span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ================= 配置 ================= */
+      var SIZE = 6;
+      var TOTAL = SIZE * SIZE;
+      var BEST_KEY = 'tool-triple-town-best';
+      var SAVE_KEY = 'tool-triple-town-save';
+      var SND_KEY = 'tool-triple-town-sound';
+
+      /* 物件表：chain 为所属链条，tier 为链条内等级，score 为合体产出该物件时的得分 */
+      var TILES = {
+        grass: { name: '草', emoji: '🌱', chain: 'main', tier: 1, score: 1, cls: 't-m1' },
+        bush: { name: '灌木', emoji: '🌿', chain: 'main', tier: 2, score: 3, cls: 't-m2' },
+        tree: { name: '树', emoji: '🌳', chain: 'main', tier: 3, score: 9, cls: 't-m3' },
+        hut: { name: '木屋', emoji: '🏚️', chain: 'main', tier: 4, score: 27, cls: 't-m4' },
+        house: { name: '房屋', emoji: '🏠', chain: 'main', tier: 5, score: 81, cls: 't-m5' },
+        mansion: { name: '别墅', emoji: '🏡', chain: 'main', tier: 6, score: 243, cls: 't-m6' },
+        castle: { name: '城堡', emoji: '🏰', chain: 'main', tier: 7, score: 729, cls: 't-m7' },
+        sky: { name: '浮空城', emoji: '☁️', chain: 'main', tier: 8, score: 2187, cls: 't-m8' },
+        tomb: { name: '墓碑', emoji: '🪦', chain: 'bear', tier: 1, score: 20, cls: 't-b1' },
+        church: { name: '教堂', emoji: '⛪', chain: 'bear', tier: 2, score: 60, cls: 't-b2' },
+        cathedral: { name: '大教堂', emoji: '🏛️', chain: 'bear', tier: 3, score: 180, cls: 't-b3' },
+        chest: { name: '小宝箱', emoji: '💰', chain: 'bear', tier: 4, score: 540, cls: 't-b4' },
+        bigchest: { name: '大宝箱', emoji: '👑', chain: 'bear', tier: 5, score: 1620, cls: 't-b5' },
+        bear: { name: '熊', emoji: '🐻', chain: null, tier: 0, score: 0, cls: 't-bear' },
+        rock: { name: '石头', emoji: '🪨', chain: 'rock', tier: 1, score: 20, cls: 't-rock' },
+        mount: { name: '山', emoji: '⛰️', chain: 'rock', tier: 2, score: 120, cls: 't-mount' },
+        crystal: { name: '钻石', emoji: '💎', chain: null, tier: 0, score: 0, cls: 't-crystal' },
+        bot: { name: '机器人', emoji: '🤖', chain: null, tier: 0, score: 0, cls: 't-bot' }
+      };
+
+      var MAIN_CHAIN = ['grass', 'bush', 'tree', 'hut', 'house', 'mansion', 'castle', 'sky'];
+      var BEAR_CHAIN = ['tomb', 'church', 'cathedral', 'chest', 'bigchest'];
+      var ROCK_CHAIN = ['rock', 'mount'];
+
+      // 合体升级表。山也能继续合成大宝箱，失败的水晶才有出路（与原作一致）
+      var NEXT = {
+        grass: 'bush', bush: 'tree', tree: 'hut', hut: 'house', house: 'mansion',
+        mansion: 'castle', castle: 'sky',
+        tomb: 'church', church: 'cathedral', cathedral: 'chest', chest: 'bigchest',
+        rock: 'mount', mount: 'bigchest'
+      };
+
+      // 钻石的试算顺序：等级高的排前面（原作同时有多种可能时取等级最高的那种）。
+      // 熊永远不参与；顶级物件（浮空城 / 大宝箱）本身不能再合体，也不在表里。
+      var CRYSTAL_TRIES = ['chest', 'castle', 'cathedral', 'mansion', 'church', 'house', 'tomb', 'hut', 'tree', 'bush', 'grass'];
+
+      // 保底回合：错过这两手之前一定各送一次，之后再按概率随机掉
+      var GUARANTEE = { crystal: 18, bot: 30 };
+      var DROP_RATE = { crystal: 3, bot: 3 };
+
+      function nextType(type) {
+        return NEXT[type] || null;
+      }
+
+      /* ================= DOM ================= */
+      var boardEl = document.getElementById('board');
+      var tilesEl = document.getElementById('tiles');
+      var cellsEl = document.getElementById('cells');
+      var scoreEl = document.getElementById('score');
+      var bestEl = document.getElementById('best');
+      var scoreChip = document.getElementById('scoreChip');
+      var statusEl = document.getElementById('status');
+      var handPiece = document.getElementById('handPiece');
+      var storePiece = document.getElementById('storePiece');
+      var nextPieceEl = document.getElementById('nextPiece');
+      var storeBox = document.getElementById('storeBox');
+      var hintEl = document.getElementById('hint');
+      var undoBtn = document.getElementById('undoBtn');
+      var soundBtn = document.getElementById('soundBtn');
+      var newBtn = document.getElementById('newBtn');
+      var slackBtn = document.getElementById('slackBtn');
+      var stage = document.getElementById('stage');
+      var overModal = document.getElementById('overModal');
+
+      /* ================= 状态 ================= */
+      var board = newSparse(TOTAL);
+      var hand = null;        // 当前棋子（必须落下的那个）
+      var nextPiece = null;   // 下一手预览
+      var store = null;       // 仓库（1 格）
+      var score = 0;
+      var turn = 0;
+      var seqCounter = 0;
+      var locked = false;     // 动画期间锁输入
+      var over = false;
+      var undoStack = [];
+      var gotCrystal = false; // 本局是否已经吃过保底钻石
+      var gotBot = false;     // 本局是否已经吃过保底机器人
+
+      var best = 0;
+      try { best = parseInt(localStorage.getItem(BEST_KEY) || '0', 10) || 0; } catch (e) { best = 0; }
+      var soundOn = true;
+      try { soundOn = localStorage.getItem(SND_KEY) !== '0'; } catch (e) { soundOn = true; }
+
+      function newSparse(n) { var a = new Array(n); for (var i = 0; i < n; i++) a[i] = null; return a; }
+
+      /* ================= 尺寸与定位 ================= */
+      function metrics() {
+        var cs = getComputedStyle(boardEl);
+        return {
+          c: parseFloat(cs.getPropertyValue('--c')) || 72,
+          g: parseFloat(cs.getPropertyValue('--g')) || 8
+        };
+      }
+
+      function posFor(i) {
+        var m = metrics();
+        var row = Math.floor(i / SIZE), col = i % SIZE;
+        return 'translate(' + (col * (m.c + m.g)) + 'px,' + (row * (m.c + m.g)) + 'px)';
+      }
+
+      function neighbors(i) {
+        var r = Math.floor(i / SIZE), c = i % SIZE, out = [];
+        if (r > 0) out.push(i - SIZE);
+        if (r < SIZE - 1) out.push(i + SIZE);
+        if (c > 0) out.push(i - 1);
+        if (c < SIZE - 1) out.push(i + 1);
+        return out;
+      }
+
+      /* ================= 音效（WebAudio 现场合成，无外部资源） ================= */
+      var audioCtx = null;
+
+      function beep(kind, level) {
+        if (!soundOn) return;
+        try {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          if (!audioCtx) audioCtx = new AC();
+          if (audioCtx.state === 'suspended' && audioCtx.resume) audioCtx.resume();
+          var cfg;
+          if (kind === 'place') cfg = [300, 0.06, 'square', 0.045];
+          else if (kind === 'merge') cfg = [380 + Math.min(8, level || 1) * 70, 0.1, 'triangle', 0.075];
+          else if (kind === 'trap') cfg = [130, 0.2, 'sine', 0.085];
+          else if (kind === 'over') cfg = [260, 0.45, 'sine', 0.075];
+          else if (kind === 'nope') cfg = [150, 0.05, 'square', 0.03];
+          else if (kind === 'crystal') cfg = [880, 0.16, 'triangle', 0.07];
+          else if (kind === 'bot') cfg = [110, 0.18, 'square', 0.05];
+          else cfg = [400, 0.06, 'sine', 0.045];
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.type = cfg[2];
+          osc.frequency.value = cfg[0];
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          var t = audioCtx.currentTime;
+          gain.gain.setValueAtTime(cfg[3], t);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + cfg[1]);
+          osc.start(t);
+          osc.stop(t + cfg[1] + 0.03);
+        } catch (e) { /* 音效失败不影响游戏 */ }
+      }
+
+      /* ================= 渲染 ================= */
+      var slots = [];
+
+      function buildBoard() {
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < TOTAL; i++) {
+          var c = document.createElement('div');
+          c.className = 'bg-cell';
+          cellsEl.appendChild(c);
+
+          var t = document.createElement('div');
+          t.className = 'tile empty';
+          t.dataset.i = String(i);
+          t.innerHTML = '<i></i>';
+          tilesEl.appendChild(t);
+          slots.push(t);
+        }
+      }
+
+      function paintPiece(el, type, rare) {
+        var inner = el.firstElementChild;
+        if (!type) {
+          el.classList.add('empty');
+          inner.className = '';
+          inner.textContent = '';
+          return;
+        }
+        var def = TILES[type];
+        el.classList.remove('empty');
+        inner.className = def.cls + (rare ? ' rare' : '');
+        var html = def.emoji;
+        if (def.chain) {
+          html += '<b class="idx">' + def.tier + '</b>';
+        }
+        inner.innerHTML = html;
+      }
+
+      // 动画类一次性触发：先移除再强制回流，保证连续两次同样的动效都能重播
+      function flash(el, cls) {
+        var inner = el.firstElementChild;
+        if (!inner) return;
+        inner.classList.remove(cls);
+        void inner.offsetWidth;
+        inner.classList.add(cls);
+      }
+
+      function render(anim) {
+        anim = anim || {};
+        for (var i = 0; i < TOTAL; i++) {
+          var cell = board[i];
+          paintPiece(slots[i], cell ? cell.type : null, cell ? cell.rare : false);
+        }
+        if (anim.vanish) for (var a = 0; a < anim.vanish.length; a++) flash(slots[anim.vanish[a]], 'vanish');
+        if (anim.pop) for (var b = 0; b < anim.pop.length; b++) flash(slots[anim.pop[b]], 'pop');
+        if (anim.hop) for (var c = 0; c < anim.hop.length; c++) flash(slots[anim.hop[c]], 'hop');
+        if (anim.tomb) for (var d = 0; d < anim.tomb.length; d++) flash(slots[anim.tomb[d]], 'tombIn');
+        if (typeof anim.spawn === 'number') flash(slots[anim.spawn], 'spawn');
+        if (typeof anim.morph === 'number') flash(slots[anim.morph], 'morph');
+      }
+
+      function relayout() {
+        for (var i = 0; i < TOTAL; i++) slots[i].style.transform = posFor(i);
+      }
+
+      var HINT_BASE = '点空格落子 · 熊会自己走动，整群熊被堵到无路可走才变墓碑';
+      var HINTS = {
+        crystal: '💎 点空格放下，它会自动变成「能凑成 3 连」的那种物件 · 凑不出就变成石头',
+        bot: '🤖 点棋盘上任意一格拆掉它 · 熊 → 墓碑 · 山 → 小宝箱 · 宝箱不能拆'
+      };
+
+      // 场上有没有机器人能拆的目标（宝箱不能拆）
+      function hasBotTarget() {
+        for (var i = 0; i < TOTAL; i++) {
+          var c = board[i];
+          if (c && c.type !== 'chest' && c.type !== 'bigchest') return true;
+        }
+        return false;
+      }
+
+      function renderTray(pulseHand) {
+        paintPiece(handPiece, hand, false);
+        paintPiece(storePiece, store, false);
+        paintPiece(nextPieceEl, nextPiece, false);
+        document.body.classList.toggle('bot-mode', hand === 'bot');
+        document.body.classList.toggle('crystal-mode', hand === 'crystal');
+        if (hintEl) {
+          var txt = HINTS[hand] || HINT_BASE;
+          // 机器人只能点已有的棋子，场上没目标时把话说明白，别让玩家干等
+          if (hand === 'bot' && !hasBotTarget()) {
+            txt = '🤖 场上现在没有能拆的棋子 —— 点「仓库」先把它寄存起来，换一手再放';
+          }
+          hintEl.textContent = txt;
+        }
+        if (pulseHand) {
+          handPiece.classList.remove('pulse');
+          void handPiece.offsetWidth;
+          handPiece.classList.add('pulse');
+        }
+      }
+
+      /* ================= 合成 ================= */
+      function findGroups() {
+        var seen = new Array(TOTAL);
+        var i;
+        for (i = 0; i < TOTAL; i++) seen[i] = false;
+        var groups = [];
+        for (i = 0; i < TOTAL; i++) {
+          var cell = board[i];
+          if (!cell || seen[i]) continue;
+          if (!nextType(cell.type)) continue;   // 熊 / 顶级物件不参与合体
+          var stack = [i], cells = [];
+          seen[i] = true;
+          while (stack.length) {
+            var cur = stack.pop();
+            cells.push(cur);
+            var nb = neighbors(cur);
+            for (var k = 0; k < nb.length; k++) {
+              var n = nb[k];
+              if (!seen[n] && board[n] && board[n].type === cell.type) {
+                seen[n] = true;
+                stack.push(n);
+              }
+            }
+          }
+          if (cells.length >= 3) groups.push({ type: cell.type, cells: cells });
+        }
+        return groups;
+      }
+
+      // 选一组合体：锚点（最后放下的那一格）序号最大者优先；并列时取等级更高的
+      function applyOneMerge(groups) {
+        var bestG = null, bestKey = -Infinity;
+        for (var i = 0; i < groups.length; i++) {
+          var g = groups[i], maxSeq = -1, anchor = -1;
+          for (var j = 0; j < g.cells.length; j++) {
+            var sq = board[g.cells[j]].seq || 0;
+            if (sq > maxSeq) { maxSeq = sq; anchor = g.cells[j]; }
+          }
+          var key = maxSeq * 10 + TILES[g.type].tier;
+          if (key > bestKey) { bestKey = key; bestG = { type: g.type, cells: g.cells, anchor: anchor }; }
+        }
+        if (!bestG) return null;
+        var next = nextType(bestG.type);
+        if (!next) return null;
+
+        var n = bestG.cells.length;
+        var rare = n >= 4;
+        for (var k = 0; k < bestG.cells.length; k++) board[bestG.cells[k]] = null;
+        board[bestG.anchor] = { type: next, seq: ++seqCounter, rare: rare };
+
+        var base = TILES[next].score;
+        var gain = base + (rare ? Math.round(base * 0.5) : 0);
+        score += gain;
+        return { cells: bestG.cells, anchor: bestG.anchor, type: next, gain: gain, rare: rare };
+      }
+
+      // 反复合体直到盘面稳定；每步之间留出动画时间
+      function settle(after) {
+        var groups = findGroups();
+        if (!groups.length) { after(); return; }
+        var m = applyOneMerge(groups);
+        if (!m) { after(); return; }
+        render({ vanish: m.cells, pop: [m.anchor] });
+        updateHUD();
+        bumpScore();
+        beep('merge', TILES[m.type].tier);
+        window.setTimeout(function () { settle(after); }, 150);
+      }
+
+      /* ================= 熊 ================= */
+      // 判死以「熊群」为单位，而不是单只熊：
+      // 只有一整群熊连一格可走的空位都够不着（全被物件和同伴封死）时，这一群才会一起变墓碑。
+      // 单只熊被同伴挡住不算死 —— 等同伴走开它就能动。原作就是这么判的，
+      // 所以「往最后一个缺口里放一只熊」并不能把里面的熊逼死；必须把整窝熊填满。
+      function bearPhase() {
+        var idxs = [];
+        for (var i = 0; i < TOTAL; i++) if (board[i] && board[i].type === 'bear') idxs.push(i);
+        idxs.sort(function (a, b) { return (board[a].seq || 0) - (board[b].seq || 0); });
+
+        // 1) 按四邻接把熊分成群，逐群判断「够不够得着空位」
+        var seen = new Array(TOTAL);
+        for (var z = 0; z < TOTAL; z++) seen[z] = false;
+        var doomed = [];
+        for (var s = 0; s < idxs.length; s++) {
+          if (seen[idxs[s]]) continue;
+          var group = [], stack = [idxs[s]], wayOut = false;
+          seen[idxs[s]] = true;
+          while (stack.length) {
+            var cur0 = stack.pop();
+            group.push(cur0);
+            var nb0 = neighbors(cur0);
+            for (var j0 = 0; j0 < nb0.length; j0++) {
+              var n0 = nb0[j0];
+              if (!board[n0]) wayOut = true;
+              else if (board[n0].type === 'bear' && !seen[n0]) { seen[n0] = true; stack.push(n0); }
+            }
+          }
+          if (!wayOut) for (var g = 0; g < group.length; g++) doomed.push(group[g]);
+        }
+
+        // 2) 同一群一起变墓碑。序号按「熊被放下的先后」发，
+        //    这样最后放下的那只熊拿到的墓碑序号最大 → 它决定合体（教堂）落点，与原作一致。
+        doomed.sort(function (a, b) { return (board[a].seq || 0) - (board[b].seq || 0); });
+        var trapped = [];
+        for (var d = 0; d < doomed.length; d++) {
+          board[doomed[d]] = { type: 'tomb', seq: ++seqCounter, rare: false };
+          trapped.push(doomed[d]);
+        }
+
+        // 3) 其余每只熊走一格（按放置先后依次走）。被同伴临时挡住的原地不动，不判死。
+        var moved = [];
+        for (var k = 0; k < idxs.length; k++) {
+          var pos = idxs[k];
+          var cur = board[pos];
+          if (!cur || cur.type !== 'bear') continue;
+          var nb = neighbors(pos), opts = [];
+          for (var j = 0; j < nb.length; j++) if (!board[nb[j]]) opts.push(nb[j]);
+          if (!opts.length) continue;
+          var dest = opts[Math.floor(Math.random() * opts.length)];
+          board[dest] = cur;
+          board[pos] = null;
+          moved.push(dest);
+        }
+        if (trapped.length) beep('trap');
+        return { moved: moved, trapped: trapped, count: idxs.length };
+      }
+
+      /* ================= 抽牌 ================= */
+      // 盘面太空时钻石 / 机器人等于废牌：钻石放进空格必然变石头，机器人没有可拆的格子。
+      // 开局就发到这两种牌，玩家既用不了也放不下，只能自己想到去仓库寄存 —— 所以先不发。
+      function itemUsable(type) {
+        if (type === 'bot') return hasBotTarget();
+        var occupied = 0;
+        for (var i = 0; i < TOTAL; i++) if (board[i]) occupied++;
+        return occupied >= 2;   // 钻石至少要场上已有 2 个棋子，才有可能凑成 3 连
+      }
+
+      // 保底：钻石和机器人各保证在本局出现一次（到点补发），其余靠 DROP_RATE 随机掉
+      function pick() {
+        if (!gotCrystal && turn >= GUARANTEE.crystal && itemUsable('crystal')) { gotCrystal = true; return 'crystal'; }
+        if (!gotBot && turn >= GUARANTEE.bot && itemUsable('bot')) { gotBot = true; return 'bot'; }
+        var pool = [
+          ['grass', 56],
+          ['bush', 12 + Math.min(10, Math.floor(turn / 8) * 2)],
+          ['tree', 3 + Math.min(7, Math.floor(turn / 12))],
+          ['bear', turn < 15 ? 0 : Math.min(30, 12 + Math.floor((turn - 15) / 5) * 2)],
+          ['crystal', itemUsable('crystal') ? DROP_RATE.crystal : 0],
+          ['bot', itemUsable('bot') ? DROP_RATE.bot : 0]
+        ];
+        var total = 0, i;
+        for (i = 0; i < pool.length; i++) total += pool[i][1];
+        var r = Math.random() * total;
+        for (i = 0; i < pool.length; i++) {
+          r -= pool[i][1];
+          if (r <= 0) return pool[i][0];
+        }
+        return 'grass';
+      }
+
+      function drawNext() {
+        hand = nextPiece || pick();
+        nextPiece = pick();
+      }
+
+      /* ================= HUD ================= */
+      function bumpScore() {
+        scoreChip.classList.remove('bump');
+        void scoreChip.offsetWidth;
+        scoreChip.classList.add('bump');
+      }
+
+      function highestName() {
+        var tier = 0, name = '—';
+        for (var i = 0; i < TOTAL; i++) {
+          var c = board[i];
+          if (!c) continue;
+          var d = TILES[c.type];
+          if (d.chain === 'main' && d.tier > tier) { tier = d.tier; name = d.name; }
+        }
+        return name;
+      }
+
+      function updateHUD() {
+        scoreEl.textContent = String(score);
+        if (score > best) {
+          best = score;
+          try { localStorage.setItem(BEST_KEY, String(best)); } catch (e) { }
+        }
+        bestEl.textContent = String(best);
+
+        var bears = 0;
+        for (var i = 0; i < TOTAL; i++) if (board[i] && board[i].type === 'bear') bears++;
+        statusEl.textContent = '回合 ' + turn + ' · 场上熊 ' + bears + ' 只 · 最高建筑 ' + highestName();
+
+        undoBtn.disabled = undoStack.length === 0;
+        var mu = document.getElementById('miniUndo');
+        if (mu) mu.disabled = undoStack.length === 0;
+      }
+
+      /* ================= 存档 ================= */
+      function save() {
+        try {
+          localStorage.setItem(SAVE_KEY, JSON.stringify({
+            b: board.map(function (c) { return c ? [c.type, c.seq || 0, c.rare ? 1 : 0] : 0; }),
+            h: hand, n: nextPiece, s: store,
+            sc: score, t: turn, q: seqCounter,
+            gc: gotCrystal ? 1 : 0, gb: gotBot ? 1 : 0
+          }));
+        } catch (e) { }
+      }
+
+      function load() {
+        try {
+          var raw = localStorage.getItem(SAVE_KEY);
+          if (!raw) return false;
+          var d = JSON.parse(raw);
+          if (!d || !d.b || d.b.length !== TOTAL) return false;
+          var ok = false;
+          board = d.b.map(function (c) {
+            if (!c) return null;
+            if (!TILES[c[0]]) return null;
+            ok = true;
+            return { type: c[0], seq: c[1] || 0, rare: !!c[2] };
+          });
+          if (!ok && !d.h) return false;
+          hand = (d.h && TILES[d.h]) ? d.h : null;
+          nextPiece = (d.n && TILES[d.n]) ? d.n : null;
+          store = (d.s && TILES[d.s]) ? d.s : null;
+          score = d.sc | 0;
+          turn = d.t | 0;
+          seqCounter = d.q | 0;
+          gotCrystal = !!d.gc;
+          gotBot = !!d.gb;
+          return !!hand;
+        } catch (e) { return false; }
+      }
+
+      function clearSave() {
+        try { localStorage.removeItem(SAVE_KEY); } catch (e) { }
+      }
+
+      /* ================= 回合流程 ================= */
+      function pushUndo() {
+        undoStack.push({
+          b: board.map(function (c) { return c ? { type: c.type, seq: c.seq, rare: c.rare } : null; }),
+          h: hand, n: nextPiece, s: store, sc: score, t: turn, q: seqCounter
+        });
+        if (undoStack.length > 30) undoStack.shift();
+      }
+
+      function hasEmpty() {
+        for (var i = 0; i < TOTAL; i++) if (!board[i]) return true;
+        return false;
+      }
+
+      /* 如果把 idx 当成 type 放下去，含 idx 的那个连通块能不能凑到 3 个 */
+      function matchAt(idx, type) {
+        var seen = {}, stack = [idx], n = 1;
+        seen[idx] = true;
+        while (stack.length) {
+          var nb = neighbors(stack.pop());
+          for (var i = 0; i < nb.length; i++) {
+            var c = nb[i];
+            if (seen[c]) continue;
+            if (board[c] && board[c].type === type) { seen[c] = true; n++; stack.push(c); }
+          }
+        }
+        return n >= 3;
+      }
+
+      /* 钻石结算：按等级从高到低试算，命中就变过去；一个都凑不出就变成石头 */
+      function resolveCrystal(idx) {
+        for (var i = 0; i < CRYSTAL_TRIES.length; i++) {
+          if (matchAt(idx, CRYSTAL_TRIES[i])) return CRYSTAL_TRIES[i];
+        }
+        return 'rock';
+      }
+
+      // 落子之后的公共收尾：合体 → 熊行动 → 再合体 → 换手
+      // delay 用于给「钻石变形」这类需要自己一个拍子的动效留时间
+      function runTurn(delay) {
+        locked = true;
+        window.setTimeout(function () {
+          settle(function () {
+            var res = bearPhase();
+            if (res.count) {
+              render({ hop: res.moved, tomb: res.trapped });
+              window.setTimeout(function () { settle(endTurn); }, 210);
+            } else {
+              render(null);
+              settle(endTurn);
+            }
+          });
+        }, delay || 100);
+      }
+
+      function playAt(idx) {
+        if (locked || over) return;
+        if (idx < 0 || idx >= TOTAL) return;
+        if (!hand) return;
+        if (hand === 'bot') { useBot(idx); return; }
+
+        if (board[idx]) {
+          flash(slots[idx], 'nope');
+          beep('nope');
+          return;
+        }
+
+        pushUndo();
+        var wasCrystal = hand === 'crystal';
+        var became = wasCrystal ? resolveCrystal(idx) : hand;
+        board[idx] = { type: became, seq: ++seqCounter, rare: false };
+        hand = null;
+        if (wasCrystal) beep(became === 'rock' ? 'nope' : 'crystal');
+        else beep('place');
+        render(wasCrystal ? { morph: idx } : { spawn: idx });
+        renderTray(false);
+        updateHUD();
+        runTurn(wasCrystal ? 380 : 100);
+      }
+
+      /* 机器人：不落子，而是拆掉棋盘上任意一格。
+         熊 → 墓碑、山 → 小宝箱，其余直接清空；按被拆棋子的分数扣分（宝箱不能拆）。 */
+      function useBot(idx) {
+        var cell = board[idx];
+        if (!cell || cell.type === 'chest' || cell.type === 'bigchest') {
+          flash(slots[idx], 'nope');
+          beep('nope');
+          return;
+        }
+
+        pushUndo();
+        hand = null;
+        var became = cell.type === 'bear' ? 'tomb' : (cell.type === 'mount' ? 'chest' : null);
+        if (became) board[idx] = { type: became, seq: ++seqCounter, rare: false };
+        else board[idx] = null;
+
+        score -= TILES[cell.type].score;
+        if (score < 0) score = 0;
+        beep('bot');
+        render(became ? { spawn: idx } : { vanish: [idx] });
+        renderTray(false);
+        updateHUD();
+        runTurn();
+      }
+
+      function endTurn() {
+        drawNext();
+        turn++;
+        save();
+        render(null);
+        renderTray(true);
+        updateHUD();
+        if (!hasEmpty()) {
+          locked = false;
+          gameOver();
+          return;
+        }
+        locked = false;
+      }
+
+      function gameOver() {
+        over = true;
+        var detail = '存活 ' + turn + ' 回合 · 最高建筑 ' + highestName();
+        document.getElementById('overScore').textContent = String(score);
+        document.getElementById('overDetail').textContent = detail;
+        overModal.classList.add('show');
+        beep('over');
+        var ou = document.getElementById('overUndo');
+        if (ou) ou.disabled = undoStack.length === 0;
+      }
+
+      function doUndo() {
+        if (locked) return;
+        if (!undoStack.length) return;
+        var s = undoStack.pop();
+        board = s.b.map(function (c) { return c ? { type: c.type, seq: c.seq, rare: c.rare } : null; });
+        hand = s.h; nextPiece = s.n; store = s.s;
+        score = s.sc; turn = s.t; seqCounter = s.q;
+        over = false;
+        overModal.classList.remove('show');
+        render(null);
+        renderTray(true);
+        updateHUD();
+        save();
+      }
+
+      function newGame() {
+        board = newSparse(TOTAL);
+        score = 0;
+        turn = 0;
+        seqCounter = 0;
+        store = null;
+        undoStack = [];
+        over = false;
+        locked = false;
+        gotCrystal = false;
+        gotBot = false;
+        overModal.classList.remove('show');
+        hand = pick();
+        nextPiece = pick();
+        render(null);
+        renderTray(true);
+        updateHUD();
+        clearSave();
+        save();
+      }
+
+      function storeAction() {
+        if (locked || over) return;
+        if (!hand && !store) return;
+        if (hand && !store) {
+          store = hand;
+          hand = null;
+          drawNext();          // 寄存后立刻补一手，保证总有棋子可落
+        } else if (store && !hand) {
+          hand = store;
+          store = null;
+        } else {
+          var t = store;
+          store = hand;
+          hand = t;
+        }
+        beep('place');
+        renderTray(true);
+        save();
+        updateHUD();
+      }
+
+      /* ================= 输入 ================= */
+      // 由点击坐标反推格子：落在格子之间的缝隙时归给右侧/下方那格，减少误触
+      function cellFromEvent(e) {
+        var rect = boardEl.getBoundingClientRect();
+        var m = metrics();
+        var cs = getComputedStyle(boardEl);
+        var pad = parseFloat(cs.getPropertyValue('--pad')) || 12;
+        var step = m.c + m.g;
+        var x = e.clientX - rect.left - pad;
+        var y = e.clientY - rect.top - pad;
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        var col = Math.floor(x / step);
+        var row = Math.floor(y / step);
+        if (x - col * step > m.c && col < SIZE - 1) col += 1;
+        if (y - row * step > m.c && row < SIZE - 1) row += 1;
+        if (col >= SIZE || row >= SIZE) return -1;
+        return row * SIZE + col;
+      }
+
+      boardEl.addEventListener('click', function (e) {
+        var idx = cellFromEvent(e);
+        if (idx >= 0) playAt(idx);
+      });
+
+      storeBox.addEventListener('click', storeAction);
+      undoBtn.addEventListener('click', doUndo);
+      newBtn.addEventListener('click', newGame);
+      slackBtn.addEventListener('click', toggleMini);
+      soundBtn.addEventListener('click', function () {
+        soundOn = !soundOn;
+        try { localStorage.setItem(SND_KEY, soundOn ? '1' : '0'); } catch (e) { }
+        soundBtn.textContent = soundOn ? '🔊 音效' : '🔇 静音';
+        if (soundOn) beep('place');
+      });
+      document.getElementById('miniUndo').addEventListener('click', doUndo);
+      document.getElementById('miniNew').addEventListener('click', newGame);
+      document.getElementById('miniExit').addEventListener('click', toggleMini);
+      document.getElementById('miniFake').addEventListener('click', enterFake);
+      document.getElementById('overUndo').addEventListener('click', doUndo);
+      document.getElementById('overNew').addEventListener('click', newGame);
+
+      document.addEventListener('keydown', function (e) {
+        var code = e.code;
+        if (code === 'Backquote') {
+          e.preventDefault();
+          if (!e.repeat) {
+            if (document.getElementById('fake').classList.contains('show')) exitFake();
+            else enterFake();
+          }
+          return;
+        }
+        if (e.key === 'Escape') {
+          if (document.getElementById('fake').classList.contains('show')) {
+            exitFake();
+            e.preventDefault();
+          }
+          return;
+        }
+        if (document.body.classList.contains('disguised')) return;
+        if (e.repeat) return;
+        var k = (e.key || '').toLowerCase();
+        if (k === 'u') { doUndo(); e.preventDefault(); }
+        else if (k === 'n') { newGame(); e.preventDefault(); }
+        else if (k === 'm') { toggleMini(); e.preventDefault(); }
+        else if (k === 's') { storeAction(); e.preventDefault(); }
+      });
+
+      /* ================= 小窗 / 老板键 ================= */
+      var dragState = null;
+
+      function toggleMini() {
+        var on = document.body.classList.toggle('mini-mode');
+        var miniTitle = document.querySelector('.mini-title');
+        if (on) {
+          var r = stage.getBoundingClientRect();
+          var left = Math.max(8, window.innerWidth - r.width - 14);
+          var top = Math.max(8, window.innerHeight - r.height - 14);
+          stage.style.left = left + 'px';
+          stage.style.top = top + 'px';
+          if (miniTitle) miniTitle.textContent = 'dev --watch --port 4173';
+        } else {
+          stage.style.left = '';
+          stage.style.top = '';
+          if (miniTitle) miniTitle.textContent = 'npm run dev';
+          exitFake();
+        }
+        window.setTimeout(relayout, 0);
+      }
+
+      function enterFake() {
+        document.body.classList.add('disguised');
+        document.getElementById('fake').classList.add('show');
+        updateFakeClock();
+        document.title = 'dataset_builder.py — 编辑中';
+      }
+
+      function exitFake() {
+        document.body.classList.remove('disguised');
+        document.getElementById('fake').classList.remove('show');
+        document.title = document.title.replace(/ — 编辑中$/, '');
+      }
+
+      function updateFakeClock() {
+        var now = new Date();
+        function p2(n) { return n < 10 ? '0' + n : '' + n; }
+        var el = document.getElementById('fakeClock');
+        if (el) el.textContent = (now.getMonth() + 1) + '-' + p2(now.getDate()) + ' ' + p2(now.getHours()) + ':' + p2(now.getMinutes());
+      }
+
+      var miniBar = document.getElementById('miniBar');
+      miniBar.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('button')) return;
+        var r = stage.getBoundingClientRect();
+        dragState = { dx: e.clientX - r.left, dy: e.clientY - r.top, id: e.pointerId };
+        if (miniBar.setPointerCapture) miniBar.setPointerCapture(e.pointerId);
+      });
+      miniBar.addEventListener('pointermove', function (e) {
+        if (!dragState || e.pointerId !== dragState.id) return;
+        var r = stage.getBoundingClientRect();
+        var w = Math.min(r.width, window.innerWidth - 16);
+        var h = Math.min(r.height, window.innerHeight - 16);
+        var left = e.clientX - dragState.dx;
+        var top = e.clientY - dragState.dy;
+        left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+        top = Math.max(8, Math.min(top, window.innerHeight - h - 8));
+        stage.style.left = left + 'px';
+        stage.style.top = top + 'px';
+      });
+      miniBar.addEventListener('pointerup', function () { dragState = null; });
+      miniBar.addEventListener('pointercancel', function () { dragState = null; });
+
+      /* ================= 假代码 ================= */
+      var fakeCode = [
+        ['from __future__ import annotations'],
+        [''],
+        ['import json', 'kw'], [''] ,
+        ['from pathlib import ', ''], ['Path', 'tp'],
+        [''],
+        ['import pandas as ', ''], ['pd', 'nm'],
+        ['import pyarrow.parquet as ', ''], ['pq', 'nm'],
+        [''],
+        ['from etl.schema_validator import validate_frame'],
+        ['from etl.shard_writer import ShardWriter'],
+        [''],
+        [''],
+        ['class ', 'kw'], ['DatasetBuilder', 'tp'], [':', ''],
+        ['    """把原始日志切成训练用的分片，', 'st'],
+        ['    按天聚合、去重、再落盘为 parquet。"""', 'st'],
+        [''],
+        ['    SHARD_ROWS = ', ''], ['250_000', 'nm'],
+        [''],
+        ['    def ', 'kw'], ['__init__', 'fn'], ['(self, root: ', ''], ['Path', 'tp'], [', batch_days: ', ''], ['int', 'tp'], [' = ', ''], ['1', 'nm'], [') -> ', ''], ['None', 'tp'], [':', ''],
+        ['        self.root = root'],
+        ['        self.batch_days = batch_days'],
+        ['        self.writer = ShardWriter(root / ', ''], ['"shards"', 'st'], [')'],
+        [''],
+        ['    def ', 'kw'], ['build', 'fn'], ['(self) -> ', ''], ['dict', 'tp'], ['[', ''], ['str', 'tp'], [', ', ''], ['int', 'tp'], [']:', ''],
+        ['        stats = {', ''], ['"rows"', 'st'], [': ', ''], ['0', 'nm'], [', ', ''], ['"shards"', 'st'], [': ', ''], ['0', 'nm'], ['}'],
+        ['        for day, files in self._iter_partitions():'],
+        ['            frame = self._read_day(files)'],
+        ['            ', ''], ['# 校验字段与类型，脏数据直接丢弃并打点', 'cm'],
+        ['            frame = validate_frame(frame)'],
+        ['            frame = frame.drop_duplicates(subset=[', ''], ['"uid"', 'st'], [', ', ''], ['"ts"', 'st'], ['])'],
+        ['            frame.sort_values(', ''], ['"ts"', 'st'], [', inplace=', ''], ['True', 'nm'], [')'],
+        [''],
+        ['            for start in range(', ''], ['0', 'nm'], [', len(frame), self.SHARD_ROWS):'],
+        ['                chunk = frame.iloc[start : start + self.SHARD_ROWS]'],
+        ['                self.writer.write(day, chunk)'],
+        ['                stats[', ''], ['"shards"', 'st'], ['] += ', ''], ['1', 'nm'],
+        [''],
+        ['            stats[', ''], ['"rows"', 'st'], ['] += len(frame)'],
+        ['            ', ''], ['# TODO: 加一列来源标记，方便回溯', 'cm'],
+        [''],
+        ['        ', ''], ['return', 'kw'], [' stats'],
+        [''],
+        ['    def ', 'kw'], ['_read_day', 'fn'], ['(self, files: ', ''], ['list', 'tp'], ['[', ''], ['Path', 'tp'], [']):'],
+        ['        frames = [pq.read_table(f).to_pandas() for f in files]'],
+        ['        ', ''], ['return', 'kw'], [' pd.concat(frames, ignore_index=', ''], ['True', 'nm'], [')'],
+        [''],
+        [''],
+        ['if __name__ == ', ''], ['"__main__"', 'st'], [':', ''],
+        ['    builder = DatasetBuilder(Path(', ''], ['"data/raw"', 'st'], ['))'],
+        ['    print(json.dumps(builder.build(), indent=', ''], ['2', 'nm'], ['))']
+      ];
+
+      function escapeHtml(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function buildFakeCode() {
+        var gutter = document.getElementById('fakeGutter');
+        var code = document.getElementById('fakeCode');
+        var ghtml = '', chtml = '';
+        for (var i = 0; i < fakeCode.length; i++) {
+          ghtml += (i + 1) + '\n';
+          chtml += fakeCode[i].map(function (seg) {
+            var text = seg[0], cls = seg[1];
+            if (cls) return '<span class="' + cls + '">' + escapeHtml(text) + '</span>';
+            return escapeHtml(text);
+          }).join('') + '\n';
+        }
+        gutter.textContent = ghtml;
+        code.innerHTML = chtml + '<span class="cur"></span>';
+      }
+
+      /* ================= 图例 ================= */
+      function buildLegend() {
+        var el = document.getElementById('legend');
+        if (!el) return;
+        var item = function (t) {
+          return '<span class="lg"><b>' + TILES[t].emoji + '</b>' + TILES[t].name + '</span>';
+        };
+        var html = '<span class="sep">主链：</span>';
+        html += MAIN_CHAIN.map(item).join('<span class="sep">›</span>');
+        html += '<span class="sep">　熊链：</span>';
+        html += item('bear') + '<span class="sep">›</span>';
+        html += BEAR_CHAIN.map(item).join('<span class="sep">›</span>');
+        html += '<span class="sep">　石链：</span>';
+        html += ROCK_CHAIN.map(item).join('<span class="sep">›</span>');
+        html += '<span class="sep">›</span>' + item('bigchest');
+        html += '<span class="sep">　道具：</span>';
+        html += '<span class="lg"><b>' + TILES.crystal.emoji + '</b>钻石</span>';
+        html += '<span class="lg"><b>' + TILES.bot.emoji + '</b>机器人</span>';
+        el.innerHTML = html;
+      }
+
+      /* ================= 其他 ================= */
+      window.addEventListener('resize', function () {
+        relayout();
+        if (document.body.classList.contains('mini-mode')) {
+          var r = stage.getBoundingClientRect();
+          var left = Math.max(8, Math.min(parseFloat(stage.style.left) || 8, window.innerWidth - r.width - 8));
+          var top = Math.max(8, Math.min(parseFloat(stage.style.top) || 8, window.innerHeight - r.height - 8));
+          stage.style.left = left + 'px';
+          stage.style.top = top + 'px';
+        }
+      });
+
+      /* ================= 启动 ================= */
+      bestEl.textContent = String(best);
+      soundBtn.textContent = soundOn ? '🔊 音效' : '🔇 静音';
+      buildBoard();
+      buildFakeCode();
+      buildLegend();
+      relayout();
+
+      if (load()) {
+        render(null);
+        renderTray(false);
+        updateHUD();
+        if (!hasEmpty()) gameOver();   // 上次就是满盘结束的，恢复后仍显示结算
+      } else {
+        newGame();
+      }
+    })();
+  </script>
+</body>
+
+</html>

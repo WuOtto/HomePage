@@ -21,10 +21,13 @@
       --shadow: rgba(0, 0, 0, 0.08);
       --shadow-lg: rgba(0, 0, 0, 0.22);
 
-      /* 棋盘尺寸（可被小窗/媒体查询覆盖） */
+      /* 棋盘尺寸（--c 由 JS 自适应；小窗/媒体查询可覆盖） */
       --c: 100px;
       --g: 12px;
       --pad: 12px;
+      /* 页面留白（移动端收窄以放大棋盘） */
+      --page-x: 16px;
+      --card-x: 20px;
       --board-bg: #bbada0;
       --cell-bg: rgba(238, 228, 218, 0.5);
     }
@@ -47,12 +50,13 @@
       }
     }
 
-    /* 平板/小屏收窄格子 */
+    /* 平板/小屏：收窄格子与页面留白（--c 交给 JS 自适应） */
     @media (max-width: 560px) {
-      :root { --c: 82px; --g: 9px; --pad: 9px; }
+      :root { --g: 9px; --pad: 9px; --page-x: 12px; --card-x: 14px; }
+      body { padding-top: 16px; padding-bottom: 28px; }
     }
     @media (max-width: 400px) {
-      :root { --c: 66px; --g: 8px; --pad: 8px; }
+      :root { --g: 8px; --pad: 8px; --page-x: 8px; --card-x: 10px; }
     }
 
     body {
@@ -60,7 +64,7 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       min-height: 100vh;
-      padding: 24px 16px 40px;
+      padding: 24px var(--page-x) 40px;
       transition: background-color 0.3s ease, color 0.3s ease;
       user-select: none;
       -webkit-user-select: none;
@@ -132,7 +136,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 18px 20px 20px;
+      padding: 18px var(--card-x) 20px;
       box-shadow: 0 6px 24px var(--shadow);
       transition: background-color 0.3s ease, border-color 0.3s ease;
     }
@@ -212,7 +216,8 @@
     body.mini-mode .chip.bump .chip-value { animation: none; }
     @keyframes miniSpawn { from { opacity: 0.1; } }
 
-    .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .head .titles { min-width: 0; }
     .head h1 { font-size: 2em; font-weight: 800; line-height: 1.1; }
     .tagline { color: var(--text-secondary); font-size: 0.86em; margin-top: 3px; }
     .mini-mode .tagline,
@@ -617,6 +622,7 @@
       var newBtn = document.getElementById('newBtn');
       var slackBtn = document.getElementById('slackBtn');
       var stage = document.getElementById('stage');
+      var cardEl = document.querySelector('.card');
       var winModal = document.getElementById('winModal');
       var overModal = document.getElementById('overModal');
       var overText = document.getElementById('overText');
@@ -635,6 +641,30 @@
       var undoScore = [];
 
       /* ================= 尺寸工具 ================= */
+      // 按可用宽度反算格子边长，手机端让棋盘尽量铺满卡片
+      // 写入的是具体 px 值，因此 metrics() 取 --c 的逻辑无需改动
+      function fitBoard() {
+        if (document.body.classList.contains('mini-mode')) return; // 小窗用固定尺寸
+
+        var bodyCS = getComputedStyle(document.body);
+        var cardCS = getComputedStyle(cardEl);
+        var cellsCS = getComputedStyle(cellsEl);
+
+        var pageX  = parseFloat(bodyCS.paddingLeft) || 0;
+        var cardX  = parseFloat(cardCS.paddingLeft) || 0;
+        var border = parseFloat(cardCS.borderLeftWidth) || 0;
+        var pad    = parseFloat(cellsCS.paddingLeft) || 0;
+        var g      = parseFloat(cellsCS.columnGap) || 0;
+
+        // 可视宽度（不含滚动条）→ 页面宽度（与 .page 的 560px 上限一致）
+        var viewport = document.documentElement.clientWidth;
+        var pageW    = Math.min(560, viewport - pageX * 2);
+        var inner    = pageW - cardX * 2 - border * 2 - 8;  // 左右各留 4px 呼吸位
+
+        var c = Math.max(56, Math.min(100, (inner - pad * 2 - g * 3) / 4));
+        document.documentElement.style.setProperty('--c', c + 'px');
+      }
+
       function metrics() {
         var cs = getComputedStyle(boardEl);
         var c = parseFloat(cs.getPropertyValue('--c')) || 100;
@@ -985,6 +1015,7 @@
           if (miniTitle) miniTitle.textContent = '2048 · 小窗';
           exitFake();
         }
+        fitBoard();   // 退出小窗后恢复自适应棋盘尺寸
         render(null);   // 小窗切换隐身档后按灰阶重绘方块
         window.setTimeout(relayout, 0);
       }
@@ -1180,6 +1211,7 @@
 
       // 窗口尺寸变化时重排（含小窗边界收敛）
       window.addEventListener('resize', function () {
+        fitBoard();
         relayout();
         if (document.body.classList.contains('mini-mode')) {
           var r = stage.getBoundingClientRect();
@@ -1194,6 +1226,7 @@
       bestEl.textContent = best;
       buildBg();
       buildFakeCode();
+      fitBoard();
       newGame();
     })();
   </script>
