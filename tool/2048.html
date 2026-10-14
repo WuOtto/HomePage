@@ -21,13 +21,15 @@
       --shadow: rgba(0, 0, 0, 0.08);
       --shadow-lg: rgba(0, 0, 0, 0.22);
 
-      /* 棋盘尺寸（--c 由 JS 自适应；小窗/媒体查询可覆盖） */
-      --c: 100px;
+      /* 棋盘尺寸：--c 随可用宽度自适应（纯 CSS 计算，首帧即不会溢出） */
+      --cmax: 100px;   /* 桌面端格子边长上限 */
       --g: 12px;
       --pad: 12px;
       /* 页面留白（移动端收窄以放大棋盘） */
       --page-x: 16px;
       --card-x: 20px;
+      --slack: 16px;   /* 棋盘左右留白合计 */
+      --c: min(var(--cmax), calc((100vw - var(--page-x) * 2 - var(--card-x) * 2 - var(--pad) * 2 - var(--g) * 3 - var(--slack)) / 4));
       --board-bg: #bbada0;
       --cell-bg: rgba(238, 228, 218, 0.5);
     }
@@ -50,9 +52,9 @@
       }
     }
 
-    /* 平板/小屏：收窄格子与页面留白（--c 交给 JS 自适应） */
+    /* 平板/小屏：收窄格子与页面留白，--c 随 100vw 自动放大 */
     @media (max-width: 560px) {
-      :root { --g: 9px; --pad: 9px; --page-x: 12px; --card-x: 14px; }
+      :root { --g: 9px; --pad: 9px; --page-x: 12px; --card-x: 14px; --slack: 10px; }
       body { padding-top: 16px; padding-bottom: 28px; }
     }
     @media (max-width: 400px) {
@@ -74,7 +76,7 @@
     /* ========== 主布局 ========== */
     .page { max-width: 560px; margin: 0 auto; }
 
-    #stage { width: fit-content; margin: 0 auto; }
+    #stage { width: fit-content; max-width: 100%; margin: 0 auto; }
 
     /* 小窗模式：整页变为可拖动悬浮窗 */
     .mini-mode #stage {
@@ -622,7 +624,6 @@
       var newBtn = document.getElementById('newBtn');
       var slackBtn = document.getElementById('slackBtn');
       var stage = document.getElementById('stage');
-      var cardEl = document.querySelector('.card');
       var winModal = document.getElementById('winModal');
       var overModal = document.getElementById('overModal');
       var overText = document.getElementById('overText');
@@ -641,34 +642,18 @@
       var undoScore = [];
 
       /* ================= 尺寸工具 ================= */
-      // 按可用宽度反算格子边长，手机端让棋盘尽量铺满卡片
-      // 写入的是具体 px 值，因此 metrics() 取 --c 的逻辑无需改动
-      function fitBoard() {
-        if (document.body.classList.contains('mini-mode')) return; // 小窗用固定尺寸
-
-        var bodyCS = getComputedStyle(document.body);
-        var cardCS = getComputedStyle(cardEl);
-        var cellsCS = getComputedStyle(cellsEl);
-
-        var pageX  = parseFloat(bodyCS.paddingLeft) || 0;
-        var cardX  = parseFloat(cardCS.paddingLeft) || 0;
-        var border = parseFloat(cardCS.borderLeftWidth) || 0;
-        var pad    = parseFloat(cellsCS.paddingLeft) || 0;
-        var g      = parseFloat(cellsCS.columnGap) || 0;
-
-        // 可视宽度（不含滚动条）→ 页面宽度（与 .page 的 560px 上限一致）
-        var viewport = document.documentElement.clientWidth;
-        var pageW    = Math.min(560, viewport - pageX * 2);
-        var inner    = pageW - cardX * 2 - border * 2 - 8;  // 左右各留 4px 呼吸位
-
-        var c = Math.max(56, Math.min(100, (inner - pad * 2 - g * 3) / 4));
-        document.documentElement.style.setProperty('--c', c + 'px');
-      }
-
+      // 直接量取真实渲染出的格子尺寸：--c 由 CSS 的 min()/calc() 求出，
+      // 读取自定义属性只会拿到未求值的字符串，必须量 DOM 才准确
       function metrics() {
-        var cs = getComputedStyle(boardEl);
-        var c = parseFloat(cs.getPropertyValue('--c')) || 100;
-        var g = parseFloat(cs.getPropertyValue('--g')) || 12;
+        var g = parseFloat(getComputedStyle(cellsEl).columnGap);
+        if (isNaN(g)) g = 0;
+        var cell = cellsEl.firstElementChild;
+        var c = cell ? cell.getBoundingClientRect().width : 0;
+        if (!c) {   // 兜底：格子尚未构建时退回自定义属性
+          var cs = getComputedStyle(boardEl);
+          c = parseFloat(cs.getPropertyValue('--c')) || 100;
+          g = parseFloat(cs.getPropertyValue('--g')) || 12;
+        }
         return { c: c, g: g };
       }
 
@@ -1015,7 +1000,6 @@
           if (miniTitle) miniTitle.textContent = '2048 · 小窗';
           exitFake();
         }
-        fitBoard();   // 退出小窗后恢复自适应棋盘尺寸
         render(null);   // 小窗切换隐身档后按灰阶重绘方块
         window.setTimeout(relayout, 0);
       }
@@ -1185,6 +1169,20 @@
         ['}']
       ];
 
+      // 一段内容支持两种写法：纯字符串，或 [文本, 高亮类名] 片段
+      function segHtml(seg) {
+        var text, cls;
+        if (typeof seg === 'string') {
+          text = seg;
+          cls = '';
+        } else {
+          text = seg && seg[0] != null ? seg[0] : '';
+          cls = seg && seg[1] ? seg[1] : '';
+        }
+        if (cls) return '<span class="' + cls + '">' + escapeHtml(text) + '</span>';
+        return escapeHtml(text);
+      }
+
       function buildFakeCode() {
         var gutter = document.getElementById('fakeGutter');
         var code = document.getElementById('fakeCode');
@@ -1192,26 +1190,19 @@
         var chtml = '';
         for (var i = 0; i < fakeCode.length; i++) {
           ghtml += (i + 1) + '\n';
-          var line = fakeCode[i];
-          var segments = line;
-          chtml += segments.map(function (seg) {
-            var text = seg[0];
-            var cls = seg[1];
-            if (cls) return '<span class="' + cls + '">' + escapeHtml(text) + '</span>';
-            return escapeHtml(text);
-          }).join('') + '\n';
+          chtml += fakeCode[i].map(segHtml).join('') + '\n';
         }
         gutter.textContent = ghtml;
         code.innerHTML = chtml + '<span class="cur"></span>';
       }
 
       function escapeHtml(s) {
-        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       }
 
       // 窗口尺寸变化时重排（含小窗边界收敛）
       window.addEventListener('resize', function () {
-        fitBoard();
         relayout();
         if (document.body.classList.contains('mini-mode')) {
           var r = stage.getBoundingClientRect();
@@ -1225,8 +1216,7 @@
       /* ================= 启动 ================= */
       bestEl.textContent = best;
       buildBg();
-      buildFakeCode();
-      fitBoard();
+      try { buildFakeCode(); } catch (e) { /* 伪装编辑器仅装饰，失败不影响游戏 */ }
       newGame();
     })();
   </script>
