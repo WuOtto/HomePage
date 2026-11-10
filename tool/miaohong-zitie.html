@@ -785,7 +785,7 @@
         return map;
       })();
 
-      var BASE = './tianzigebishun/bishun_data/';
+      var BASE = './tianzigebishun/bishun_bundle/';
       var MAX_CHARS = 300;
 
       var MAIN = { green: 'rgb(0,176,80)', black: 'rgb(0,0,0)', red: 'rgb(152,15,41)' };
@@ -855,16 +855,27 @@
         return 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '")';
       }
 
-      /* ---------- 数据加载 ---------- */
+      /* ---------- 数据加载（按 Unicode 区段取 bundle） ---------- */
+      var bundleCache = Object.create(null);
+      var bundleLoading = Object.create(null);
+
       function loadOne(ch) {
         if (ch in cache) return Promise.resolve(cache[ch]);
-        if (loading[ch]) return loading[ch];
-        var p = fetch(BASE + encodeURIComponent(ch) + '.json')
-          .then(function (r) { if (!r.ok) throw new Error('404'); return r.json(); })
-          .then(function (d) { cache[ch] = (d && d.strokes && d.strokes.length) ? d : null; return cache[ch]; })
-          .catch(function () { cache[ch] = null; return null; });
-        loading[ch] = p;
-        return p;
+        var key = 'b' + (ch.codePointAt(0) >> 8);
+        var p;
+        if (key in bundleLoading) {
+          p = bundleLoading[key];
+        } else {
+          p = bundleLoading[key] = fetch(BASE + key + '.json')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .catch(function () { return null; });
+        }
+        return p.then(function (bd) {
+          bundleCache[key] = bd;
+          var d = (bd && bd[ch] && bd[ch].strokes && bd[ch].strokes.length) ? bd[ch] : null;
+          cache[ch] = d;
+          return d;
+        });
       }
 
       function loadAll(list, onProgress) {
@@ -936,7 +947,7 @@
             + ' · 共 ' + info.pages + ' 页'
             + (miss.length ? '（' + miss.length + ' 个字已用楷体代替）' : '');
           if (miss.length === chars.length) {
-            hintEl.textContent = '未能从当前地址加载矢量字形数据（./tianzigebishun/bishun_data/），'
+            hintEl.textContent = '未能从当前地址加载矢量字形数据（./tianzigebishun/bishun_bundle/），'
               + '已自动改用系统楷体渲染——范字、描红、渐变、打印均可正常使用。';
             if (location.protocol === 'file:') {
               hintEl.textContent += ' 当前以 file:// 方式打开，浏览器会拦截本地数据读取；'
