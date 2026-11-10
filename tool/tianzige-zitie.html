@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>田字格笔顺字帖生成器</title>
+  <meta name="keywords" content="田字格字帖,笔顺字帖,米字格,描红字帖">
+  <meta name="description" content="输入汉字即可生成田字格/米字格笔顺字帖，支持逐笔描红、拼音、笔顺动画演示，可直接打印或导出 PDF。">
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --input-bg: #ffffff;
+      --input-border: #cccccc;
+      --input-focus: #28a745;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --error-color: #dc3545;
+      --accent-color: #007bff;
+      --hint-bg: #e7f3ff;
+      --hint-border: #b3d9ff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #444444;
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --input-focus: #34ce57;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary: #6c757d;
+        --button-secondary-hover: #868e96;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --error-color: #ff6b6b;
+        --accent-color: #4dabf7;
+        --hint-bg: #1a2d3d;
+        --hint-border: #2a4d6d;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.1em;
+      color: var(--text-color);
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 26px;
+      font-size: 0.95em;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .num {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--button-bg);
+      color: #fff;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 16px;
+      line-height: 1.8;
+      font-family: inherit;
+      background: var(--input-bg);
+      color: var(--text-color);
+      resize: vertical;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    textarea:focus,
+    input[type="text"]:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, .15);
+    }
+
+    textarea::placeholder {
+      color: var(--text-secondary);
+      opacity: .7;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 340px;
+      height: 40px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--input-bg);
+      color: var(--text-color);
+      outline: none;
+    }
+
+    .opt-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .opt-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .opt-label {
+      width: 84px;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid var(--input-border);
+      border-radius: 20px;
+      background: var(--input-bg);
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+      transition: all .18s;
+    }
+
+    .pill:hover {
+      border-color: var(--button-bg);
+      color: var(--button-bg);
+    }
+
+    .pill.on {
+      border-color: var(--button-bg);
+      background: rgba(40, 167, 69, .12);
+      color: var(--button-bg);
+      font-weight: 600;
+    }
+
+    .pill input {
+      display: none;
+    }
+
+    .swatch {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid rgba(0, 0, 0, .15);
+      flex-shrink: 0;
+    }
+
+    .swatch.green {
+      background: #00b050;
+    }
+
+    .swatch.black {
+      background: #333333;
+    }
+
+    .swatch.red {
+      background: #980f29;
+    }
+
+    .depth-bar {
+      width: 30px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .d1 {
+      background: #666;
+    }
+
+    .d2 {
+      background: #808080;
+    }
+
+    .d3 {
+      background: #999;
+    }
+
+    .d4 {
+      background: #aaa;
+    }
+
+    .d5 {
+      background: #bbb;
+    }
+
+    .d6 {
+      background: #d0d0d0;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch .slider {
+      position: absolute;
+      inset: 0;
+      background: var(--input-border);
+      border-radius: 13px;
+      transition: .25s;
+    }
+
+    .switch .slider::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      width: 22px;
+      height: 22px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .25s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    }
+
+    .switch input:checked+.slider {
+      background: var(--button-bg);
+    }
+
+    .switch input:checked+.slider::before {
+      transform: translateX(20px);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 26px;
+      cursor: pointer;
+      transition: background-color .2s, transform .1s;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--button-bg);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: var(--button-hover);
+    }
+
+    .btn-secondary {
+      background: var(--button-secondary);
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--button-bg);
+      color: var(--button-bg);
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .status.err {
+      color: var(--error-color);
+    }
+
+    .hint {
+      background: var(--hint-bg);
+      border: 1px solid var(--hint-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 12px;
+      display: none;
+    }
+
+    .hint.show {
+      display: block;
+    }
+
+    /* ============ 预览（纸张） ============ */
+    .preview-scroll {
+      overflow-x: auto;
+      padding: 8px 0 4px;
+    }
+
+    .page {
+      width: 180mm;
+      background: #fff;
+      color: #222;
+      margin: 0 auto 16px;
+      box-shadow: 0 2px 10px var(--shadow);
+      border: 1px solid #e0e0e0;
+    }
+
+    .page-head {
+      height: 12mm;
+      line-height: 12mm;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      letter-spacing: 1px;
+    }
+
+    .sheet {
+      display: block;
+    }
+
+    .row {
+      display: flex;
+    }
+
+    .cell {
+      position: relative;
+      flex: 0 0 var(--cell);
+      width: var(--cell);
+      height: var(--cell);
+      border-left: 1px solid var(--grid);
+      border-top: 1px solid var(--grid);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: 0 0;
+    }
+
+    .cell.col-last {
+      border-right: 1px solid var(--grid);
+    }
+
+    .row.row-last .cell {
+      border-bottom: 1px solid var(--grid);
+    }
+
+    .cell .py {
+      position: absolute;
+      top: 4%;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: calc(var(--cell) * 0.19);
+      line-height: 1.1;
+      color: var(--main);
+      font-family: 'Times New Roman', -apple-system, 'Segoe UI', Arial, sans-serif;
+      pointer-events: none;
+    }
+
+    .cell .glyph {
+      position: absolute;
+      inset: 7%;
+      width: 86%;
+      height: 86%;
+    }
+
+    .cell.with-py .glyph {
+      inset: 20% 10% 6%;
+      width: 80%;
+      height: 74%;
+    }
+
+    .cell .fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Kaiti SC", STKaiti, KaiTi, "楷体", "楷体_GB2312", "AR PL UKai CN", serif;
+      font-size: calc(var(--cell) * 0.72);
+    }
+
+    /* ============ 笔顺演示 ============ */
+    .anim-wrap {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .anim-stage {
+      width: 220px;
+      height: 220px;
+      flex-shrink: 0;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .anim-stage svg {
+      width: 190px;
+      height: 190px;
+    }
+
+    .anim-side {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .char-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      max-height: 132px;
+      overflow-y: auto;
+    }
+
+    .chip {
+      padding: 5px 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 18px;
+      cursor: pointer;
+      font-family: "Kaiti SC", STKaiti, KaiTi, "楷体", serif;
+      transition: all .15s;
+    }
+
+    .chip:hover {
+      border-color: var(--button-bg);
+    }
+
+    .chip.on {
+      border-color: var(--button-bg);
+      background: rgba(40, 167, 69, .14);
+      color: var(--button-bg);
+    }
+
+    .chip.nodata {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .anim-meta {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .anim-meta b {
+      color: var(--text-color);
+      font-size: 20px;
+      font-family: "Kaiti SC", STKaiti, KaiTi, "楷体", serif;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin: 24px 0 10px;
+      color: var(--button-bg);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .info-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .info-section h2 {
+      font-size: 16px;
+      color: var(--text-color);
+      margin: 0 0 10px;
+    }
+
+    .info-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .info-section li {
+      margin-bottom: 4px;
+    }
+
+    .info-section code {
+      background: rgba(128, 128, 128, .18);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .opt-label {
+        width: 100%;
+      }
+
+      .btn-row button {
+        flex: 1;
+        padding: 12px 10px;
+      }
+
+      .anim-stage {
+        margin: 0 auto;
+      }
+    }
+
+    /* ============ 打印 ============ */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 15mm 15mm 12mm;
+      }
+
+      body {
+        padding: 0;
+        background: #fff;
+      }
+
+      .container {
+        max-width: none;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .preview-scroll {
+        overflow: visible;
+        padding: 0;
+      }
+
+      .page {
+        margin: 0;
+        border: none;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+      }
+
+      .page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+    }
+  </style>
+  <style id="dyn-style"></style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="no-print">
+      <h1>田字格笔顺字帖生成器</h1>
+      <p class="subtitle">输入汉字，生成可打印的田字格 / 米字格笔顺描红字帖</p>
+    </div>
+
+    <!-- 输入 -->
+    <div class="card no-print">
+      <div class="card-title"><span class="num">1</span>输入汉字</div>
+      <textarea id="words" placeholder="请输入要练习的汉字，例如：天地人和 或 一二三四五六七八九十"></textarea>
+      <div class="opt-row" style="margin-top:12px;">
+        <div class="opt-label">快捷填充</div>
+        <div class="pills">
+          <button type="button" class="pill" data-sample="一二三四五六七八九十">数字</button>
+          <button type="button" class="pill" data-sample="天地人日月金木水火土">五行天地</button>
+          <button type="button" class="pill" data-sample="人口手足上下大小多少">基础字</button>
+          <button type="button" class="pill" data-sample="永">永字八法</button>
+        </div>
+      </div>
+      <div class="switch-row">
+        <span>去除重复字（同一字只出现一次）</span>
+        <label class="switch"><input type="checkbox" id="dedupe" checked><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <!-- 格式 -->
+    <div class="card no-print">
+      <div class="card-title"><span class="num">2</span>格式设置</div>
+      <div class="opt-row">
+        <div class="opt-label">格子类型</div>
+        <div class="pills" id="p-grid">
+          <label class="pill on"><input type="radio" name="grid" value="tzg" checked><span>田字格</span></label>
+          <label class="pill"><input type="radio" name="grid" value="mzg"><span>米字格</span></label>
+        </div>
+      </div>
+      <div class="opt-row">
+        <div class="opt-label">格子颜色</div>
+        <div class="pills" id="p-gcolor">
+          <label class="pill"><input type="radio" name="gcolor" value="green"><span class="swatch green"></span><span>绿色</span></label>
+          <label class="pill on"><input type="radio" name="gcolor" value="black" checked><span class="swatch black"></span><span>黑色</span></label>
+          <label class="pill"><input type="radio" name="gcolor" value="red"><span class="swatch red"></span><span>红色</span></label>
+        </div>
+      </div>
+      <div class="opt-row">
+        <div class="opt-label">文字颜色</div>
+        <div class="pills" id="p-zcolor">
+          <label class="pill"><input type="radio" name="zcolor" value="green"><span class="swatch green"></span><span>绿色</span></label>
+          <label class="pill on"><input type="radio" name="zcolor" value="black" checked><span class="swatch black"></span><span>黑色</span></label>
+          <label class="pill"><input type="radio" name="zcolor" value="red"><span class="swatch red"></span><span>红色</span></label>
+        </div>
+      </div>
+      <div class="opt-row">
+        <div class="opt-label">格子大小</div>
+        <div class="pills" id="p-size">
+          <label class="pill"><input type="radio" name="size" value="13"><span>小（13mm）</span></label>
+          <label class="pill on"><input type="radio" name="size" value="15" checked><span>中（15mm）</span></label>
+          <label class="pill"><input type="radio" name="size" value="18"><span>大（18mm）</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 描红 -->
+    <div class="card no-print">
+      <div class="card-title"><span class="num">3</span>描红设置</div>
+      <div class="opt-row">
+        <div class="opt-label">描红深度</div>
+        <div class="pills" id="p-depth">
+          <label class="pill"><input type="radio" name="depth" value="1"><span class="depth-bar d1"></span><span>非常深</span></label>
+          <label class="pill"><input type="radio" name="depth" value="2"><span class="depth-bar d2"></span><span>深</span></label>
+          <label class="pill"><input type="radio" name="depth" value="3"><span class="depth-bar d3"></span><span>较深</span></label>
+          <label class="pill"><input type="radio" name="depth" value="4"><span class="depth-bar d4"></span><span>略浅</span></label>
+          <label class="pill on"><input type="radio" name="depth" value="5" checked><span class="depth-bar d5"></span><span>适中</span></label>
+          <label class="pill"><input type="radio" name="depth" value="6"><span class="depth-bar d6"></span><span>非常浅</span></label>
+        </div>
+      </div>
+      <div class="switch-row">
+        <span>笔顺剩余格子填充整字（关闭则留空白格）</span>
+        <label class="switch"><input type="checkbox" id="fill"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <span>显示拼音（首格）</span>
+        <label class="switch"><input type="checkbox" id="pinyin"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <span>页头文字（打印时每页顶部显示）</span>
+        <input type="text" id="title" placeholder="如：一年级上册 · 生字表" style="max-width:260px;">
+      </div>
+    </div>
+
+    <!-- 按钮 -->
+    <div class="card no-print">
+      <div class="btn-row">
+        <button type="button" class="btn-primary" id="btn-gen">生成字帖</button>
+        <button type="button" class="btn-secondary" id="btn-print">打印 / 保存 PDF</button>
+        <button type="button" class="btn-ghost" id="btn-clear">清空</button>
+      </div>
+      <div class="status" id="status"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+
+    <!-- 预览 -->
+    <div class="preview-scroll" id="preview"></div>
+
+    <!-- 笔顺演示 -->
+    <div class="card no-print" id="anim-card" style="display:none;">
+      <div class="card-title"><span class="num">4</span>笔顺动画演示</div>
+      <div class="anim-wrap">
+        <div class="anim-stage" id="anim-stage"></div>
+        <div class="anim-side">
+          <div class="anim-meta" id="anim-meta">点击汉字查看笔顺</div>
+          <div class="char-chips" id="chips"></div>
+          <div class="opt-row" style="margin-bottom:0;">
+            <button type="button" class="btn-primary" id="btn-play" style="padding:8px 18px;font-size:14px;">重新播放</button>
+            <div class="pills" id="p-speed" style="margin-left:4px;">
+              <label class="pill"><input type="radio" name="speed" value="0.6"><span>慢速</span></label>
+              <label class="pill on"><input type="radio" name="speed" value="1" checked><span>常速</span></label>
+              <label class="pill"><input type="radio" name="speed" value="1.7"><span>快速</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 说明 -->
+    <div class="info-section no-print">
+      <h2>使用说明</h2>
+      <ul>
+        <li>在输入框中输入（或粘贴）要练习的汉字，非汉字字符会被自动过滤。</li>
+        <li>每个字生成：<b>首格整字（可选拼音）</b> → <b>按笔顺逐笔累加的描红格</b> → 补齐当前行的空格（可切换为填充浅色整字）。</li>
+        <li>点击「打印 / 保存 PDF」，在打印对话框中<b>勾选「背景图形」</b>，并选择 A4 纵向、无页眉页脚，即可输出字帖。</li>
+        <li>点击下方汉字可查看该字的<b>笔顺书写动画</b>，支持慢速 / 常速 / 快速。</li>
+        <li>笔顺数据来自开源项目 <code>makemeahanzi</code> / <code>hanzi-writer-data</code>，拼音数据来自 <code>jifei/Pinyin</code>，共收录 9500+ 汉字。</li>
+        <li>极少数生僻字可能没有笔顺数据，会退化为楷体字体显示，且不支持动画。</li>
+      </ul>
+    </div>
+
+    <div class="no-print">
+      <a href="./index.html" class="back-link">← 返回工具列表</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------------- 拼音字典（来自 Pinyin.php，紧凑编码：汉字 + 小写拼音字母串） ---------------- */
+      var PINYIN_RAW = "腌yan嗄a迫po捱ai艾ai瑷ai嗌ai犴an鳌ao廒ao拗niu岙ao鏊ao扒ba岜ba耙pa鲅ba癍ban膀pang磅bang炮pao曝pu刨pao瀑pu陂bei埤pi鹎bei邶bei孛bei鐾bei鞴bei畚ben甏beng舭bi秘mi辟pi泌mi裨bi濞bi庳bi嬖bi畀bi筚bi箅bi襞bi跸bi笾bian扁bian碥bian窆bian便bian弁bian缏bian骠biao杓shao飚biao飑biao瘭biao髟biao玢bin豳bin镔bin膑bin屏ping泊bo逋bu晡bu钸bu醭bu埔pu瓿bu礤ca骖can藏cang艚cao侧ce喳zha刹sha瘥chai禅chan廛chan镡tan澶chan躔chan阊chang鲳chang长chang苌chang氅chang鬯chang焯chao朝chao车che琛chen谶chen榇chen蛏cheng埕cheng枨cheng塍cheng裎cheng螭chi眵chi墀chi篪chi坻di瘛chi种zhong重zhong仇chou帱chou俦chou雠chou臭chou楮chu畜chu嘬zuo膪chuai巛chuan椎zhui呲ci兹zi伺si璁cong楱cou攒zan爨cuan隹zhui榱cui撮cuo鹾cuo嗒da哒da沓ta骀tai绐dai埭dai甙dai弹dan澹dan叨dao纛dao簦deng提ti翟zhai绨ti丶dian佃dian簟dian癜dian调tiao铞diao佚yi堞die瓞die揲die垤die疔ding岽dong硐dong恫dong垌dong峒dong芏du煅duan碓dui镦dui囤tun铎duo缍duo驮tuo沲tuo柁tuo哦o恶e轭e锷e鹗e阏e诶ea鲕er珥er佴er番fan彷pang霏fei蜚fei鲱fei芾fei瀵fen鲼fen否fou趺fu桴fu莩fu菔fu幞fu郛fu绂fu绋fu祓fu砩fu黻fu罘fu蚨fu脯pu滏fu黼fu鲋fu鳆fu咖ka噶ga轧zha陔gai戤gai扛kang戆gang筻gang槔gao藁gao缟gao咯ge仡yi搿ge塥ge鬲ge哿ge句ju缑gou鞲gou笱gou遘gou瞽gu罟gu嘏gu牿gu鲴gu栝kuo莞guan纶lun涫guan涡wo呙guo馘guo猓guo咳ke氦hai颔han吭keng颃hang巷xiang蚵ke翮he吓xia桁heng泓hong蕻hong黉hong後hou唿hu煳hu浒hu祜hu岵hu鬟huan圜huan郇xun锾huan逭huan咴hui虺hui会hui溃kui哕hui缋hui锪huo蠖huo缉ji稽ji赍ji丌ji咭ji亟ji殛ji戢ji嵴ji蕺ji系xi蓟ji霁ji荠qi跽ji哜ji鲚ji洎ji芰ji茄qie珈jia迦jia笳jia葭jia跏jia郏jia恝jia铗jia袷qia蛱jia角jiao挢jiao岬jia徼jiao湫qiu敫jiao瘕jia浅qian蒹jian搛jian湔jian缣jian犍jian鹣jian鲣jian鞯jian蹇jian謇jian硷jian枧jian戬jian谫jian囝jian裥jian笕jian翦jian趼jian楗jian牮jian踺jian茳jiang礓jiang耩jiang降jiang绛jiang洚jiang鲛jiao僬jiao鹪jiao艽jiao茭jiao嚼jiao峤qiao觉jiao校xiao噍jiao醮jiao疖jie喈jie桔ju拮jie桀jie颉jie婕jie羯jie鲒jie蚧jie骱jie衿jin馑jin卺jin廑jin堇jin槿jin靳jin缙jin荩jin赆jin妗jin旌jing腈jing憬jing肼jing迳jing胫jing弪jing獍jing扃jiong鬏jiu疚jiu僦jiu桕jiu疽ju裾ju苴ju椐ju锔ju琚ju鞫ju踽ju榉ju莒ju遽ju倨ju钜ju犋ju屦ju榘ju窭ju讵ju醵ju苣ju圈quan镌juan蠲juan锩juan狷juan桊juan鄄juan獗jue攫jue孓jue橛jue珏jue桷jue劂jue爝jue镢jue觖jue筠jun麇jun捃jun浚jun喀ka卡ka佧ka胩ka锎kai蒈kai剀kai垲kai锴kai戡kan莰kan闶kang钪kang尻kao栲kao柯ke疴ke钶ke颏ke珂ke髁ke壳ke岢ke溘ke骒ke缂ke氪ke锞ke裉ken倥kong崆kong箜kong芤kou眍kou筘kou刳ku堀ku喾ku侉kua蒯kuai哙kuai狯kuai郐kuai匡kuang夼kuang邝kuang圹kuang纩kuang贶kuang岿kui悝kui睽kui逵kui馗kui夔kui喹kui隗wei暌kui揆kui蝰kui跬kui喟kui聩kui篑kui蒉kui愦kui锟kun醌kun琨kun髡kun悃kun阃kun蛞kuo砬la落luo剌la瘌la涞lai崃lai铼lai赉lai濑lai斓lan镧lan谰lan漤lan罱lan稂lang阆lang莨liang蒗lang铹lao痨lao醪lao栳lao铑lao耢lao勒le仂le叻le泐le鳓le了le镭lei嫘lei缧lei檑lei诔lei耒lei酹lei塄leng愣leng藜li骊li黧li缡li嫠li鲡li蓠li澧li锂li醴li鳢li俪li砺li郦li詈li猁li溧li栎li轹li傈li坜li苈li疠li疬li篥li粝li跞li俩liang裢lian濂lian臁lian奁lian蠊lian琏lian蔹lian裣lian楝lian潋lian椋liang墚liang寮liao鹩liao蓼liao钌liao廖liao尥liao洌lie捩lie埒lie躐lie鬣lie辚lin遴lin啉lin瞵lin懔lin廪lin蔺lin膦lin酃ling柃ling鲮ling呤ling镏liu旒liu骝liu鎏liu锍liu碌lu鹨liu茏long栊long泷long砻long癃long垅long偻lou蝼lou蒌lou耧lou嵝lou露lu瘘lou噜lu轳lu垆lu胪lu舻lu栌lu镥lu绿lv辘lu簏lu潞lu辂lu渌lu氇lu捋lv稆lv率lv闾lv栾luan銮luan滦luan娈luan脔luan锊lve猡luo椤luo脶luo镙luo倮luo蠃luo瘰luo珞luo泺luo荦luo雒luo呒mu抹mo唛mai杩ma么me埋mai荬mai脉mai劢mai颟man蔓man鳗man鞔man螨man墁man缦man熳man镘man邙mang硭mang旄mao茆mao峁mao泖mao昴mao耄mao瑁mao懋mao瞀mao麽me没mei嵋mei湄mei猸mei镅mei鹛mei浼mei钔men瞢meng甍meng礞meng艨meng黾mian鳘min溟ming暝ming模mo谟mo嫫mo镆mo瘼mo耱mo貊mo貘mo牟mou鍪mou蛑mou侔mou毪mu坶mu仫mu唔wu那na镎na哪na呢ne肭na艿nai鼐nai萘nai柰nai蝻nan馕nang攮nang曩nang猱nao铙nao硇nao蛲nao垴nao坭ni猊ni铌ni鲵ni祢mi睨ni慝te伲ni鲇nian鲶nian埝nian嬲niao茑niao脲niao啮nie陧nie颞nie臬nie蘖nie甯ning聍ning狃niu侬nong耨nou孥nu胬nu钕nv恧nv褰qian掮qian荨xun钤qian箝qian鬈quan缱qian肷qian纤xian茜qian慊qian椠qian戗qiang镪qiang锖qiang樯qiang嫱qiang雀que缲qiao硗qiao劁qiao樵qiao谯qiao鞒qiao愀qiao鞘qiao郄xi箧qie亲qin覃tan溱qin檎qin锓qin嗪qin螓qin揿qin吣qin圊qing鲭qing檠qing黥qing謦qing苘qing磬qing箐qing綮qi茕qiong邛dao蛩tun筇qiong跫qiong銎qiong楸qiu俅qiu赇qiu逑qiu犰qiu蝤qiu巯qiu鼽qiu糗qiu区qu祛qu麴qu诎qu衢qu癯qu劬qu璩qu氍qu朐qu磲qu鸲qu蕖qu蠼qu蘧qu阒qu颧quan荃quan铨quan辁quan筌quan绻quan畎quan阕que悫que髯ran禳rang穰rang仞ren妊ren轫ren衽ren狨rong肜rong蝾rong嚅ru濡ru薷ru襦ru颥ru洳ru溽ru蓐ru朊ruan蕤rui枘rui箬ruo挲suo脎sa塞sai鳃sai噻sai毵san馓san糁san霰xian磉sang颡sang缫sao鳋sao埽sao瘙sao色se杉shan鲨sha痧sha裟sha铩sha唼sha酾shai栅zha跚shan芟shan埏shan钐shan舢shan剡yan鄯shan疝shan蟮shan墒shang垧shang绱shang蛸shao筲shao苕tiao召zhao劭shao猞she畲she折zhe滠she歙xi厍she莘shen娠shen诜shen什shen谂shen渖shen矧shen胂shen椹shen省sheng眚sheng嵊sheng嘘xu蓍shi鲺shi识shi拾shi埘shi莳shi炻shi鲥shi豕shi似si噬shi贳shi铈shi螫shi筮shi殖zhi熟shu艏shou菽shu摅shu纾shu毹shu疋shu数shu属shu术shu澍shu沭shu丨shu腧shu说shuo妁shuo蒴shuo槊shuo搠shuo鸶si澌si缌si锶si厶si蛳si驷si泗si汜si兕si姒si耜si笥si忪song淞song崧song凇song菘song竦song溲sou飕sou蜩tiao萜tie汀ting葶ting莛ting梃ting佟tong酮tong仝tong茼tong砼tong钭dou酴tu钍tu堍tu抟tuan忒te煺tui暾tun氽tun乇tuo砣tuo沱tuo跎tuo坨tuo橐tuo酡tuo鼍tuo庹tuo拓tuo柝tuo箨tuo腽wa崴wai芄wan畹wan琬wan脘wan菀wan尢you辋wang魍wang逶wei葳wei隈wei惟wei帏wei圩wei囗wei潍wei嵬wei沩wei涠wei尾wei玮wei炜wei韪wei洧wei艉wei鲔wei遗yi尉wei軎wei璺wen阌wen蓊weng蕹weng渥wo硪wo龌wo圬wu吾wu浯wu鼯wu牾wu迕wu庑wu痦wu芴wu杌wu焐wu阢wu婺wu鋈wu樨xi栖qi郗xi蹊qi淅xi熹xi浠xi僖xi穸xi螅xi菥xi舾xi矽xi粞xi硒xi醯xi欷xi鼷xi檄xi隰xi觋xi屣xi葸xi蓰xi铣xi饩xi阋xi禊xi舄xi狎xia硖xia柙xia暹xian莶xian祆xian籼xian跹xian鹇xian痫xian猃xian燹xian蚬xian筅xian冼xian岘xian骧xiang葙xiang芗xiang缃xiang庠xiang鲞xiang蟓xiang削xue枵xiao绡xiao筱xiao邪xie勰xie缬xie血xue榭xie瀣xie薤xie燮xie躞xie廨xie绁xie渫xie榍xie獬xie昕xin忻xin囟xin陉jing荥ying饧tang硎xing荇xing芎xiong馐xiu庥xiu鸺xiu貅xiu髹xiu宿xiu岫xiu溴xiu吁xu盱xu顼xu糈xu醑xu洫xu溆xu蓿xu萱xuan谖xuan儇xuan煊xuan痃xuan铉xuan泫xuan碹xuan楦xuan镟xuan踅xue泶xue鳕xue埙xun曛xun窨xun獯xun峋xun洵xun恂xun浔xun鲟xun蕈xun垭ya岈ya琊ya痖ya迓ya砑ya咽yan鄢yan菸yan崦yan铅qian芫yuan兖yan琰yan罨yan厣yan焱yan酽yan谳yan鞅yang炀yang蛘yang约yue珧yao轺yao繇yao鳐yao崾yao钥yao曜yao铘ye烨ye邺ye靥ye晔ye猗yi铱yi欹qi黟yi怡yi沂yi圯yi荑yi诒yi眙yi嶷yi钇yi舣yi酏yi熠yi弋yi懿yi镒yi峄yi怿yi悒yi佾yi殪yi挹yi埸yi劓yi镱yi瘗yi癔yi翊yi蜴yi氤yin堙yin洇yin鄞yin狺yin夤yin圻qi饮yin吲yin胤yin茚yin璎ying撄ying嬴ying滢ying潆ying蓥ying瘿ying郢ying媵ying邕yong镛yong墉yong慵yong痈yong鳙yong饔yong喁yong俑yong莸you猷you疣you蚰you蝣you莜you牖you铕you卣you宥you侑you蚴you釉you馀yu萸yu禺yu妤yu欤yu觎yu窬yu蝓yu嵛yu舁yu雩yu龉yu伛yu圉yu庾yu瘐yu窳yu俣yu毓yu峪yu煜yu燠yu蓣yu饫yu阈yu鬻yu聿yu钰yu鹆yu蜮yu眢yuan箢yuan员yuan沅yuan橼yuan塬yuan爰yuan螈yuan鼋yuan掾yuan垸yuan瑗yuan刖yue瀹yue樾yue龠yue氲yun昀yun郧yun狁yun郓yun韫yun恽yun扎zha拶za咋za仔zai昝zan瓒zan奘zang唣zao择ze迮ze赜ze笮ze箦ze舴ze昃ze缯zeng罾zeng齄zha柞zha痄zha瘵zhai旃zhan璋zhang漳zhang嫜zhang鄣zhang仉zhang幛zhang着zhe啁zhou爪zhao棹zhao笊zhao摺zhe磔zhe这zhe柘zhe桢zhen蓁zhen祯zhen浈zhen畛zhen轸zhen稹zhen圳zhen徵zhi钲zheng卮zhi胝zhi祗zhi摭zhi絷zhi埴zhi轵zhi黹zhi帙zhi轾zhi贽zhi陟zhi忮zhi彘zhi膣zhi鸷zhi骘zhi踬zhi郅zhi觯zhi锺zhong螽zhong舯zhong碡zhou绉zhou荮zhou籀zhou酎zhou洙zhu邾zhu潴zhu槠zhu橥zhu舳zhu瘃zhu渚zhu麈zhu箸zhu炷zhu杼zhu翥zhu疰zhu颛zhuan赚zhuan馔zhuan僮tong缒zhui肫zhun窀zhun涿zhuo倬zhuo濯zhuo诼zhuo禚zhuo浞zhuo谘zi淄zi髭zi孳zi粢zi趑zi觜zui缁zi鲻zi嵫zi笫zi耔zi腙zong偬zong诹zou陬zou鄹zou驺zou鲰zou菹ju镞zu躜zuan缵zuan蕞zui撙zun胙zuo阿a柏bai蚌beng薄bo堡bao呗bei贲ben臂bi瘪bie槟bin剥bo伯bo卜bu参can嚓ca差cha孱chan绰chuo称cheng澄cheng大da单dan得de的de地di都dou读du度du蹲dun佛fo伽jia盖gai镐hao给gei呱gua氿jiu桧hui掴guo蛤ha还hai和he核he哼heng鹄hu划hua夹jia贾jia芥jie劲jin荆jing颈jing貉he吖a啊a锕a哎ai哀ai埃ai唉ai欸ai锿ai挨ai皑ai癌ai毐ai矮ai蔼ai霭ai砹ai爱ai隘ai碍ai嗳ai嫒ai叆ai暧ai安an桉an氨an庵an谙an鹌an鞍an俺an埯an唵an铵an揞an岸an按an胺an案an暗an黯an玵an肮ang昂ang盎ang凹ao敖ao遨ao嗷ao獒ao熬ao聱ao螯ao翱ao謷ao鏖ao袄ao媪ao坳ao傲ao奥ao骜ao澳ao懊ao八ba巴ba叭ba芭ba疤ba捌ba笆ba粑ba拔ba茇ba妭ba菝ba跋ba魃ba把ba靶ba坝ba爸ba罢ba霸ba灞ba吧ba钯ba掰bai白bai百bai佰bai捭bai摆bai败bai拜bai稗bai扳ban攽ban班ban般ban颁ban斑ban搬ban瘢ban阪ban坂ban板ban版ban钣ban舨ban办ban半ban伴ban拌ban绊ban瓣ban扮ban邦bang帮bang梆bang浜bang绑bang榜bang棒bang傍bang谤bang蒡bang镑bang包bao苞bao孢bao胞bao龅bao煲bao褒bao雹bao饱bao宝bao保bao鸨bao葆bao褓bao报bao抱bao趵bao豹bao鲍bao暴bao爆bao枹bao杯bei卑bei悲bei碑bei北bei贝bei狈bei备bei背bei钡bei倍bei悖bei被bei辈bei惫bei焙bei蓓bei碚bei褙bei蹩bei椑bei奔ben倴ben犇ben锛ben本ben苯ben坌ben笨ben崩beng绷beng嘣beng甭beng泵beng迸beng镚beng蹦beng屄bi逼bi荸bi鼻bi匕bi比bi吡bi沘bi妣bi彼bi秕bi笔bi俾bi鄙bi币bi必bi毕bi闭bi庇bi诐bi苾bi荜bi毖bi哔bi陛bi毙bi铋bi狴bi萆bi梐bi敝bi婢bi赑bi愎bi弼bi蓖bi痹bi滗bi碧bi蔽bi馝bi弊bi薜bi篦bi壁bi避bi髀bi璧bi芘bi边bian砭bian萹bian编bian煸bian蝙bian鳊bian鞭bian贬bian匾bian褊bian藊bian卞bian抃bian苄bian汴bian忭bian变bian遍bian辨bian辩bian辫bian标biao骉biao彪biao摽biao膘biao飙biao镖biao瀌biao镳biao表biao婊biao裱biao鳔biao别bie憋bie鳖bie宾bin彬bin傧bin滨bin缤bin濒bin摈bin殡bin髌bin鬓bin冰bing兵bing丙bing邴bing秉bing柄bing饼bing炳bing禀bing并bing病bing摒bing拨bo波bo玻bo钵bo饽bo袯bo菠bo播bo驳bo帛bo勃bo钹bo铂bo亳bo舶bo脖bo博bo鹁bo渤bo搏bo馎bo箔bo膊bo踣bo馞bo礴bo跛bo檗bo擘bo簸bo啵bo蕃bo哱bo卟bu补bu捕bu哺bu不bu布bu步bu怖bu钚bu部bu埠bu簿bu擦ca猜cai才cai材cai财cai裁cai采cai彩cai睬cai踩cai菜cai蔡cai餐can残can蚕can惭can惨can黪can灿can粲can璨can穇can仓cang伧cang苍cang沧cang舱cang操cao糙cao曹cao嘈cao漕cao槽cao螬cao草cao册ce厕ce测ce恻ce策ce岑cen涔cen噌ceng层ceng嶒ceng蹭ceng叉cha杈cha插cha馇cha锸cha茬cha茶cha搽cha嵖cha猹cha槎cha碴cha察cha檫cha衩cha镲cha汊cha岔cha侘cha诧cha姹cha蹅cha拆chai钗chai侪chai柴chai豺chai虿chai茝chai觇chan掺chan搀chan襜chan谗chan婵chan馋chan缠chan蝉chan潺chan蟾chan巉chan产chan浐chan谄chan铲chan阐chan蒇chan骣chan冁chan忏chan颤chan羼chan韂chan伥chang昌chang菖chang猖chang娼chang肠chang尝chang常chang偿chang徜chang嫦chang厂chang场chang昶chang惝chang敞chang怅chang畅chang倡chang唱chang裳chang抄chao怊chao钞chao超chao晁chao巢chao嘲chao潮chao吵chao炒chao耖chao砗che扯che彻che坼che掣che撤che澈che瞮che抻chen郴chen嗔chen瞋chen臣chen尘chen辰chen沉chen忱chen陈chen宸chen晨chen谌chen碜chen衬chen龀chen趁chen柽cheng琤cheng撑cheng瞠cheng成cheng丞cheng呈cheng诚cheng承cheng城cheng铖cheng程cheng惩cheng酲cheng橙cheng逞cheng骋cheng秤cheng铛cheng樘cheng吃chi哧chi鸱chi蚩chi笞chi嗤chi痴chi媸chi魑chi池chi弛chi驰chi迟chi茌chi持chi踟chi尺chi齿chi侈chi耻chi豉chi褫chi彳chi叱chi斥chi赤chi饬chi炽chi翅chi敕chi啻chi傺chi匙chi冲chong充chong忡chong茺chong舂chong憧chong艟chong虫chong崇chong宠chong铳chong抽chou瘳chou惆chou绸chou畴chou酬chou稠chou愁chou筹chou踌chou丑chou瞅chou出chu初chu樗chu刍chu除chu厨chu锄chu滁chu蜍chu雏chu橱chu躇chu蹰chu杵chu础chu储chu楚chu褚chu亍chu处chu怵chu绌chu搐chu触chu憷chu黜chu矗chu揣chuai搋chuai膗chuai踹chuai川chuan氚chuan穿chuan舡chuan船chuan遄chuan椽chuan舛chuan喘chuan串chuan钏chuan疮chuang窗chuang床chuang闯chuang创chuang怆chuang吹chui炊chui垂chui陲chui捶chui棰chui槌chui锤chui春chun瑃chun椿chun蝽chun纯chun莼chun唇chun淳chun鹑chun醇chun蠢chun踔chuo戳chuo啜chuo惙chuo辍chuo龊chuo歠chuo疵ci词ci茈ci茨ci祠ci瓷ci辞ci慈ci磁ci雌ci鹚ci糍ci此ci泚ci跐ci次ci刺ci佽ci赐ci匆cong苁cong囱cong枞cong葱cong骢cong聪cong从cong丛cong淙cong悰cong琮cong凑cou辏cou腠cou粗cu徂cu殂cu促cu猝cu蔟cu醋cu踧cu簇cu蹙cu蹴cu汆cuan撺cuan镩cuan蹿cuan窜cuan篡cuan崔cui催cui摧cui璀cui脆cui萃cui啐cui淬cui悴cui毳cui瘁cui粹cui翠cui村cun皴cun存cun忖cun寸cun吋cun搓cuo磋cuo蹉cuo嵯cuo矬cuo痤cuo脞cuo挫cuo莝cuo厝cuo措cuo锉cuo错cuo酇cuo咑da垯da耷da搭da褡da达da怛da妲da荙da笪da答da跶da靼da瘩da鞑da打da呆dai歹dai逮dai傣dai代dai岱dai迨dai玳dai带dai殆dai贷dai待dai怠dai袋dai叇dai戴dai黛dai襶dai呔dai丹dan担dan眈dan耽dan郸dan聃dan殚dan瘅dan箪dan儋dan胆dan疸dan掸dan亶dan旦dan但dan诞dan萏dan啖dan淡dan惮dan蛋dan氮dan赕dan当dang裆dang挡dang档dang党dang谠dang凼dang砀dang宕dang荡dang菪dang刀dao忉dao氘dao舠dao导dao岛dao捣dao倒dao捯dao祷dao蹈dao到dao盗dao悼dao道dao稻dao焘dao锝de嘚de德de扽den灯deng登deng噔deng蹬deng等deng戥deng邓deng僜deng凳deng嶝deng磴deng瞪deng镫deng低di羝di堤di嘀di滴di狄di迪di籴di荻di敌di涤di笛di觌di嫡di镝di氐di邸di诋di抵di底di柢di砥di骶di玓di弟di帝di递di娣di第di谛di蒂di棣di睇di缔di碲di嗲dia掂dian滇dian颠dian巅dian癫dian典dian点dian碘dian踮dian电dian甸dian阽dian坫dian店dian玷dian垫dian钿dian淀dian惦dian奠dian殿dian靛dian刁diao叼diao汈diao凋diao貂diao碉diao雕diao鲷diao屌diao吊diao钓diao窎diao掉diao铫diao爹die跌die迭die谍die耋die喋die牒die叠die碟die嵽die蝶die蹀die鲽die仃ding叮ding玎ding盯ding町ding耵ding顶ding酊ding鼎ding订ding钉ding定ding啶ding腚ding碇ding锭ding丢diu铥diu东dong冬dong咚dong氡dong鸫dong董dong懂dong动dong冻dong侗dong栋dong胨dong洞dong胴dong兜dou蔸dou篼dou抖dou陡dou蚪dou斗dou豆dou逗dou痘dou窦dou督du嘟du毒du独du渎du椟du犊du牍du黩du髑du厾du笃du堵du赌du睹du杜du肚du妒du渡du镀du蠹du端duan短duan段duan断duan缎duan椴duan锻duan簖duan堆dui队dui对dui兑dui怼dui憝dui吨dun惇dun敦dun墩dun礅dun盹dun趸dun沌dun炖dun砘dun钝dun盾dun顿dun遁dun多duo咄duo哆duo掇duo裰duo夺duo踱duo朵duo垛duo哚duo躲duo亸duo剁duo舵duo堕duo惰duo跺duo屙e婀e讹e囮e俄e莪e峨e娥e锇e鹅e蛾e额e厄e扼e苊e呃e垩e饿e鄂e谔e萼e遏e愕e腭e颚e噩e鳄e恩en蒽en摁en鞥eng儿er而er鸸er尔er耳er迩er饵er洱er铒er二er贰er发fa乏fa伐fa罚fa垡fa阀fa筏fa法fa砝fa珐fa帆fan幡fan藩fan翻fan凡fan矾fan钒fan烦fan樊fan燔fan繁fan蹯fan蘩fan反fan返fan犯fan饭fan泛fan范fan贩fan畈fan梵fan方fang邡fang坊fang芳fang枋fang钫fang防fang妨fang肪fang房fang鲂fang仿fang访fang纺fang舫fang放fang飞fei妃fei非fei菲fei啡fei绯fei扉fei肥fei淝fei腓fei匪fei诽fei悱fei棐fei斐fei榧fei翡fei篚fei吠fei肺fei狒fei废fei沸fei费fei痱fei镄fei分fen芬fen吩fen纷fen氛fen酚fen坟fen汾fen棼fen焚fen鼢fen粉fen份fen奋fen忿fen偾fen粪fen愤fen丰feng风feng沣feng枫feng封feng砜feng疯feng峰feng烽feng葑feng锋feng蜂feng酆feng冯feng逢feng缝feng讽feng唪feng凤feng奉feng俸feng缶fou夫fu呋fu肤fu麸fu跗fu稃fu孵fu敷fu弗fu伏fu凫fu扶fu芙fu孚fu拂fu苻fu服fu怫fu茯fu氟fu俘fu浮fu符fu匐fu涪fu艴fu幅fu辐fu蜉fu福fu蝠fu抚fu甫fu拊fu斧fu府fu俯fu釜fu辅fu腑fu腐fu父fu讣fu付fu负fu妇fu附fu咐fu阜fu驸fu赴fu复fu副fu赋fu傅fu富fu腹fu缚fu赙fu蝮fu覆fu馥fu袱fu旮ga嘎ga钆ga尜ga尕ga尬ga该gai垓gai荄gai赅gai改gai丐gai钙gai溉gai概gai甘gan玕gan肝gan坩gan苷gan矸gan泔gan柑gan竿gan酐gan疳gan尴gan杆gan秆gan赶gan敢gan感gan澉gan橄gan擀gan干gan旰gan绀gan淦gan骭gan赣gan冈gang冮gang刚gang肛gang纲gang钢gang缸gang罡gang岗gang港gang杠gang皋gao高gao羔gao睾gao膏gao篙gao糕gao杲gao搞gao槁gao稿gao告gao郜gao诰gao锆gao戈ge圪ge纥ge疙ge哥ge胳ge鸽ge袼ge搁ge割ge歌ge革ge阁ge格ge隔ge嗝ge膈ge骼ge镉ge舸ge葛ge个ge各ge虼ge硌ge铬ge根gen跟gen哏gen亘gen艮gen茛gen庚geng耕geng浭geng赓geng羹geng埂geng耿geng哽geng绠geng梗geng鲠geng更geng工gong弓gong公gong功gong攻gong肱gong宫gong恭gong蚣gong躬gong龚gong塨gong觥gong巩gong汞gong拱gong珙gong共gong贡gong供gong勾gou佝gou沟gou钩gou篝gou苟gou岣gou狗gou枸gou构gou购gou诟gou垢gou够gou彀gou媾gou觏gou估gu咕gu沽gu孤gu姑gu轱gu鸪gu菰gu菇gu蛄gu蓇gu辜gu酤gu觚gu毂gu箍gu古gu谷gu汩gu诂gu股gu骨gu牯gu钴gu羖gu蛊gu鼓gu榾gu鹘gu臌gu瀔gu固gu故gu顾gu梏gu崮gu雇gu锢gu痼gu瓜gua刮gua胍gua鸹gua剐gua寡gua卦gua诖gua挂gua褂gua乖guai拐guai怪guai关guan观guan官guan倌guan蒄guan棺guan瘝guan鳏guan馆guan管guan贯guan冠guan掼guan惯guan祼guan盥guan灌guan瓘guan鹳guan罐guan琯guan光guang咣guang胱guang广guang犷guang桄guang逛guang归gui圭gui龟gui妫gui规gui皈gui闺gui硅gui瑰gui鲑gui宄gui轨gui庋gui匦gui诡gui鬼gui姽gui癸gui晷gui簋gui柜gui炅gui刿gui刽gui贵gui桂gui跪gui鳜gui衮gun绲gun辊gun滚gun磙gun鲧gun棍gun埚guo郭guo啯guo崞guo聒guo锅guo蝈guo国guo帼guo虢guo果guo椁guo蜾guo裹guo过guo哈ha铪ha孩hai骸hai胲hai海hai醢hai亥hai骇hai害hai嗐hai嗨hai顸han蚶han酣han憨han鼾han邗han邯han含han函han晗han焓han涵han韩han寒han罕han喊han蔊han汉han汗han旱han捍han悍han菡han焊han撖han撼han翰han憾han瀚han夯hang杭hang绗hang航hang沆hang蒿hao薅hao嚆hao蚝hao毫hao嗥hao豪hao壕hao嚎hao濠hao好hao郝hao号hao昊hao耗hao浩hao皓hao滈hao颢hao灏hao诃he呵he喝he嗬he禾he合he何he劾he河he曷he阂he盍he荷he菏he盒he涸he颌he阖he贺he赫he褐he鹤he壑he黑hei嘿hei痕hen很hen狠hen恨hen亨heng恒heng珩heng横heng衡heng蘅heng啈heng轰hong訇hong烘hong薨hong弘hong红hong闳hong宏hong荭hong虹hong竑hong洪hong鸿hong哄hong讧hong吽hong齁hou侯hou喉hou猴hou瘊hou骺hou篌hou糇hou吼hou后hou郈hou厚hou垕hou逅hou候hou堠hou鲎hou乎hu呼hu忽hu轷hu烀hu惚hu滹hu囫hu狐hu弧hu胡hu壶hu斛hu葫hu猢hu湖hu瑚hu鹕hu槲hu蝴hu糊hu醐hu觳hu虎hu唬hu琥hu互hu户hu冱hu护hu沪hu枑hu怙hu戽hu笏hu瓠hu扈hu鹱hu花hua砉hua华hua哗hua骅hua铧hua猾hua滑hua化hua画hua话hua桦hua婳hua觟hua怀huai徊huai淮huai槐huai踝huai耲huai坏huai欢huan獾huan环huan洹huan桓huan萑huan寰huan缳huan缓huan幻huan奂huan宦huan换huan唤huan涣huan浣huan患huan焕huan痪huan豢huan漶huan鲩huan擐huan肓huang荒huang塃huang慌huang皇huang黄huang凰huang隍huang喤huang遑huang徨huang湟huang惶huang媓huang煌huang锽huang潢huang璜huang蝗huang篁huang艎huang磺huang癀huang蟥huang簧huang鳇huang恍huang晃huang谎huang幌huang滉huang皝huang灰hui诙hui挥hui恢hui晖hui辉hui麾hui徽hui隳hui回hui茴hui洄hui蛔hui悔hui毁hui卉hui汇hui讳hui荟hui浍hui诲hui绘hui恚hui贿hui烩hui彗hui晦hui秽hui惠hui喙hui慧hui蕙hui蟪hui珲hun昏hun荤hun阍hun惛hun婚hun浑hun馄hun混hun魂hun诨hun溷hun耠huo劐huo豁huo活huo火huo伙huo钬huo夥huo或huo货huo获huo祸huo惑huo霍huo镬huo攉huo藿huo嚯huo讥ji击ji叽ji饥ji玑ji圾ji芨ji机ji乩ji肌ji矶ji鸡ji剞ji唧ji积ji笄ji屐ji姬ji基ji犄ji嵇ji畸ji跻ji箕ji齑ji畿ji墼ji激ji羁ji及ji吉ji岌ji汲ji级ji极ji即ji佶ji笈ji急ji疾ji棘ji集ji蒺ji楫ji辑ji嫉ji瘠ji藉ji籍ji几ji己ji虮ji挤ji脊ji掎ji戟ji麂ji计ji记ji伎ji纪ji技ji忌ji际ji妓ji季ji剂ji迹ji济ji既ji觊ji继ji偈ji祭ji悸ji寄ji寂ji绩ji暨ji稷ji鲫ji髻ji冀ji骥ji加jia佳jia枷jia浃jia痂jia家jia袈jia嘉jia镓jia荚jia戛jia颊jia甲jia胛jia钾jia假jia价jia驾jia架jia嫁jia稼jia戋jian尖jian奸jian歼jian坚jian间jian肩jian艰jian监jian兼jian菅jian笺jian缄jian煎jian拣jian茧jian柬jian俭jian捡jian检jian减jian剪jian睑jian简jian碱jian见jian件jian饯jian建jian荐jian贱jian剑jian健jian舰jian涧jian渐jian谏jian践jian锏jian毽jian腱jian溅jian鉴jian键jian僭jian箭jian江jiang将jiang姜jiang豇jiang浆jiang僵jiang缰jiang疆jiang讲jiang奖jiang桨jiang蒋jiang匠jiang酱jiang犟jiang糨jiang交jiao郊jiao浇jiao娇jiao姣jiao骄jiao胶jiao椒jiao蛟jiao焦jiao跤jiao蕉jiao礁jiao佼jiao狡jiao饺jiao绞jiao铰jiao矫jiao皎jiao脚jiao搅jiao剿jiao缴jiao叫jiao轿jiao较jiao教jiao窖jiao酵jiao侥jiao阶jie皆jie接jie秸jie揭jie嗟jie街jie孑jie节jie讦jie劫jie杰jie诘jie洁jie结jie捷jie睫jie截jie碣jie竭jie姐jie解jie介jie戒jie届jie界jie疥jie诫jie借jie巾jin斤jin今jin金jin津jin矜jin筋jin襟jin仅jin紧jin锦jin谨jin尽jin进jin近jin晋jin烬jin浸jin禁jin觐jin噤jin茎jing京jing泾jing经jing菁jing惊jing晶jing睛jing粳jing兢jing精jing鲸jing井jing阱jing刭jing景jing儆jing警jing径jing净jing痉jing竞jing竟jing敬jing靖jing静jing境jing镜jing迥jiong炯jiong窘jiong纠jiu鸠jiu究jiu赳jiu阄jiu揪jiu啾jiu九jiu久jiu玖jiu灸jiu韭jiu酒jiu旧jiu臼jiu咎jiu柩jiu救jiu厩jiu就jiu舅jiu鹫jiu军jun均jun君jun钧jun菌jun皲jun俊jun郡jun峻jun骏jun竣jun拘ju狙ju居ju驹ju掬ju雎ju鞠ju局ju菊ju焗ju橘ju咀ju沮ju矩ju举ju龃ju巨ju拒ju具ju炬ju俱ju剧ju据ju距ju惧ju飓ju锯ju聚ju踞ju捐juan涓juan娟juan鹃juan卷juan倦juan绢juan眷juan隽juan撅jue噘jue决jue诀jue抉jue绝jue掘jue崛jue厥jue谲jue蕨jue爵jue蹶jue矍jue倔jue咔ka开kai揩kai凯kai铠kai慨kai楷kai忾kai刊kan勘kan龛kan堪kan坎kan侃kan砍kan槛kan看kan瞰kan康kang慷kang糠kang亢kang伉kang抗kang炕kang考kao拷kao烤kao铐kao犒kao靠kao苛ke轲ke科ke棵ke搕ke嗑ke稞ke窠ke颗ke磕ke瞌ke蝌ke可ke坷ke渴ke克ke刻ke恪ke客ke课ke肯ken垦ken恳ken啃ken坑keng铿keng空kong孔kong恐kong控kong抠kou口kou叩kou扣kou寇kou蔻kou枯ku哭ku窟ku骷ku苦ku库ku绔ku裤ku酷ku夸kua垮kua挎kua胯kua跨kua块kuai快kuai侩kuai脍kuai筷kuai宽kuan髋kuan款kuan诓kuang哐kuang筐kuang狂kuang诳kuang旷kuang况kuang矿kuang框kuang眶kuang亏kui盔kui窥kui葵kui魁kui傀kui匮kui馈kui愧kui坤kun昆kun鲲kun捆kun困kun扩kuo括kuo阔kuo廓kuo垃la拉la啦la邋la旯la喇la腊la蜡la辣la来lai莱lai徕lai睐lai赖lai癞lai籁lai兰lan岚lan拦lan栏lan婪lan阑lan蓝lan澜lan褴lan篮lan览lan揽lan缆lan榄lan懒lan烂lan滥lan啷lang郎lang狼lang琅lang廊lang榔lang锒lang螂lang朗lang浪lang捞lao劳lao牢lao崂lao老lao佬lao姥lao唠lao烙lao涝lao酪lao雷lei羸lei垒lei磊lei蕾lei儡lei肋lei泪lei类lei累lei擂lei嘞lei棱leng楞leng冷leng睖leng厘li狸li离li梨li犁li鹂li喱li蜊li漓li璃li黎li罹li篱li蠡li礼li李li里li俚li逦li哩li娌li理li鲤li力li历li厉li立li吏li丽li励li呖li利li沥li枥li例li戾li隶li荔li俐li莉li莅li栗li砾li蛎li唳li笠li粒li雳li痢li连lian怜lian帘lian莲lian涟lian联lian廉lian鲢lian镰lian敛lian脸lian练lian炼lian恋lian殓lian链lian良liang凉liang梁liang粮liang粱liang两liang魉liang亮liang谅liang辆liang靓liang量liang晾liang踉liang辽liao疗liao聊liao僚liao寥liao撩liao嘹liao獠liao潦liao缭liao燎liao料liao撂liao瞭liao镣liao咧lie列lie劣lie冽lie烈lie猎lie裂lie趔lie拎lin邻lin林lin临lin淋lin琳lin粼lin嶙lin潾lin霖lin磷lin鳞lin麟lin凛lin檩lin吝lin赁lin躏lin伶ling灵ling苓ling囹ling泠ling玲ling瓴ling铃ling凌ling陵ling聆ling菱ling棂ling蛉ling翎ling羚ling绫ling零ling龄ling岭ling领ling另ling令ling溜liu熘liu刘liu浏liu留liu流liu琉liu硫liu馏liu榴liu瘤liu柳liu绺liu六liu遛liu龙long咙long珑long胧long聋long笼long隆long窿long陇long拢long垄long娄lou楼lou髅lou搂lou篓lou陋lou镂lou漏lou喽lou撸lu卢lu芦lu庐lu炉lu泸lu鸬lu颅lu鲈lu卤lu虏lu掳lu鲁lu橹lu录lu赂lu鹿lu禄lu路lu箓lu漉lu戮lu鹭lu麓lu峦luan孪luan挛luan鸾luan卵luan乱luan抡lun仑lun伦lun囵lun沦lun轮lun论lun啰luo罗luo萝luo逻luo锣luo箩luo骡luo螺luo裸luo洛luo络luo骆luo摞luo漯luo驴lv榈lv吕lv侣lv旅lv铝lv屡lv缕lv膂lv褛lv履lv律lv虑lv氯lv滤lv掠lve略lve妈ma麻ma蟆ma马ma犸ma玛ma码ma蚂ma骂ma吗ma嘛ma霾mai买mai迈mai麦mai卖mai霡mai蛮man馒man瞒man满man曼man谩man幔man漫man慢man牤mang芒mang忙mang盲mang氓mang茫mang莽mang漭mang蟒mang猫mao毛mao矛mao茅mao牦mao锚mao髦mao蝥mao蟊mao冇mao卯mao铆mao茂mao冒mao贸mao袤mao帽mao貌mao玫mei枚mei眉mei莓mei梅mei媒mei楣mei煤mei酶mei霉mei每mei美mei镁mei妹mei昧mei袂mei寐mei媚mei魅mei门men扪men闷men焖men懑men们men虻meng萌meng蒙meng盟meng檬meng曚meng朦meng猛meng锰meng蜢meng懵meng孟meng梦meng咪mi眯mi弥mi迷mi猕mi谜mi醚mi糜mi麋mi靡mi米mi弭mi觅mi密mi幂mi谧mi蜜mi眠mian绵mian棉mian免mian勉mian娩mian冕mian渑mian湎mian缅mian腼mian面mian喵miao苗miao描miao瞄miao秒miao渺miao藐miao妙miao庙miao缥miao咩mie灭mie蔑mie篾mie乜mie民min皿min抿min泯min闽min悯min敏min名ming明ming鸣ming茗ming冥ming铭ming瞑ming螟ming酩ming命ming谬miu摸mo馍mo摹mo膜mo摩mo磨mo蘑mo魔mo末mo茉mo殁mo沫mo陌mo莫mo秣mo蓦mo漠mo寞mo墨mo默mo嬷mo缪mou哞mou眸mou谋mou某mou母mu牡mu亩mu拇mu姆mu木mu目mu沐mu苜mu牧mu钼mu募mu墓mu幕mu睦mu慕mu暮mu穆mu拿na呐na纳na钠na衲na捺na乃nai奶nai氖nai奈nai耐nai囡nan男nan南nan难nan喃nan楠nan赧nan腩nan囔nang囊nang孬nao呶nao挠nao恼nao脑nao瑙nao闹nao淖nao讷ne馁nei内nei嫩nen恁nen能neng嗯ng妮ni尼ni泥ni怩ni倪ni霓ni拟ni你ni旎ni昵ni逆ni匿ni腻ni溺ni拈nian蔫nian年nian黏nian捻nian辇nian撵nian碾nian廿nian念nian娘niang酿niang鸟niao袅niao尿niao捏nie聂nie涅nie嗫nie镊nie镍nie蹑nie孽nie您nin宁ning咛ning狞ning柠ning凝ning拧ning佞ning泞ning妞niu牛niu扭niu忸niu纽niu钮niu农nong哝nong浓nong脓nong弄nong奴nu驽nu努nu弩nu怒nu暖nuan疟nue虐nue挪nuo诺nuo喏nuo懦nuo糯nuo女nv噢o讴ou瓯ou欧ou殴ou鸥ou呕ou偶ou藕ou怄ou趴pa啪pa葩pa杷pa爬pa琶pa帕pa怕pa拍pai排pai徘pai牌pai哌pai派pai湃pai潘pan攀pan爿pan盘pan磐pan蹒pan蟠pan判pan盼pan叛pan畔pan乓pang滂pang庞pang旁pang螃pang耪pang抛pao咆pao庖pao袍pao跑pao泡pao呸pei胚pei陪pei培pei赔pei裴pei沛pei佩pei配pei喷pen盆pen抨peng怦peng砰peng烹peng嘭peng朋peng彭peng棚peng蓬peng硼peng鹏peng澎peng篷peng膨peng捧peng碰peng丕pi批pi纰pi坯pi披pi砒pi劈pi噼pi霹pi皮pi枇pi毗pi蚍pi疲pi啤pi琵pi脾pi貔pi匹pi痞pi癖pi屁pi睥pi媲pi僻pi譬pi偏pian篇pian翩pian骈pian蹁pian片pian骗pian剽piao漂piao飘piao瓢piao殍piao瞟piao票piao氕pie瞥pie撇pie拼pin姘pin贫pin频pin嫔pin颦pin品pin聘pin乒ping娉ping平ping评ping坪ping苹ping凭ping瓶ping萍ping钋po坡po泼po颇po婆po鄱po叵po珀po破po粕po魄po剖pou抔pou扑pu铺pu噗pu仆pu匍pu菩pu葡pu蒲pu璞pu圃pu浦pu普pu谱pu蹼pu七qi沏qi妻qi柒qi凄qi萋qi戚qi期qi欺qi嘁qi漆qi齐qi芪qi其qi歧qi祈qi祇qi脐qi畦qi跂qi崎qi骑qi琪qi棋qi旗qi鳍qi麒qi乞qi岂qi企qi杞qi启qi起qi绮qi气qi讫qi迄qi弃qi汽qi泣qi契qi砌qi葺qi器qi憩qi俟qi掐qia洽qia恰qia千qian仟qian阡qian芊qian迁qian钎qian牵qian悭qian谦qian签qian愆qian前qian虔qian钱qian钳qian乾qian潜qian黔qian遣qian谴qian欠qian芡qian倩qian堑qian嵌qian歉qian羌qiang枪qiang戕qiang腔qiang蜣qiang锵qiang墙qiang蔷qiang抢qiang羟qiang襁qiang呛qiang炝qiang跄qiang悄qiao跷qiao锹qiao敲qiao橇qiao乔qiao侨qiao荞qiao桥qiao憔qiao瞧qiao巧qiao俏qiao诮qiao峭qiao窍qiao翘qiao撬qiao切qie且qie妾qie怯qie窃qie挈qie惬qie趄qie锲qie钦qin侵qin衾qin芹qin芩qin秦qin琴qin禽qin勤qin擒qin噙qin寝qin沁qin青qing轻qing氢qing倾qing卿qing清qing蜻qing情qing晴qing氰qing擎qing顷qing请qing庆qing罄qing穷qiong穹qiong琼qiong丘qiu秋qiu蚯qiu鳅qiu囚qiu求qiu虬qiu泅qiu酋qiu球qiu遒qiu裘qiu岖qu驱qu屈qu蛆qu躯qu趋qu蛐qu黢qu渠qu瞿qu曲qu取qu娶qu龋qu去qu趣qu觑qu悛quan权quan全quan诠quan泉quan拳quan痊quan蜷quan醛quan犬quan劝quan券quan炔que缺que瘸que却que确que鹊que阙que榷que逡qun裙qun群qun蚺ran然ran燃ran冉ran苒ran染ran瓤rang壤rang攘rang嚷rang让rang荛rao饶rao娆rao桡rao扰rao绕rao惹re热re人ren壬ren仁ren忍ren荏ren稔ren刃ren认ren任ren纫ren韧ren饪ren扔reng仍reng日ri戎rong茸rong荣rong绒rong容rong嵘rong蓉rong溶rong榕rong熔rong融rong冗rong氄rong柔rou揉rou糅rou蹂rou鞣rou肉rou如ru茹ru铷ru儒ru孺ru蠕ru汝ru乳ru辱ru入ru缛ru褥ru阮ruan软ruan蕊rui蚋rui锐rui瑞rui睿rui闰run润run若ruo偌ruo弱ruo仨sa洒sa撒sa卅sa飒sa萨sa腮sai赛sai三san叁san伞san散san桑sang搡sang嗓sang丧sang搔sao骚sao扫sao嫂sao臊sao涩se啬se铯se瑟se穑se森sen僧seng杀sha沙sha纱sha砂sha啥sha傻sha厦sha歃sha煞sha霎sha筛shai晒shai山shan删shan苫shan衫shan姗shan珊shan煽shan潸shan膻shan闪shan陕shan讪shan汕shan扇shan善shan骟shan缮shan擅shan膳shan嬗shan赡shan鳝shan伤shang殇shang商shang觞shang熵shang晌shang赏shang上shang尚shang捎shao烧shao梢shao稍shao艄shao勺shao芍shao韶shao少shao邵shao绍shao哨shao潲shao奢she赊she舌she佘she蛇she舍she设she社she射she涉she赦she摄she慑she麝she申shen伸shen身shen呻shen绅shen砷shen深shen神shen沈shen审shen哂shen婶shen肾shen甚shen渗shen葚shen蜃shen慎shen升sheng生sheng声sheng昇sheng牲sheng笙sheng甥sheng绳sheng圣sheng胜sheng晟sheng剩sheng尸shi失shi师shi诗shi虱shi狮shi施shi湿shi十shi时shi实shi食shi蚀shi史shi矢shi使shi始shi驶shi屎shi士shi氏shi示shi世shi仕shi市shi式shi势shi事shi侍shi饰shi试shi视shi拭shi柿shi是shi适shi恃shi室shi逝shi轼shi舐shi弑shi释shi谥shi嗜shi誓shi收shou手shou守shou首shou寿shou受shou狩shou授shou售shou兽shou绶shou瘦shou殳shu书shu抒shu枢shu叔shu姝shu殊shu倏shu梳shu淑shu舒shu疏shu输shu蔬shu秫shu孰shu赎shu塾shu暑shu黍shu署shu蜀shu鼠shu薯shu曙shu戍shu束shu述shu树shu竖shu恕shu庶shu墅shu漱shu刷shua唰shua耍shua衰shuai摔shuai甩shuai帅shuai蟀shuai闩shuan拴shuan栓shuan涮shuan双shuang霜shuang孀shuang爽shuang谁shui水shui税shui睡shui吮shun顺shun舜shun瞬shun烁shuo铄shuo朔shuo硕shuo司si丝si私si咝si思si斯si厮si撕si嘶si死si巳si四si寺si祀si饲si肆si嗣si松song嵩song怂song耸song悚song讼song宋song送song诵song颂song搜sou嗖sou馊sou艘sou叟sou擞sou嗽sou苏su酥su俗su夙su诉su肃su素su速su粟su嗉su塑su溯su簌su酸suan蒜suan算suan虽sui睢sui绥sui隋sui随sui髓sui岁sui祟sui遂sui碎sui隧sui穗sui孙sun损sun笋sun隼sun唆suo梭suo蓑suo羧suo缩suo所suo索suo唢suo琐suo锁suo他ta它ta她ta铊ta塌ta塔ta獭ta挞ta榻ta踏ta蹋ta胎tai台tai邰tai抬tai苔tai跆tai太tai汰tai态tai钛tai泰tai酞tai贪tan摊tan滩tan瘫tan坛tan昙tan谈tan痰tan谭tan潭tan檀tan坦tan袒tan毯tan叹tan炭tan探tan碳tan汤tang嘡tang羰tang唐tang堂tang棠tang塘tang搪tang膛tang镗tang糖tang螳tang倘tang淌tang躺tang烫tang趟tang涛tao绦tao掏tao滔tao韬tao饕tao逃tao桃tao陶tao萄tao淘tao讨tao套tao特te疼teng腾teng誊teng滕teng藤teng剔ti梯ti踢ti啼ti题ti醍ti蹄ti体ti屉ti剃ti涕ti悌ti惕ti替ti天tian添tian田tian恬tian甜tian填tian忝tian殄tian舔tian掭tian佻tiao挑tiao条tiao迢tiao笤tiao髫tiao窕tiao眺tiao粜tiao跳tiao帖tie贴tie铁tie餮tie铤ting厅ting听ting烃ting廷ting亭ting庭ting停ting蜓ting婷ting霆ting挺ting艇ting通tong嗵tong同tong彤tong桐tong铜tong童tong潼tong瞳tong统tong捅tong桶tong筒tong恸tong痛tong偷tou头tou投tou骰tou透tou凸tu秃tu突tu图tu荼tu徒tu途tu涂tu屠tu土tu吐tu兔tu菟tu湍tuan团tuan疃tuan彖tuan推tui颓tui腿tui退tui蜕tui褪tui吞tun屯tun饨tun豚tun臀tun托tuo拖tuo脱tuo佗tuo陀tuo驼tuo鸵tuo妥tuo椭tuo唾tuo挖wa哇wa洼wa娲wa蛙wa娃wa瓦wa佤wa袜wa歪wai外wai弯wan剜wan湾wan蜿wan豌wan丸wan纨wan完wan玩wan顽wan烷wan宛wan挽wan晚wan惋wan婉wan绾wan皖wan碗wan万wan腕wan汪wang亡wang王wang网wang枉wang罔wang往wang惘wang妄wang忘wang旺wang望wang危wei威wei偎wei微wei煨wei薇wei巍wei韦wei为wei违wei围wei闱wei桅wei唯wei帷wei维wei伟wei伪wei苇wei纬wei委wei诿wei娓wei萎wei猥wei痿wei卫wei未wei位wei味wei畏wei胃wei谓wei喂wei猬wei渭wei蔚wei慰wei魏wei温wen瘟wen文wen纹wen闻wen蚊wen雯wen刎wen吻wen紊wen稳wen问wen汶wen翁weng嗡weng瓮weng挝wo莴wo倭wo喔wo窝wo蜗wo我wo肟wo沃wo卧wo握wo幄wo斡wo乌wu邬wu污wu巫wu呜wu钨wu诬wu屋wu无wu毋wu芜wu吴wu梧wu蜈wu五wu午wu伍wu仵wu怃wu忤wu妩wu武wu侮wu捂wu鹉wu舞wu兀wu勿wu戊wu务wu坞wu物wu误wu悟wu晤wu骛wu雾wu寤wu鹜wu夕xi兮xi西xi吸xi汐xi希xi昔xi析xi唏xi牺xi息xi奚xi悉xi烯xi惜xi晰xi稀xi翕xi犀xi皙xi锡xi溪xi熙xi蜥xi熄xi嘻xi膝xi嬉xi羲xi蟋xi曦xi习xi席xi袭xi媳xi洗xi玺xi徙xi喜xi禧xi戏xi细xi隙xi呷xia虾xia瞎xia匣xia侠xia峡xia狭xia遐xia瑕xia暇xia辖xia霞xia黠xia下xia夏xia罅xia仙xian先xian氙xian掀xian酰xian锨xian鲜xian闲xian贤xian弦xian咸xian涎xian娴xian衔xian舷xian嫌xian显xian险xian跣xian藓xian苋xian县xian现xian限xian线xian宪xian陷xian馅xian羡xian献xian腺xian乡xiang相xiang香xiang厢xiang湘xiang箱xiang襄xiang镶xiang详xiang祥xiang翔xiang享xiang响xiang饷xiang飨xiang想xiang向xiang项xiang象xiang像xiang橡xiang肖xiao枭xiao哓xiao骁xiao逍xiao消xiao宵xiao萧xiao硝xiao销xiao箫xiao潇xiao霄xiao魈xiao嚣xiao崤xiao淆xiao小xiao晓xiao孝xiao哮xiao笑xiao效xiao啸xiao挟xie些xie楔xie歇xie蝎xie协xie胁xie偕xie斜xie谐xie揳xie携xie撷xie鞋xie写xie泄xie泻xie卸xie屑xie械xie亵xie谢xie邂xie懈xie蟹xie心xin芯xin辛xin欣xin锌xin新xin歆xin薪xin馨xin鑫xin信xin衅xin星xing猩xing惺xing腥xing刑xing邢xing形xing型xing醒xing擤xing兴xing杏xing幸xing性xing姓xing悻xing凶xiong兄xiong匈xiong讻xiong汹xiong胸xiong雄xiong熊xiong休xiu咻xiu修xiu羞xiu朽xiu秀xiu袖xiu绣xiu锈xiu嗅xiu欻xu戌xu须xu胥xu虚xu墟xu需xu魆xu徐xu许xu诩xu栩xu旭xu序xu叙xu恤xu酗xu勖xu绪xu续xu絮xu婿xu蓄xu煦xu轩xuan宣xuan揎xuan喧xuan暄xuan玄xuan悬xuan旋xuan漩xuan璇xuan选xuan癣xuan炫xuan绚xuan眩xuan渲xuan靴xue薛xue穴xue学xue噱xue雪xue谑xue勋xun熏xun薰xun醺xun旬xun寻xun巡xun询xun荀xun循xun训xun讯xun汛xun迅xun驯xun徇xun逊xun殉xun巽xun丫ya压ya押ya鸦ya桠ya鸭ya牙ya伢ya芽ya蚜ya崖ya涯ya睚ya衙ya哑ya雅ya亚ya讶ya娅ya氩ya揠ya呀ya恹yan胭yan烟yan焉yan阉yan淹yan湮yan嫣yan延yan闫yan严yan言yan妍yan岩yan炎yan沿yan研yan盐yan阎yan蜒yan筵yan颜yan檐yan奄yan俨yan衍yan掩yan郾yan眼yan偃yan演yan魇yan鼹yan厌yan砚yan彦yan艳yan晏yan唁yan宴yan验yan谚yan堰yan雁yan焰yan滟yan餍yan燕yan赝yan央yang泱yang殃yang鸯yang秧yang扬yang羊yang阳yang杨yang佯yang疡yang徉yang洋yang仰yang养yang氧yang痒yang怏yang样yang恙yang烊yang漾yang幺yao夭yao吆yao妖yao腰yao邀yao爻yao尧yao肴yao姚yao窑yao谣yao摇yao徭yao遥yao瑶yao杳yao咬yao舀yao窈yao药yao要yao鹞yao耀yao耶ye掖ye椰ye噎ye爷ye揶ye也ye冶ye野ye业ye叶ye页ye曳ye夜ye液ye谒ye腋ye一yi伊yi衣yi医yi依yi咿yi揖yi壹yi漪yi噫yi仪yi夷yi饴yi宜yi咦yi贻yi姨yi胰yi移yi痍yi颐yi疑yi彝yi乙yi已yi以yi苡yi矣yi迤yi蚁yi倚yi椅yi旖yi乂yi亿yi义yi艺yi刈yi忆yi议yi屹yi亦yi异yi抑yi呓yi邑yi役yi译yi易yi诣yi绎yi驿yi轶yi弈yi奕yi疫yi羿yi益yi谊yi逸yi翌yi肄yi裔yi意yi溢yi缢yi毅yi薏yi翳yi臆yi翼yi因yin阴yin茵yin荫yin音yin姻yin铟yin喑yin愔yin吟yin垠yin银yin淫yin寅yin龈yin霪yin尹yin引yin蚓yin隐yin瘾yin印yin英ying莺ying婴ying嘤ying罂ying缨ying樱ying鹦ying膺ying鹰ying迎ying茔ying荧ying盈ying莹ying萤ying营ying萦ying楹ying蝇ying赢ying瀛ying颍ying颖ying影ying应ying映ying硬ying哟yo唷yo佣yong拥yong庸yong雍yong壅yong臃yong永yong甬yong咏yong泳yong勇yong涌yong恿yong蛹yong踊yong用yong优you攸you忧you呦you幽you悠you尤you由you邮you犹you油you铀you鱿you游you友you有you酉you莠you黝you又you右you幼you佑you柚you囿you诱you鼬you迂yu纡yu於yu淤yu瘀yu于yu余yu盂yu臾yu鱼yu竽yu俞yu狳yu谀yu娱yu渔yu隅yu揄yu逾yu腴yu渝yu愉yu瑜yu榆yu虞yu愚yu舆yu与yu予yu屿yu宇yu羽yu雨yu禹yu语yu圄yu玉yu驭yu芋yu妪yu郁yu育yu狱yu浴yu预yu域yu欲yu谕yu遇yu喻yu御yu寓yu裕yu愈yu誉yu豫yu鹬yu鸢yuan鸳yuan冤yuan渊yuan元yuan园yuan垣yuan袁yuan原yuan圆yuan援yuan媛yuan缘yuan猿yuan源yuan辕yuan远yuan苑yuan怨yuan院yuan愿yuan曰yue月yue岳yue钺yue阅yue悦yue跃yue越yue粤yue晕yun云yun匀yun芸yun纭yun耘yun允yun陨yun殒yun孕yun运yun酝yun愠yun韵yun蕴yun熨yun匝za咂za杂za砸za灾zai甾zai哉zai栽zai载zai宰zai崽zai再zai在zai糌zan簪zan咱zan趱zan暂zan錾zan赞zan赃zang脏zang臧zang驵zang葬zang遭zao糟zao凿zao早zao枣zao蚤zao澡zao藻zao皂zao灶zao造zao噪zao燥zao躁zao则ze责ze泽ze啧ze帻ze仄ze贼zei怎zen谮zen增zeng憎zeng锃zeng赠zeng甑zeng吒zha挓zha哳zha揸zha渣zha楂zha札zha闸zha铡zha眨zha砟zha乍zha诈zha咤zha炸zha蚱zha榨zha拃zha斋zhai摘zhai宅zhai窄zhai债zhai砦zhai寨zhai沾zhan毡zhan粘zhan詹zhan谵zhan瞻zhan斩zhan盏zhan展zhan崭zhan搌zhan辗zhan占zhan栈zhan战zhan站zhan绽zhan湛zhan蘸zhan张zhang章zhang獐zhang彰zhang樟zhang蟑zhang涨zhang掌zhang丈zhang仗zhang杖zhang帐zhang账zhang胀zhang障zhang嶂zhang瘴zhang钊zhao招zhao昭zhao找zhao沼zhao兆zhao诏zhao赵zhao照zhao罩zhao肇zhao蜇zhe遮zhe哲zhe辄zhe蛰zhe谪zhe辙zhe者zhe锗zhe赭zhe褶zhe浙zhe蔗zhe鹧zhe贞zhen针zhen侦zhen珍zhen帧zhen胗zhen真zhen砧zhen斟zhen甄zhen榛zhen箴zhen臻zhen诊zhen枕zhen疹zhen缜zhen阵zhen鸩zhen振zhen朕zhen赈zhen震zhen镇zhen争zheng征zheng怔zheng峥zheng狰zheng睁zheng铮zheng筝zheng蒸zheng拯zheng整zheng正zheng证zheng郑zheng诤zheng政zheng挣zheng症zheng之zhi支zhi只zhi汁zhi芝zhi吱zhi枝zhi知zhi肢zhi织zhi栀zhi脂zhi蜘zhi执zhi直zhi侄zhi值zhi职zhi植zhi跖zhi踯zhi止zhi旨zhi址zhi芷zhi纸zhi祉zhi指zhi枳zhi咫zhi趾zhi酯zhi至zhi志zhi豸zhi帜zhi制zhi质zhi炙zhi治zhi栉zhi峙zhi挚zhi桎zhi致zhi秩zhi掷zhi痔zhi窒zhi蛭zhi智zhi痣zhi滞zhi置zhi雉zhi稚zhi中zhong忠zhong终zhong盅zhong钟zhong衷zhong肿zhong冢zhong踵zhong仲zhong众zhong舟zhou州zhou诌zhou周zhou洲zhou粥zhou妯zhou轴zhou肘zhou纣zhou咒zhou宙zhou胄zhou昼zhou皱zhou骤zhou帚zhou朱zhu侏zhu诛zhu茱zhu珠zhu株zhu诸zhu铢zhu猪zhu蛛zhu竹zhu竺zhu逐zhu烛zhu躅zhu主zhu拄zhu煮zhu嘱zhu瞩zhu伫zhu苎zhu助zhu住zhu贮zhu注zhu驻zhu柱zhu祝zhu著zhu蛀zhu铸zhu筑zhu抓zhua跩zhuai拽zhuai专zhuan砖zhuan转zhuan啭zhuan撰zhuan篆zhuan妆zhuang庄zhuang桩zhuang装zhuang壮zhuang状zhuang撞zhuang幢zhuang追zhui骓zhui锥zhui坠zhui缀zhui惴zhui赘zhui谆zhun准zhun拙zhuo捉zhuo桌zhuo灼zhuo茁zhuo卓zhuo斫zhuo浊zhuo酌zhuo啄zhuo擢zhuo镯zhuo孜zi咨zi姿zi赀zi资zi辎zi嗞zi滋zi锱zi龇zi子zi姊zi秭zi籽zi梓zi紫zi訾zi滓zi自zi字zi恣zi眦zi渍zi宗zong综zong棕zong踪zong鬃zong总zong纵zong粽zong邹zou走zou奏zou揍zou租zu足zu卒zu族zu诅zu阻zu组zu俎zu祖zu纂zuan钻zuan攥zuan嘴zui最zui罪zui醉zui尊zun遵zun樽zun鳟zun昨zuo左zuo佐zuo作zuo坐zuo阼zuo怍zuo祚zuo唑zuo座zuo做zuo酢zuo斌bin曾zeng查zha査zha乘cheng传chuan丁ding行xing瑾jin婧jing恺kai阚kan奎kui乐le陆lu逯lv璐lu淼miao闵min娜na奇qi琦qi强qiang邱qiu芮rui莎sha盛sheng石shi祎yi殷yin瑛ying昱yu眃yun琢zhuo枰ping玟min珉min珣xun淇qi缈miao彧yu祺qi骞qian垚yao妸e烜hui祁qi傢jia珮pei濮pu屺qi珅shen缇ti霈pei晞xi璠fan骐qi姞ji偲cai齼chu宓mi朴pu萁qi颀qi阗tian湉tian翀chong岷min桤qi囯guo浛han勐meng苠min岍qian皞hao岐qi溥pu锘muo渼mei燊shen玚chang亓qi湋wei涴wan沤ou胖pang莆pu扦qian僳su坍tan锑ti嚏ti腆tian丿pie鼗tao芈mi匚fang刂li冂tong亻dan仳pi俜ping俳pai倜ti傥tang傩nuo佥qian勹bao亠tou廾gong匏pao扌ti拚pin掊pou搦nuo擗pi啕tao嗦suo嗍suo辔pei嘌piao嗾sou嘧mi帔pei帑tang彡san犭fan狍pao狲sun狻jun飧sun夂zhi饣shi庀pi忄shu愫su闼ta丬jiang氵san汔qi沔mian汨mi泮pan洮tao涑su淠pi湓pen溻ta溏tang濉sui宀bao搴qian辶zou逄pang逖ti遢ta邈miao邃sui彐ji屮cao娑suo嫖piao纟jiao缗min瑭tang杪miao桫suo榀pin榫sun槭qi甓pi攴po耆qi牝pin犏pian氆pu攵fan肽tai胼pian脒mi脬pao旆pei炱tai燧sui灬biao礻shi祧tiao忑te忐tan愍min肀yu碛qi眄mian眇miao眭sui睃suo瞍sou畋tian罴pi蠓meng蠛mie笸po筢pa衄nv艋meng敉mi糸mi綦qi醅pei醣tang趿ta觫su龆tiao鲆ping稣su鲐tai鲦tiao鳎ta髂qia縻mi裒pou冫liang冖tu讠yan谇sui谝pian谡su卩dan阝zuo陴pi邳pi郫pi郯tan廴yin凵qian圮pi堋peng鼙pi艹cao芑qi苤pie荪sun荽sui葜qia蒎pai蔌su蕲qi薮sou薹tai蘼mi钅jin钷po钽tan铍pi铴tang铽te锫pei锬tan锼sou镤pu镨pu皤po鹈ti鹋miao疒bing疱pao衤yi袢pan裼ti襻pan耥tang耦ou虍hu蛴qi蜞qi蜱pi螋sou螗tang螵piao蟛peng";
+      var PINYIN = (function () {
+        var map = Object.create(null), i = 0, n = PINYIN_RAW.length;
+        while (i < n) {
+          var ch = PINYIN_RAW.charAt(i++);
+          var v = '';
+          while (i < n) {
+            var c = PINYIN_RAW.charAt(i);
+            if (c >= 'a' && c <= 'z') { v += c; i++; } else { break; }
+          }
+          if (v) map[ch] = v;
+        }
+        return map;
+      })();
+
+      /* ---------------- 常量 ---------------- */
+      var BASE = './tianzigebishun/bishun_data/';
+      var MAX_CHARS = 300;
+
+      var MAIN = { green: 'rgb(0,176,80)', black: 'rgb(0,0,0)', red: 'rgb(152,15,41)' };
+      var FADE = {
+        green: ['136,255,136', '153,255,153', '160,255,160', '170,255,170', '184,255,184', '204,255,204'],
+        black: ['136,136,136', '153,153,153', '160,160,160', '170,170,170', '184,184,184', '204,204,204'],
+        red: ['255,136,136', '255,153,153', '255,160,160', '255,170,170', '255,184,184', '255,204,204']
+      };
+      var GRID = { green: '#00b050', black: '#555555', red: '#980f29' };
+
+      var cache = Object.create(null);   // char -> data | null
+      var loading = Object.create(null);
+      var lastChars = [];
+      var animTimers = [];
+      var animChar = '';
+      var animGid = '';
+      var uid = 0;
+
+      /* ---------------- DOM ---------------- */
+      var $ = function (id) { return document.getElementById(id); };
+      var wordsEl = $('words'), previewEl = $('preview'), statusEl = $('status'), hintEl = $('hint');
+      var chipsEl = $('chips'), stageEl = $('anim-stage'), metaEl = $('anim-meta'), animCard = $('anim-card');
+
+      /* ---------------- 选项 ---------------- */
+      function opt(name) {
+        var el = document.querySelector('input[name="' + name + '"]:checked');
+        return el ? el.value : '';
+      }
+      function optNum(name) { return parseFloat(opt(name)) || 15; }
+      var opts = function () {
+        return {
+          grid: opt('grid'), gcolor: opt('gcolor'), zcolor: opt('zcolor'),
+          size: optNum('size'), depth: parseInt(opt('depth'), 10) || 5,
+          fill: $('fill').checked, pinyin: $('pinyin').checked,
+          dedupe: $('dedupe').checked, title: $('title').value.trim(),
+          speed: parseFloat(opt('speed')) || 1
+        };
+      };
+
+      /* ---------------- 单选项高亮 ---------------- */
+      ['grid', 'gcolor', 'zcolor', 'size', 'depth', 'speed'].forEach(function (name) {
+        document.querySelectorAll('input[name="' + name + '"]').forEach(function (inp) {
+          inp.addEventListener('change', function () {
+            document.querySelectorAll('input[name="' + name + '"]').forEach(function (o) {
+              if (o.parentElement && o.parentElement.classList.contains('pill')) {
+                o.parentElement.classList.toggle('on', o.checked);
+              }
+            });
+          });
+        });
+      });
+
+      /* ---------------- 格子底纹（内联 SVG，不依赖 img/ 目录） ---------------- */
+      function guideURI(type, color) {
+        var inner = type === 'mzg'
+          ? "<line x1='8' y1='8' x2='92' y2='92'/><line x1='92' y1='8' x2='8' y2='92'/>"
+          : '';
+        var svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
+          + "<g fill='none' stroke='" + color + "' stroke-width='0.9' stroke-dasharray='4 3'>"
+          + "<line x1='50' y1='0' x2='50' y2='100'/><line x1='0' y1='50' x2='100' y2='50'/>"
+          + inner + "</g></svg>";
+        return "url(\"data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) + "\")";
+      }
+
+      /* ---------------- 数据加载 ---------------- */
+      function loadOne(ch) {
+        if (ch in cache) return Promise.resolve(cache[ch]);
+        if (loading[ch]) return loading[ch];
+        var p = fetch(BASE + encodeURIComponent(ch) + '.json')
+          .then(function (r) { if (!r.ok) throw new Error('404'); return r.json(); })
+          .then(function (d) { cache[ch] = (d && d.strokes && d.strokes.length) ? d : null; return cache[ch]; })
+          .catch(function () { cache[ch] = null; return null; });
+        loading[ch] = p;
+        return p;
+      }
+
+      function loadAll(list, onProgress) {
+        var need = list.filter(function (c) { return !(c in cache) && !loading[c]; });
+        var total = need.length, done = 0;
+        var i = 0;
+        return new Promise(function (resolve) {
+          function step() {
+            if (i >= need.length) { resolve(); return; }
+            var batch = need.slice(i, i + 8);
+            i += 8;
+            Promise.all(batch.map(function (c) {
+              return loadOne(c).then(function () {
+                done++;
+                if (onProgress) onProgress(done, total);
+              });
+            })).then(step);
+          }
+          step();
+        });
+      }
+
+      /* ---------------- 字形 SVG ---------------- */
+      function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+
+      function glyphSVG(data, color, upto) {
+        var arr = (upto === undefined) ? data.strokes : data.strokes.slice(0, upto);
+        var paths = arr.map(function (d) { return '<path d="' + d + '"></path>'; }).join('');
+        return '<svg class="glyph" viewBox="0 0 1024 1024" fill="' + color + '" stroke="' + color + '" stroke-width="0">'
+          + '<g transform="translate(0,900) scale(1,-1)">' + paths + '</g></svg>';
+      }
+
+      /* ---------------- 生成字帖 ---------------- */
+      function parseChars(text, dedupe) {
+        var m = String(text).match(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g) || [];
+        if (!dedupe) return m;
+        var seen = Object.create(null), out = [];
+        m.forEach(function (c) { if (!seen[c]) { seen[c] = 1; out.push(c); } });
+        return out;
+      }
+
+      function generate() {
+        var o = opts();
+        statusEl.className = 'status';
+        hintEl.className = 'hint';
+        var chars = parseChars(wordsEl.value, o.dedupe);
+
+        if (!chars.length) {
+          previewEl.innerHTML = '';
+          animCard.style.display = 'none';
+          statusEl.textContent = '请先输入汉字。';
+          lastChars = [];
+          return;
+        }
+        if (chars.length > MAX_CHARS) {
+          chars = chars.slice(0, MAX_CHARS);
+          showHint('单次最多生成 ' + MAX_CHARS + ' 个字，已自动截取前 ' + MAX_CHARS + ' 个。');
+        }
+
+        statusEl.textContent = '正在加载笔顺数据…';
+        loadAll(chars, function (d, t) {
+          statusEl.textContent = '正在加载笔顺数据… ' + d + '/' + t;
+        }).then(function () {
+          lastChars = chars;
+          render(chars, o);
+          renderChips(chars);
+          var miss = chars.filter(function (c) { return !cache[c]; });
+          var strokes = chars.reduce(function (s, c) { return s + (cache[c] ? cache[c].strokes.length : 0); }, 0);
+          statusEl.textContent = '已生成 ' + chars.length + ' 个字、共 ' + strokes + ' 笔'
+            + (miss.length ? '（' + miss.length + ' 个字已用楷体代替，无逐笔演示）' : '');
+          if (miss.length === chars.length) {
+            hintEl.textContent = '未能从当前地址加载笔顺数据（./tianzigebishun/bishun_data/），'
+              + '所有字退化为楷体显示，逐笔累加与笔顺动画不可用。';
+            if (location.protocol === 'file:') {
+              hintEl.textContent += ' 当前以 file:// 方式打开，浏览器会拦截本地数据读取；'
+                + '请部署到网站，或在本目录启动本地服务（如 python3 -m http.server）后访问。';
+            } else {
+              hintEl.textContent += ' 请确认本页面与 tianzigebishun 文件夹部署在同一站点目录下。';
+            }
+            hintEl.className = 'hint show';
+          }
+        });
+      }
+
+      function render(chars, o) {
+        var cell = o.size;                                  // mm
+        var cols = Math.max(6, Math.min(14, Math.floor(180 / cell)));
+        var headMm = o.title ? 12 : 0;
+        // A4 纵向 297mm，上下页边距 15/12mm，可用高 270mm，留 6mm 安全余量
+        var rowsPerPage = Math.max(6, Math.floor((264 - headMm) / cell));
+
+        var mainColor = MAIN[o.zcolor];
+        var fadeColor = 'rgb(' + FADE[o.zcolor][o.depth - 1] + ')';
+        var gridColor = GRID[o.gcolor];
+
+        // 组织格子内容
+        var cells = [];
+        chars.forEach(function (ch) {
+          var data = cache[ch];
+          if (!data) {
+            cells.push({ kind: 'fallback', ch: ch });
+            for (var k = 0; k < 8; k++) cells.push({ kind: 'blank' });
+            var pad0 = (cols - (9 % cols)) % cols;
+            for (var k2 = 0; k2 < pad0; k2++) cells.push({ kind: 'blank' });
+            return;
+          }
+          var n = data.strokes.length;
+          cells.push({ kind: 'full', ch: ch, color: mainColor, py: o.pinyin ? (PINYIN[ch] || '') : '' });
+          for (var i = 1; i <= n; i++) cells.push({ kind: 'step', ch: ch, i: i, color: fadeColor });
+          var used = n + 1;
+          var pad = (cols - (used % cols)) % cols;
+          for (var j = 0; j < pad; j++) {
+            cells.push(o.fill
+              ? { kind: 'full', ch: ch, color: fadeColor, py: o.pinyin ? (PINYIN[ch] || '') : '' }
+              : { kind: 'blank' });
+          }
+        });
+
+        // 分页：补齐整页
+        var perPage = cols * rowsPerPage;
+        var tail = (perPage - (cells.length % perPage)) % perPage;
+        for (var t = 0; t < tail; t++) cells.push({ kind: 'blank' });
+
+        // 渲染
+        var html = '';
+        var idx = 0;
+        var guide = guideURI(o.grid, gridColor);
+        while (idx < cells.length) {
+          var pageCells = cells.slice(idx, idx + perPage);
+          idx += perPage;
+          var rows = '';
+          for (var r = 0; r < rowsPerPage; r++) {
+            var rowCells = pageCells.slice(r * cols, r * cols + cols);
+            if (!rowCells.length) break;
+            var isLast = (r === rowsPerPage - 1) || (r * cols + cols >= pageCells.length);
+            var line = '';
+            rowCells.forEach(function (c, ci) {
+              line += cellHTML(c, o, ci === cols - 1);
+            });
+            rows += '<div class="row' + (isLast ? ' row-last' : '') + '">' + line + '</div>';
+          }
+          html += '<div class="page" style="--cell:' + cell + 'mm;--grid:' + gridColor + ';">'
+            + (o.title ? '<div class="page-head">' + esc(o.title) + '</div>' : '')
+            + '<div class="sheet">' + rows + '</div></div>';
+        }
+        previewEl.innerHTML = html;
+        var dyn = document.getElementById('dyn-style');
+        if (dyn) dyn.textContent = '#preview .cell{background-image:' + guide + '}';
+      }
+
+      function cellHTML(c, o, isColLast) {
+        var cls = 'cell' + (isColLast ? ' col-last' : '');
+        var inner = '';
+        if (c.kind === 'blank') {
+          return '<div class="' + cls + '"></div>';
+        }
+        if (c.kind === 'fallback') {
+          cls += ' with-py';
+          inner = '<div class="fallback" style="color:' + MAIN[o.zcolor] + '">' + esc(c.ch) + '</div>';
+          if (o.pinyin && PINYIN[c.ch]) {
+            inner = '<div class="py">' + esc(PINYIN[c.ch]) + '</div>' + inner;
+          }
+          return '<div class="' + cls + '">' + inner + '</div>';
+        }
+        var data = cache[c.ch];
+        var upto = (c.kind === 'full') ? undefined : c.i;
+        if (c.py) cls += ' with-py';
+        inner = (c.py ? '<div class="py">' + esc(c.py) + '</div>' : '')
+          + glyphSVG(data, c.color, upto);
+        return '<div class="' + cls + '">' + inner + '</div>';
+      }
+
+      function showHint(msg) {
+        hintEl.textContent = msg;
+        hintEl.className = 'hint show';
+      }
+
+      /* ---------------- 笔顺动画 ---------------- */
+      function renderChips(chars) {
+        animCard.style.display = '';
+        chipsEl.innerHTML = chars.map(function (c) {
+          var ok = !!cache[c];
+          return '<span class="chip' + (ok ? '' : ' nodata') + '" data-ch="' + esc(c) + '">' + esc(c) + '</span>';
+        }).join('');
+        chipsEl.querySelectorAll('.chip').forEach(function (el) {
+          el.addEventListener('click', function () {
+            if (el.classList.contains('nodata')) {
+              metaEl.innerHTML = '<b>' + esc(el.getAttribute('data-ch')) + '</b> — 暂无笔顺数据';
+              stageEl.innerHTML = '';
+              return;
+            }
+            chipsEl.querySelectorAll('.chip').forEach(function (x) { x.classList.remove('on'); });
+            el.classList.add('on');
+            showAnim(el.getAttribute('data-ch'));
+          });
+        });
+        var first = chipsEl.querySelector('.chip:not(.nodata)');
+        if (first) {
+          first.classList.add('on');
+          showAnim(first.getAttribute('data-ch'));
+        } else {
+          metaEl.textContent = '暂无可演示的汉字';
+          stageEl.innerHTML = '';
+        }
+      }
+
+      function medianPath(pts) {
+        if (!pts || !pts.length) return '';
+        var d = 'M ' + pts[0][0] + ' ' + pts[0][1];
+        for (var i = 1; i < pts.length; i++) d += ' L ' + pts[i][0] + ' ' + pts[i][1];
+        return d;
+      }
+
+      function showAnim(ch) {
+        var data = cache[ch];
+        if (!data) return;
+        animChar = ch;
+        var o = opts();
+        var mainColor = MAIN[o.zcolor];
+        var faint = 'rgb(' + FADE[o.zcolor][6 - 1] + ')';
+        var gid = 'a' + (++uid);
+        animGid = gid;
+
+        var defs = '', body = '', ghosts = '';
+        var hasMask = [];
+        data.strokes.forEach(function (d, i) {
+          var mid = gid + '_' + i;
+          var mp = medianPath(data.medians && data.medians[i]);
+          hasMask[i] = !!mp;
+          if (!mp) return;
+          defs += '<mask id="' + mid + '" maskUnits="userSpaceOnUse" x="-500" y="-700" width="2200" height="2600">'
+            + '<path id="mp_' + mid + '" d="' + mp + '" fill="none" stroke="#fff" stroke-width="140"'
+            + ' stroke-linecap="round" stroke-linejoin="round"/></mask>';
+        });
+        data.strokes.forEach(function (d, i) {
+          ghosts += '<path d="' + d + '" fill="' + faint + '"></path>';
+          body += '<path d="' + d + '" fill="' + mainColor + '"'
+            + (hasMask[i] ? ' mask="url(#' + gid + '_' + i + ')"' : '') + '></path>';
+        });
+
+        stageEl.innerHTML = '<svg viewBox="0 0 1024 1024"><defs>' + defs + '</defs>'
+          + '<g transform="translate(0,900) scale(1,-1)">' + ghosts + body + '</g></svg>';
+
+        metaEl.innerHTML = '<b>' + esc(ch) + '</b> — 共 ' + data.strokes.length + ' 笔'
+          + (PINYIN[ch] ? '，拼音 ' + esc(PINYIN[ch]) : '')
+          + '　<span id="stroke-now"></span>';
+
+        playAnim();
+      }
+
+      function playAnim() {
+        animTimers.forEach(clearTimeout);
+        animTimers = [];
+        var svg = stageEl.querySelector('svg');
+        if (!svg) return;
+        var o = opts();
+        var data = cache[animChar];
+        var masks = [];
+        data.strokes.forEach(function (d, i) {
+          var p = svg.querySelector('#mp_' + animGid + '_' + i);
+          if (!p) return;
+          var len = 0;
+          try { len = p.getTotalLength(); } catch (e) { len = 400; }
+          if (!len || !isFinite(len)) len = 400;
+          p.style.transition = 'none';
+          p.style.strokeDasharray = len + ' ' + (len + 10);
+          p.style.strokeDashoffset = len;
+          masks.push({ el: p, len: len });
+        });
+        // 强制回流
+        void svg.getBoundingClientRect();
+
+        var t = 0;
+        var nowEl = $('stroke-now');
+        masks.forEach(function (m, i) {
+          var dur = Math.max(260, m.len * 1.15) / o.speed;
+          animTimers.push(setTimeout(function () {
+            m.el.style.transition = 'stroke-dashoffset ' + dur + 'ms linear';
+            m.el.style.strokeDashoffset = '0';
+            if (nowEl) nowEl.textContent = '第 ' + (i + 1) + ' / ' + masks.length + ' 笔';
+          }, t));
+          t += dur + 90 / o.speed;
+        });
+        animTimers.push(setTimeout(function () {
+          if (nowEl) nowEl.textContent = '书写完成';
+        }, t + 100));
+      }
+
+      /* ---------------- 事件绑定 ---------------- */
+      var debounceTimer = null;
+      wordsEl.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(generate, 700);
+      });
+
+      ['fill', 'pinyin', 'dedupe'].forEach(function (id) {
+        $(id).addEventListener('change', function () { if (lastChars.length) generate(); });
+      });
+      ['grid', 'gcolor', 'zcolor', 'size', 'depth'].forEach(function (name) {
+        document.querySelectorAll('input[name="' + name + '"]').forEach(function (inp) {
+          inp.addEventListener('change', function () { if (lastChars.length) generate(); });
+        });
+      });
+      ['speed'].forEach(function (name) {
+        document.querySelectorAll('input[name="' + name + '"]').forEach(function (inp) {
+          inp.addEventListener('change', function () { if (animChar) playAnim(); });
+        });
+      });
+
+      $('title').addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () { if (lastChars.length) generate(); }, 500);
+      });
+
+      document.querySelectorAll('.pill[data-sample]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          wordsEl.value = btn.getAttribute('data-sample');
+          generate();
+        });
+      });
+
+      $('btn-gen').addEventListener('click', generate);
+      $('btn-print').addEventListener('click', function () {
+        if (!lastChars.length) { statusEl.className = 'status err'; statusEl.textContent = '请先生成字帖。'; return; }
+        window.print();
+      });
+      $('btn-clear').addEventListener('click', function () {
+        wordsEl.value = '';
+        previewEl.innerHTML = '';
+        chipsEl.innerHTML = '';
+        stageEl.innerHTML = '';
+        animCard.style.display = 'none';
+        lastChars = [];
+        statusEl.className = 'status';
+        statusEl.textContent = '';
+        hintEl.className = 'hint';
+      });
+      $('btn-play').addEventListener('click', function () { if (animChar) playAnim(); });
+
+      /* file:// 协议下 fetch 会被浏览器拦截，给出提示 */
+      if (location.protocol === 'file:') {
+        showHint('检测到以 file:// 方式打开，浏览器会拦截本地数据读取。请通过本地服务器访问，例如在项目根目录执行 python3 -m http.server 后打开 http://localhost:8000/tool/tianzige-zitie.html');
+      }
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>百家姓暗号加解密</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --text-secondary: #666666;
+      --card-bg: #f9f9f9;
+      --card-border: #dddddd;
+      --input-bg: #ffffff;
+      --input-border: #cccccc;
+      --input-focus: #28a745;
+      --button-bg: #28a745;
+      --button-hover: #218838;
+      --button-secondary-bg: #6c757d;
+      --button-secondary-hover: #5a6268;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --error-color: #dc3545;
+      --tip-bg: #eef7ef;
+      --tip-border: #b9e0c2;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --text-secondary: #cccccc;
+        --card-bg: #2d2d2d;
+        --card-border: #555555;
+        --input-bg: #3a3a3a;
+        --input-border: #555555;
+        --input-focus: #34ce57;
+        --button-bg: #28a745;
+        --button-hover: #34ce57;
+        --button-secondary-bg: #6c757d;
+        --button-secondary-hover: #7a8288;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --error-color: #ff6b6b;
+        --tip-bg: #26332a;
+        --tip-border: #3f6b4b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    .converter-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 4px var(--shadow);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      font-size: 1.1em;
+    }
+
+    .input-group textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      border: 2px solid var(--input-border);
+      border-radius: 5px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: border-color 0.2s ease, background-color 0.3s ease;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .input-group textarea.name-input {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-size: 1.15em;
+      line-height: 1.8;
+      letter-spacing: 1px;
+    }
+
+    .input-group textarea:focus {
+      outline: none;
+      border-color: var(--input-focus);
+    }
+
+    .input-group .hint {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .input-group .error {
+      font-size: 0.9em;
+      color: var(--error-color);
+      margin-top: 5px;
+      display: none;
+      word-break: break-all;
+    }
+
+    .convert-arrow {
+      text-align: center;
+      font-size: 1.8em;
+      color: var(--button-bg);
+      margin: 5px 0 15px;
+    }
+
+    .stat-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      margin-top: -5px;
+      margin-bottom: 15px;
+    }
+
+    .stat-bar span {
+      font-family: 'Courier New', monospace;
+      color: var(--button-bg);
+      font-weight: bold;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+      padding: 15px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 5px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .option-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .option-group label {
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.95em;
+    }
+
+    .option-group input[type="checkbox"] {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--button-bg);
+    }
+
+    .tip-box {
+      padding: 10px 14px;
+      border-radius: 5px;
+      font-size: 0.9em;
+      line-height: 1.6;
+      background: var(--tip-bg);
+      border: 1px solid var(--tip-border);
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+      display: none;
+      word-break: break-all;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button.action-btn {
+      flex: 1;
+      min-width: 110px;
+      padding: 12px 20px;
+      background: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button.action-btn:hover {
+      background: var(--button-hover);
+    }
+
+    button.action-btn:active {
+      transform: scale(0.98);
+    }
+
+    button.action-btn.secondary {
+      background: var(--button-secondary-bg);
+    }
+
+    button.action-btn.secondary:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--button-bg);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: var(--button-bg);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: var(--button-hover);
+    }
+
+    .info-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .info-section h3 {
+      margin-top: 0;
+      color: var(--text-color);
+    }
+
+    .info-section ul {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      padding-left: 20px;
+    }
+
+    .info-section code {
+      font-family: 'Courier New', monospace;
+      background: var(--input-bg);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    .map-group {
+      margin-top: 18px;
+    }
+
+    .map-group h4 {
+      margin: 0 0 10px;
+      color: var(--text-color);
+      font-size: 1em;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+      gap: 8px;
+    }
+
+    .map-grid .cell {
+      padding: 8px 4px;
+      text-align: center;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      background: var(--input-bg);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .map-grid .cell .name {
+      font-weight: bold;
+      font-size: 1.15em;
+      color: var(--text-color);
+    }
+
+    .map-grid .cell .code {
+      font-family: 'Courier New', monospace;
+      color: var(--button-bg);
+      font-size: 0.95em;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      .converter-container {
+        padding: 20px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button.action-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>百家姓暗号加解密</h1>
+  <p class="subtitle">把磁力链接 / 网址 / 任意文本变成「赵钱孙李…」，也能一键还原</p>
+
+  <div class="converter-container">
+    <div class="input-group">
+      <label for="plain-input">明文（链接 / 文本）</label>
+      <textarea id="plain-input"
+        placeholder="输入磁力链接、ed2k 链接、网址或任意文本&#10;例如：magnet:?xt=urn:btih:24169F3EFB914074853F5C6346F4486726F56BDD"></textarea>
+      <div class="hint">支持磁力链接、ed2k、迅雷、HTTP(S) 网址与任意文本；不支持的字符会自动转义编码</div>
+      <div class="error" id="plain-error"></div>
+    </div>
+
+    <div class="convert-arrow">⇅</div>
+
+    <div class="input-group">
+      <label for="name-input">百家姓暗号</label>
+      <textarea id="name-input" class="name-input"
+        placeholder="输入百家姓暗号，例如：孙周钱郑陈苏李云苏水陈钱周赵王周冯吴李苏吴窦郑李周郑苏周周冯郑王孙郑苏吴郑水章章"></textarea>
+      <div class="hint">自动忽略空格、换行和常见标点；40 位十六进制结果会自动补全为磁力链接</div>
+      <div class="error" id="name-error"></div>
+    </div>
+
+    <div class="stat-bar">
+      <div>明文字符：<span id="stat-plain">0</span></div>
+      <div>暗号字数：<span id="stat-name">0</span></div>
+    </div>
+
+    <div class="tip-box" id="tip-box"></div>
+
+    <div class="control-panel">
+      <div class="option-group">
+        <input type="checkbox" id="opt-strip-magnet" checked>
+        <label for="opt-strip-magnet">加密时去掉磁力链接固定前缀</label>
+      </div>
+      <div class="option-group">
+        <input type="checkbox" id="opt-auto-magnet" checked>
+        <label for="opt-auto-magnet">解密时自动补全磁力链接</label>
+      </div>
+      <div class="option-group">
+        <input type="checkbox" id="opt-unescape" checked>
+        <label for="opt-unescape">解密时还原 %XX 转义</label>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="action-btn" onclick="copyPlain()">复制明文</button>
+      <button class="action-btn" onclick="copyName()">复制暗号</button>
+      <button class="action-btn secondary" onclick="fillDemo()">填入示例</button>
+      <button class="action-btn secondary" onclick="clearAll()">清空</button>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h3>使用说明</h3>
+    <ul>
+      <li><strong>加密</strong>：在「明文」框输入内容，下方自动生成百家姓暗号（一个字符对应一个姓氏）</li>
+      <li><strong>解密</strong>：在「百家姓暗号」框输入姓氏串，上方自动还原原始链接或文本（双向实时转换）</li>
+      <li>磁力链接默认只编码 <code>btih:</code> 后面的哈希部分，解密时再自动补回 <code>magnet:?xt=urn:btih:</code> 前缀，暗号更短</li>
+      <li>转换前删掉 <code>&amp;dn=文件名</code>、<code>&amp;tr=</code> 等参数可以显著缩短暗号长度</li>
+      <li>映射表不支持的字符（如中文、空格、emoji）会自动做百分号转义后编码，解密时勾选「还原 %XX 转义」即可还原成原始字符</li>
+      <li>本工具完全在本地浏览器运行，不会上传任何数据</li>
+    </ul>
+  </div>
+
+  <div class="info-section">
+    <h3>姓氏对照表</h3>
+    <div class="map-group">
+      <h4>数字 0-9</h4>
+      <div class="map-grid" id="map-digits"></div>
+    </div>
+    <div class="map-group">
+      <h4>小写字母 a-z</h4>
+      <div class="map-grid" id="map-lower"></div>
+    </div>
+    <div class="map-group">
+      <h4>大写字母 A-Z</h4>
+      <div class="map-grid" id="map-upper"></div>
+    </div>
+    <div class="map-group">
+      <h4>链接常用符号</h4>
+      <div class="map-grid" id="map-symbol"></div>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <a href="./index.html" class="back-link">返回工具列表</a>
+  </div>
+
+  <div class="toast" id="toast">已复制到剪贴板</div>
+
+  <script>
+    /* ============================================================
+       百家姓暗号映射表（与 fuliba2023.net 原版一致）
+       姓 -> 字符
+       ============================================================ */
+    var MAGNET_HEADER = 'magnet:?xt=urn:btih:';
+
+    var DIGIT_NAMES = '赵钱孙李周吴郑王冯陈';                                  // 0-9
+    var LOWER_NAMES = '褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜戚谢邹喻';  // a-z
+    var UPPER_NAMES = '福水窦章云苏潘葛奚范彭郎鲁韦昌马苗凤花方俞任袁柳唐罗';  // A-Z
+    var SYMBOL_PAIRS = [
+      ['薛', '.'], ['伍', '-'], ['余', '_'], ['米', '+'], ['贝', '='],
+      ['姚', '/'], ['孟', '?'], ['顾', '#'], ['尹', '%'], ['江', '&'],
+      ['钟', '*'], ['竺', ':'], ['赖', '|']
+    ];
+    // 旧版兼容：早期版本用「卜」编码竖线，解密时仍然支持
+    var LEGACY_PAIRS = [['卜', '|']];
+
+    var nameMap = Object.create(null);  // 姓 -> 字符（解密用）
+    var charMap = Object.create(null);  // 字符 -> 姓（加密用）
+
+    (function buildMaps() {
+      for (var i = 0; i < DIGIT_NAMES.length; i++) nameMap[DIGIT_NAMES[i]] = String(i);
+      for (var j = 0; j < LOWER_NAMES.length; j++) nameMap[LOWER_NAMES[j]] = String.fromCharCode(97 + j);
+      for (var k = 0; k < UPPER_NAMES.length; k++) nameMap[UPPER_NAMES[k]] = String.fromCharCode(65 + k);
+      for (var s = 0; s < SYMBOL_PAIRS.length; s++) nameMap[SYMBOL_PAIRS[s][0]] = SYMBOL_PAIRS[s][1];
+
+      // 反向表：保留首个匹配（| 取「赖」，与「首个匹配键优先」的原语义一致）
+      var order = DIGIT_NAMES + LOWER_NAMES + UPPER_NAMES;
+      for (var n = 0; n < order.length; n++) {
+        var ch = nameMap[order[n]];
+        if (!(ch in charMap)) charMap[ch] = order[n];
+      }
+      for (var p = 0; p < SYMBOL_PAIRS.length; p++) {
+        var sc = SYMBOL_PAIRS[p][1];
+        if (!(sc in charMap)) charMap[sc] = SYMBOL_PAIRS[p][0];
+      }
+
+      // 兼容姓氏只进解密表，不影响加密结果
+      for (var l = 0; l < LEGACY_PAIRS.length; l++) nameMap[LEGACY_PAIRS[l][0]] = LEGACY_PAIRS[l][1];
+    })();
+
+    /* ============================================================
+       编解码核心逻辑
+       ============================================================ */
+    // 映射表不支持的字符做百分号编码（%XX 的字节全部可映射），保证无损可逆
+    function pctEscapeChar(ch) {
+      return encodeURIComponent(ch).replace(/[!'()*~]/g, function (c) {
+        return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+      });
+    }
+
+    function encodeText(str, opts) {
+      str = str.replace(/^\s+/, '').replace(/\s+$/, '');
+      var v = str;
+      var stripped = false;
+      if (opts.stripMagnet && /^magnet:\?xt=urn:btih:/i.test(v)) {
+        v = v.replace(/^magnet:\?xt=urn:btih:/i, '');
+        stripped = true;
+      }
+      var out = '', escaped = 0, unknown = [];
+      for (var i = 0; i < v.length; i++) {
+        var ch = v[i];
+        if (charMap[ch]) { out += charMap[ch]; continue; }
+        if (ch.trim() === '') continue;
+        var enc = pctEscapeChar(ch), buf = '', ok = true;
+        for (var m = 0; m < enc.length; m++) {
+          var mapped = charMap[enc[m]];
+          if (!mapped) { ok = false; break; }
+          buf += mapped;
+        }
+        if (ok) { out += buf; escaped++; } else { unknown.push(ch); }
+      }
+      return { text: out, stripped: stripped, escaped: escaped, unknown: unknown };
+    }
+
+    function decodeText(str, opts) {
+      var out = '', unknown = [];
+      for (var i = 0; i < str.length; i++) {
+        var ch = str[i];
+        if (nameMap[ch]) { out += nameMap[ch]; continue; }
+        if (/[\s，,。、；;：!！？?"'"'（）()【】\[\]{}|]/.test(ch)) continue;  // 分隔符直接忽略
+        unknown.push(ch);
+      }
+      var magnet = false;
+      // 与原版一致：以 40 位以上十六进制开头即补回磁力头（后面可跟 &dn= 等参数）
+      if (opts.autoMagnet && /^[0-9a-fA-F]{40,}/.test(out)) {
+        out = MAGNET_HEADER + out;
+        magnet = true;
+      }
+      var unescaped = false;
+      if (opts.unescape && out.indexOf('%') >= 0) {
+        try {
+          var d = decodeURIComponent(out);
+          if (d !== out) { out = d; unescaped = true; }
+        } catch (e) { /* 转义不合法时保留原样 */ }
+      }
+      return { text: out, magnet: magnet, unescaped: unescaped, unknown: unknown };
+    }
+
+    /* ============================================================
+       界面逻辑
+       ============================================================ */
+    var plainInput = document.getElementById('plain-input');
+    var nameInput = document.getElementById('name-input');
+    var plainError = document.getElementById('plain-error');
+    var nameError = document.getElementById('name-error');
+    var statPlain = document.getElementById('stat-plain');
+    var statName = document.getElementById('stat-name');
+    var tipBox = document.getElementById('tip-box');
+    var optStrip = document.getElementById('opt-strip-magnet');
+    var optMagnet = document.getElementById('opt-auto-magnet');
+    var optUnescape = document.getElementById('opt-unescape');
+
+    var isUpdating = false;
+    var lastSource = 'plain';  // 记录最后一次编辑的输入框，选项变化时按它重算
+
+    function getOpts() {
+      return {
+        stripMagnet: optStrip.checked,
+        autoMagnet: optMagnet.checked,
+        unescape: optUnescape.checked
+      };
+    }
+
+    function showError(el, msg) {
+      if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function showTip(msg) {
+      if (!msg) { tipBox.style.display = 'none'; tipBox.innerHTML = ''; return; }
+      tipBox.innerHTML = msg;
+      tipBox.style.display = 'block';
+    }
+
+    function runEncode() {
+      var value = plainInput.value;
+      showError(nameError, '');
+      if (!value.trim()) {
+        isUpdating = true; nameInput.value = ''; isUpdating = false;
+        updateStats('', ''); showTip(''); return;
+      }
+      var r = encodeText(value, getOpts());
+      isUpdating = true; nameInput.value = r.text; isUpdating = false;
+      updateStats(value.trim(), r.text);
+
+      var err = '';
+      if (r.unknown.length) err = '以下字符无法转换已被忽略：' + unique(r.unknown).join(' ');
+      showError(plainError, err);
+
+      var tips = [];
+      if (r.stripped) tips.push('已去掉磁力链接固定前缀 <code>magnet:?xt=urn:btih:</code>，仅编码 40 位哈希');
+      if (r.escaped) tips.push('含 ' + r.escaped + ' 个映射表外的字符，已按 <code>%XX</code> 转义编码（解密时勾选「还原 %XX 转义」即可还原）');
+      showTip(tips.join('<br>'));
+    }
+
+    function runDecode() {
+      var value = nameInput.value;
+      showError(plainError, '');
+      if (!value.trim()) {
+        isUpdating = true; plainInput.value = ''; isUpdating = false;
+        updateStats('', ''); showTip(''); return;
+      }
+      var r = decodeText(value, getOpts());
+      isUpdating = true; plainInput.value = r.text; isUpdating = false;
+      updateStats(r.text, value.replace(/\s/g, ''));
+
+      var err = '';
+      if (r.unknown.length) err = '以下字符不在姓氏表中已被忽略：' + unique(r.unknown).join(' ');
+      showError(nameError, err);
+
+      var tips = [];
+      if (r.magnet) tips.push('识别为 40 位哈希，已自动补全磁力链接前缀');
+      if (r.unescaped) tips.push('已还原 <code>%XX</code> 转义为原始字符');
+      showTip(tips.join('<br>'));
+    }
+
+    function unique(arr) {
+      var seen = Object.create(null), out = [];
+      for (var i = 0; i < arr.length; i++) {
+        if (!seen[arr[i]]) { seen[arr[i]] = 1; out.push(arr[i]); }
+      }
+      return out;
+    }
+
+    function updateStats(plain, name) {
+      statPlain.textContent = plain ? countChars(plain) : 0;
+      statName.textContent = name ? countChars(name) : 0;
+    }
+
+    // 按 Unicode 码点计数，避免 emoji / 生僻字被算成 2
+    function countChars(str) {
+      var s = str.replace(/[\r\n]+/g, '');
+      var c = 0;
+      for (var i = 0; i < s.length; i++) {
+        var code = s.charCodeAt(i);
+        if (code >= 0xD800 && code <= 0xDBFF && i + 1 < s.length) i++;
+        c++;
+      }
+      return c;
+    }
+
+    plainInput.addEventListener('input', function () {
+      if (isUpdating) return;
+      lastSource = 'plain';
+      runEncode();
+    });
+
+    nameInput.addEventListener('input', function () {
+      if (isUpdating) return;
+      lastSource = 'name';
+      runDecode();
+    });
+
+    function onOptionChange() {
+      if (lastSource === 'name') runDecode(); else runEncode();
+    }
+    optStrip.addEventListener('change', onOptionChange);
+    optMagnet.addEventListener('change', onOptionChange);
+    optUnescape.addEventListener('change', onOptionChange);
+
+    // 复制
+    function copyText(text, emptyMsg) {
+      if (!text.trim()) { showToast(emptyMsg); return; }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          showToast('已复制到剪贴板');
+        }, function () {
+          legacyCopy(text);
+        });
+      } else {
+        legacyCopy(text);
+      }
+    }
+
+    function legacyCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('已复制到剪贴板');
+      } catch (e) {
+        showToast('复制失败，请手动复制');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function copyPlain() { copyText(plainInput.value, '暂无明文可复制'); }
+    function copyName() { copyText(nameInput.value, '暂无暗号可复制'); }
+
+    var DEMO = 'magnet:?xt=urn:btih:24169F3EFB914074853F5C6346F4486726F56BDD';
+    function fillDemo() {
+      lastSource = 'plain';
+      plainInput.value = DEMO;
+      runEncode();
+      showToast('已填入示例并完成加密');
+    }
+
+    function clearAll() {
+      plainInput.value = '';
+      nameInput.value = '';
+      showError(plainError, '');
+      showError(nameError, '');
+      showTip('');
+      updateStats('', '');
+      plainInput.focus();
+    }
+
+    // Toast 提示
+    var toastTimer = null;
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // 渲染对照表
+    function renderGrid(elId, pairs) {
+      var el = document.getElementById(elId);
+      var html = '';
+      for (var i = 0; i < pairs.length; i++) {
+        html += '<div class="cell"><div class="name">' + pairs[i][0] + '</div><div class="code">' +
+          escapeHTML(pairs[i][1]) + '</div></div>';
+      }
+      el.innerHTML = html;
+    }
+
+    function escapeHTML(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function buildPairs(names, chars) {
+      var pairs = [];
+      for (var i = 0; i < chars.length; i++) pairs.push([names[i], chars[i]]);
+      return pairs;
+    }
+
+    renderGrid('map-digits', buildPairs(DIGIT_NAMES, '0123456789'));
+    renderGrid('map-lower', buildPairs(LOWER_NAMES, 'abcdefghijklmnopqrstuvwxyz'));
+    renderGrid('map-upper', buildPairs(UPPER_NAMES, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
+    renderGrid('map-symbol', SYMBOL_PAIRS);
+  </script>
+</body>
+
+</html>
