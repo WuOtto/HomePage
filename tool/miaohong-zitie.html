@@ -413,6 +413,7 @@
       margin: 0 auto 16px;
       box-shadow: 0 2px 10px var(--shadow);
       border: 1px solid #e0e0e0;
+      zoom: var(--fit, 1);
     }
 
     .page-head {
@@ -589,6 +590,7 @@
         margin: 0;
         border: none;
         box-shadow: none;
+        zoom: 1 !important;
         page-break-after: always;
         break-after: page;
       }
@@ -756,6 +758,7 @@
         <li>本工具所有格子都是<b>完整字形</b>（范字或描红），区别于「田字格笔顺字帖生成器」按笔顺逐笔累加的格子；两者一个练字形运笔、一个练笔顺。</li>
         <li>「渐变色描红」会让描红格从深到浅逐格变淡，适合从描写过渡到独立书写。</li>
         <li>点击「打印 / 保存 PDF」，在打印对话框中<b>勾选「背景图形」</b>，并选择 A4 纵向、无页眉页脚。</li>
+        <li>手机等窄屏上预览会<b>自动缩小到屏幕宽度</b>方便查看整页，打印输出仍为标准 A4 原始尺寸。</li>
         <li>字形数据来自开源项目 <code>makemeahanzi</code> / <code>hanzi-writer-data</code>，拼音数据来自 <code>jifei/Pinyin</code>，共收录 9500+ 汉字。</li>
         <li>极少数生僻字（或字形数据未能加载时）自动改用系统楷体渲染，范字与描红排布不受影响。</li>
       </ul>
@@ -1111,6 +1114,18 @@
         hintEl.textContent = '检测到以 file:// 方式打开，浏览器会拦截本地数据读取。请通过本地服务器访问，例如在项目根目录执行 python3 -m http.server 后打开 http://localhost:8000/tool/miaohong-zitie.html';
         hintEl.className = 'hint show';
       }
+
+      /* 窄屏（手机）时把 A4 预览整页缩放到容器宽度，免横向滚动；打印不受影响 */
+      function fitPreview() {
+        var avail = previewEl.clientWidth;
+        if (avail <= 0) return;
+        var pagePx = 180 / 25.4 * 96; /* 180mm ≈ 680px */
+        var z = pagePx > avail ? avail / pagePx : 1;
+        z = Math.max(0.3, Math.round(z * 100) / 100);
+        previewEl.style.setProperty('--fit', z);
+      }
+      fitPreview();
+      window.addEventListener('resize', fitPreview);
     })();
   </script>
 </body>
